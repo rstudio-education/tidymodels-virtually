@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Tidymodels, Virtually</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alison Hill" />
+    <meta name="date" content="2020-04-22" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <meta name="description" content="Tidymodels, Virtually"/>
+    <meta name="generator" content="xaringan and remark.js"/>
+    <meta name="github-repo" content="rstudio-education/virtual-tidymodels"/>
+    <meta name="twitter:title" content="Tidymodels, Virtually"/>
+    <meta name="twitter:description" content="Tidymodels, Virtually"/>
+    <meta name="twitter:url" content="TBD"/>
+    <meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/248553842/408a8d80-7363-11ea-96ae-d04b664002df"/>
+    <meta name="twitter:image:alt" content="The first slide features a flying machine"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="og:title" content="Tidymodels, Virtually"/>
+    <meta name="og:description" content="Tidymodels, Virtually"/>
+    <meta name="og:url" content="TBD"/>
+    <meta name="og:image" content="https://repository-images.githubusercontent.com/248553842/408a8d80-7363-11ea-96ae-d04b664002df"/>
+    <meta name="og:image:alt" content="The first slide features a flying machine"/>
+    <meta name="og:type" content="website"/>
+    <meta name="og:locale" content="en_US"/>
+    <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+layout: true
+
+&lt;a class="footer-link" href="TBD"&gt;TBD&lt;/a&gt;
+
+---
+
+class: title-slide, center, bottom
+
+# Tidymodels, Virtually
+
+## Virtual Workshop for CHOP
+
+### Alison Hill 
+
+
+---
+name: clouds
+class: center, middle
+background-image: url(images/Clouds.jpg)
+background-size: cover
+
+
+
+---
+template: clouds
+
+## .big-text[Hello.]
+
+???
+
+So hello- we're so happy you could join us today. 
+
+---
+name: clouds2
+background-image: url(images/Clouds2.jpg)
+background-size: cover
+
+---
+template: clouds2
+class: middle, center
+
+.pull-left[
+### Alison Hill 
+
+&lt;img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/&gt;
+
+[<i class="fab  fa-github "></i> @apreshill](https://github.com/apreshill)  
+[<i class="fab  fa-twitter "></i> @apreshill](https://twitter.com/apreshill)
+
+]
+
+???
+
+My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+
+--
+
+.pull-right[
+### Desirée De Leon  
+
+&lt;img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/desiree/avatar.jpg" width="150px"/&gt;
+
+[<i class="fab  fa-github "></i> @dcossyleon](https://github.com/dcossyleon)  
+[<i class="fab  fa-twitter "></i> @dcossyle](https://twitter.com/dcossyle)
+
+]
+
+???
+
+And I'm Desirée De Leon. I interned with Alison last summer at RStudio on the education team.
+
+---
+class: freight-slide, center, middle, inverse
+
+# .shadow-text[We ship a lot of websites.]
+
+???
+
+I am a developmental psychologist
+
+Desirée is a neuroscientist
+
+Neither of us is a web developer
+
+But we both ship a lot of websites for teaching data science.
+
+Here are just a few of them.
+
+
+---
+class: freight-slide, center, middle, inverse
+
+# .shadow-text[We ship a lot of websites.]
+
+http://bit.ly/giraffe-stats
+
+https://education.rstudio.com/
+
+https://bookdown.org/yihui/blogdown/
+
+https://stat545.com/
+
+https://conf20-intro-ml.netlify.com/
+
+https://summer-of-blogdown.netlify.com/
+
+https://apreshill.github.io/data-vis-labs-2018/
+
+
+???
+
+If you type the short link on the bottom right of this slide into your browser right now, you'll be able to follow along.
+
+All of these links are clickable from the slides.
+
+Each site was built using R Markdown, with different tools chosen depending on what we needed.
+
+---
+template: clouds
+
+# Who are you?
+
+???
+
+So that's us. Who are you?
+
+---
+background-image: url(images/tm-org.png)
+background-size: contain
+
+---
+
+# Block 1: Model
+
+9-9:50
+
+kind of whole game-ish
+
+packages: parsnip / rsample / yardstick
+
+concepts: modeling + predicting / splitting / metric
+
+models: lm
+
+data: continuous
+
+---
+
+# Block 2: Preprocess
+
+10-10:50
+
+packages: rsample / recipes / workflows
+
+concepts: splitting + strata / data leakage
+
+models: logistic regression
+
+
+---
+
+# Block 3: Resample
+
+11-11:50
+
+packages: rsample / tune
+
+concepts: cross-validation
+
+models: decision tree
+
+---
+
+# Block 4: Ensembles I
+
+12-12:50
+
+packages: baguette
+
+concepts: bootstrapping / aggregating --&gt; bagging
+
+models: bagging decision trees
+
+
+---
+class: inverse
+
+# Day Two
+
+---
+
+# Block 1: Ensembles II
+
+models: random forests
+
+# Block 2: Tune I
+
+package: tune / dials / vip 
+
+concepts: hyperparameters / grids / variable importance
+
+models: decision tree
+
+# Block 3: Tune II
+
+models: random forests / KNN?
+
+# Block 4: Case Study
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "solarized-light",
+"highlightLanguage": ["r", "css", "yaml"],
+"slideNumberFormat": "",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

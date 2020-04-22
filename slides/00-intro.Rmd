@@ -1,0 +1,251 @@
+---
+title: "Tidymodels, Virtually"
+subtitle: "Virtual Workshop for CHOP"
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      # autoplay: 5000
+      highlightStyle: solarized-light
+      highlightLanguage: ["r", "css", "yaml"]
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(collapse = TRUE,
+                      fig.retina = 3)
+library(tidymodels)
+```
+
+layout: true
+
+<a class="footer-link" href="TBD">TBD</a>
+
+---
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle`
+
+### `r rmarkdown::metadata$author` 
+
+
+---
+name: clouds
+class: center, middle
+background-image: url(images/Clouds.jpg)
+background-size: cover
+
+```{r meta, echo=FALSE}
+library(metathis)
+meta() %>%
+  meta_general(
+    description = "Tidymodels, Virtually",
+    generator = "xaringan and remark.js"
+  ) %>% 
+  meta_name("github-repo" = "rstudio-education/virtual-tidymodels") %>% 
+  meta_social(
+    title = "Tidymodels, Virtually",
+    url = "TBD",
+    image = "https://repository-images.githubusercontent.com/248553842/408a8d80-7363-11ea-96ae-d04b664002df",
+    image_alt = "The first slide features a flying machine",
+    og_type = "website",
+    twitter_card_type = "summary_large_image"
+  )
+```
+
+---
+template: clouds
+
+## .big-text[Hello.]
+
+???
+
+So hello- we're so happy you could join us today. 
+
+---
+name: clouds2
+background-image: url(images/Clouds2.jpg)
+background-size: cover
+
+---
+template: clouds2
+class: middle, center
+
+.pull-left[
+### Alison Hill 
+
+<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/>
+
+[`r icon::fa("github")` @apreshill](https://github.com/apreshill)  
+[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)
+
+]
+
+???
+
+My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+
+--
+
+.pull-right[
+### Desirée De Leon  
+
+<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/desiree/avatar.jpg" width="150px"/>
+
+[`r icon::fa("github")` @dcossyleon](https://github.com/dcossyleon)  
+[`r icon::fa("twitter")` @dcossyle](https://twitter.com/dcossyle)
+
+]
+
+???
+
+And I'm Desirée De Leon. I interned with Alison last summer at RStudio on the education team.
+
+---
+class: freight-slide, center, middle, inverse
+
+# .shadow-text[We ship a lot of websites.]
+
+???
+
+I am a developmental psychologist
+
+Desirée is a neuroscientist
+
+Neither of us is a web developer
+
+But we both ship a lot of websites for teaching data science.
+
+Here are just a few of them.
+
+
+---
+class: freight-slide, center, middle, inverse
+
+# .shadow-text[We ship a lot of websites.]
+
+http://bit.ly/giraffe-stats
+
+https://education.rstudio.com/
+
+https://bookdown.org/yihui/blogdown/
+
+https://stat545.com/
+
+https://conf20-intro-ml.netlify.com/
+
+https://summer-of-blogdown.netlify.com/
+
+https://apreshill.github.io/data-vis-labs-2018/
+
+
+???
+
+If you type the short link on the bottom right of this slide into your browser right now, you'll be able to follow along.
+
+All of these links are clickable from the slides.
+
+Each site was built using R Markdown, with different tools chosen depending on what we needed.
+
+---
+template: clouds
+
+# Who are you?
+
+???
+
+So that's us. Who are you?
+
+---
+background-image: url(images/tm-org.png)
+background-size: contain
+
+---
+
+# Block 1: Model
+
+9-9:50
+
+kind of whole game-ish
+
+packages: parsnip / rsample / yardstick
+
+concepts: modeling + predicting / splitting + strata / metric
+
+models: lm
+
+data: continuous
+
+---
+
+# Block 2: Preprocess
+
+10-10:50
+
+packages: rsample / recipes / workflows
+
+concepts: splitting + strata / data leakage
+
+models: logistic regression
+
+
+---
+
+# Block 3: Resample
+
+11-11:50
+
+packages: rsample / tune
+
+concepts: cross-validation + strata
+
+models: decision tree
+
+---
+
+# Block 4: Ensembles I
+
+12-12:50
+
+packages: baguette
+
+concepts: bootstrapping / aggregating --> bagging
+
+models: bagging decision trees
+
+
+---
+class: inverse
+
+# Day Two
+
+---
+
+# Block 1: Ensembles II
+
+models: random forests
+
+# Block 2: Tune I
+
+package: tune / dials / vip 
+
+concepts: hyperparameters / grids / variable importance
+
+models: decision tree
+
+# Block 3: Tune II
+
+models: random forests / KNN?
+
+# Block 4: Case Study

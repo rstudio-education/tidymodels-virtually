@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Predictive Modeling</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alison Hill" />
+    <meta name="date" content="2020-04-22" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+layout: true
+
+&lt;a class="footer-link" href="TBD"&gt;TBD&lt;/a&gt;
+
+---
+
+class: title-slide, center, bottom
+
+# Predictive Modeling
+
+## Tidymodels, Virtually: 1
+
+### Alison Hill 
+
+
+---
+name: clouds
+class: center, middle
+background-image: url(images/Clouds.jpg)
+background-size: cover
+
+---
+name: clouds2
+background-image: url(images/Clouds2.jpg)
+background-size: cover
+
+---
+template: clouds2
+class: middle, center
+
+
+### Alison Hill 
+
+&lt;img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/&gt;
+
+[<i class="fab  fa-github "></i> @apreshill](https://github.com/apreshill)  
+[<i class="fab  fa-twitter "></i> @apreshill](https://twitter.com/apreshill)
+
+
+
+???
+
+My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+
+
+---
+class: middle, center, frame
+
+# Goal of Predictive Modeling
+
+--
+
+
+## 🔨 build .display[models] that
+
+--
+
+
+## 🎯 generate .display[accurate predictions]
+
+--
+
+
+## 🔮 for .display[future, yet-to-be-seen data]
+
+
+
+--
+
+.footnote[Max Kuhn &amp; Kjell Johnston, http://www.feat.engineering/]
+
+
+???
+
+This is our whole game vision for today. This is the main goal for predictive modeling broadly, and for machine learning specifically.
+
+We'll use this goal to drive learning of 3 core tidymodels packages:
+
+- parsnip
+- yardstick
+- and rsample
+
+---
+class: inverse, middle, center
+
+# 🔨 Build models 
+
+--
+
+## with parsnip
+
+
+???
+
+Enter the parsnip package
+
+---
+exclude: true
+name: predictions
+class: middle, center, frame
+
+# Goal of Predictive Modeling
+
+## 🔮 generate accurate .display[predictions]
+
+---
+class: middle
+
+# .center[`lm()`]
+
+
+
+```r
+lm_ames &lt;- lm(Sale_Price ~ Gr_Liv_Area, data = ames)
+lm_ames
+&gt; 
+&gt; Call:
+&gt; lm(formula = Sale_Price ~ Gr_Liv_Area, data = ames)
+&gt; 
+&gt; Coefficients:
+&gt; (Intercept)  Gr_Liv_Area  
+&gt;     13289.6        111.7
+```
+
+
+???
+
+So let's start with prediction. To predict, we have to have two things: a model to generate predictions, and data to predict
+
+This type of formula interface may look familiar
+
+How would we use parsnip to build this kind of linear regression model?
+
+---
+exclude: true
+name: step1
+background-image: url("images/predicting/predicting.001.jpeg")
+background-size: contain
+
+---
+class: middle, frame
+
+
+# .center[To specify a model with parsnip]
+
+.right-column[
+
+1\. Pick a .display[model]
+
+2\. Set the .display[engine]
+
+3\. Set the .display[mode] (if needed)
+
+]
+
+---
+class: middle, frame
+
+# .center[To specify a model with parsnip]
+
+
+
+
+```r
+decision_tree() %&gt;%
+  set_engine("C5.0") %&gt;%
+  set_mode("classification")
+```
+
+
+
+
+---
+class: middle, frame
+
+# .center[To specify a model with parsnip]
+
+
+
+```r
+nearest_neighbor() %&gt;%              
+  set_engine("kknn") %&gt;%             
+  set_mode("regression") %&gt;%        
+```
+
+
+
+---
+class: middle, frame
+
+.fade[
+# .center[To specify a model with parsnip]
+]
+
+
+.right-column[
+
+1\. Pick a .display[model]
+.fade[
+2\. Set the .display[engine]
+
+3\. Set the .display[mode] (if needed)
+]
+
+]
+
+---
+class: middle, center
+
+# 1\. Pick a .display[model] 
+
+All available models are listed at
+
+&lt;https://tidymodels.github.io/parsnip/articles/articles/Models.html&gt;
+
+&lt;iframe src="https://tidymodels.github.io/parsnip/articles/articles/Models.html" width="504" height="400px"&gt;&lt;/iframe&gt;
+
+---
+class: middle
+
+.center[
+# `linear_reg()`
+
+Specifies a model that uses linear regression
+]
+
+
+```r
+linear_reg(mode = "regression", penalty = NULL, mixture = NULL)
+```
+
+---
+class: middle
+
+.center[
+# `linear_reg()`
+
+Specifies a model that uses linear regression
+]
+
+
+```r
+linear_reg(
+  mode = "regression", # "default" mode, if exists
+  penalty = NULL,      # model hyper-parameter
+  mixture = NULL       # model hyper-parameter
+  )
+```
+
+---
+class: middle, frame
+
+.fade[
+# .center[To specify a model with parsnip]
+]
+
+
+.right-column[
+.fade[
+1\. Pick a .display[model]
+]
+
+2\. Set the .display[engine]
+
+.fade[
+3\. Set the .display[mode] (if needed)
+]
+
+]
+
+---
+class: middle, center
+
+
+# `set_engine()`
+
+Adds an engine to power or implement the model.
+
+
+
+```r
+lm_spec %&gt;% set_engine(engine = "lm", ...)
+```
+
+---
+class: middle, frame
+
+.fade[
+# .center[To specify a model with parsnip]
+]
+
+
+.right-column[
+.fade[
+1\. Pick a .display[model]
+
+2\. Set the .display[engine]
+]
+
+3\. Set the .display[mode] (if needed)
+
+
+]
+
+---
+class: middle, center
+
+
+# `set_mode()`
+
+Sets the class of problem the model will solve, which influences which output is collected. Not necessary if mode is set in Step 1.
+
+
+
+```r
+lm_spec %&gt;% set_mode(mode = "regression")
+```
+
+---
+class: your-turn
+
+# Your turn 1
+
+Write a pipe that creates a model that uses `lm()` to fit a linear regression. Save it as `lm_spec` and look at the object. What does it return?
+
+
+*Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
+
+
+<div class="countdown" id="timer_5ea0c2a0" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+
+```r
+lm_spec &lt;- 
+   linear_reg() %&gt;%          # model type
+   set_engine(engine = "lm") # engine
+
+lm_spec
+&gt; Linear Regression Model Specification (regression)
+&gt; 
+&gt; Computational engine: lm
+```
+
+---
+class: middle, center
+
+# `fit()`
+
+Train a model by fitting a model. Returns a parsnip model fit.
+
+
+```r
+fit(lm_spec, Sale_Price ~ Gr_Liv_Area, data = ames)
+```
+
+---
+class: middle
+
+.center[
+# `fit()`
+
+Train a model by fitting a model. Returns a parsnip model fit.
+]
+
+
+```r
+fit(
+  lm_spec,                  # parsnip model
+  Sale_Price ~ Gr_Liv_Area, # a formula
+  data = ames               # dataframe
+  )
+```
+
+---
+class: your-turn
+
+# Your turn 2
+
+Double check. Does
+
+
+```r
+lm_fit &lt;- 
+  lm_spec %&gt;% 
+  fit(Sale_Price ~ Gr_Liv_Area, 
+      data = ames)
+lm_fit
+```
+
+give the same results as
+
+
+```r
+lm(Sale_Price ~ Gr_Liv_Area, data = ames)
+```
+
+<div class="countdown" id="timer_5ea0c4cd" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+```r
+lm(Sale_Price ~ Gr_Liv_Area, data = ames)
+&gt; 
+&gt; Call:
+&gt; lm(formula = Sale_Price ~ Gr_Liv_Area, data = ames)
+&gt; 
+&gt; Coefficients:
+&gt; (Intercept)  Gr_Liv_Area  
+&gt;     13289.6        111.7
+```
+
+---
+
+```r
+lm_fit
+&gt; parsnip model object
+&gt; 
+&gt; Fit time:  2ms 
+&gt; 
+&gt; Call:
+&gt; stats::lm(formula = formula, data = data)
+&gt; 
+&gt; Coefficients:
+&gt; (Intercept)  Gr_Liv_Area  
+&gt;     13289.6        111.7
+```
+
+---
+name: handout
+class: center, middle
+
+data `(x, y)` + model = fitted model
+
+---
+class: center, middle
+
+# Show of hands
+
+How many people have used a fitted model to generate .display[predictions] with R?
+
+---
+template: step1
+
+---
+name: step2
+background-image: url("images/predicting/predicting.003.jpeg")
+background-size: contain
+
+---
+class: middle, center
+
+# `predict()`
+
+Use a fitted model to predict new `y` values from data. Returns a tibble.
+
+
+```r
+predict(lm_fit, new_data = ames) 
+```
+
+
+---
+
+
+```r
+lm_fit %&gt;% 
+  predict(new_data = ames)
+&gt; # A tibble: 2,930 x 1
+&gt;      .pred
+&gt;      &lt;dbl&gt;
+&gt;  1 198255.
+&gt;  2 113367.
+&gt;  3 161731.
+&gt;  4 248964.
+&gt;  5 195239.
+&gt;  6 192447.
+&gt;  7 162736.
+&gt;  8 156258.
+&gt;  9 193787.
+&gt; 10 214786.
+&gt; # … with 2,920 more rows
+```
+
+---
+name: lm-predict
+class: middle, center
+
+# Predictions
+
+&lt;img src="figs/01-predicting/lm-predict-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+class: your-turn
+
+# Your turn 3
+
+Fill in the blanks. Use `predict()` to
+
+1. Use your linear model to predict sale prices; save the tibble as `price_pred`  
+1. Add a pipe and use `mutate()` to add a column with the observed sale prices; name it `truth`
+
+*Hint: Be sure to remove every `_` before running the code!*
+
+<div class="countdown" id="timer_5ea0c2bf" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+```r
+lm_fit &lt;- 
+  lm_spec %&gt;% 
+  fit(Sale_Price ~ Gr_Liv_Area, 
+      data = ames)
+
+price_pred &lt;- 
+  lm_fit %&gt;% 
+  predict(new_data = ames) %&gt;% 
+  mutate(truth = ames$Sale_Price)
+
+price_pred
+&gt; # A tibble: 2,930 x 2
+&gt;      .pred  truth
+&gt;      &lt;dbl&gt;  &lt;int&gt;
+&gt;  1 198255. 215000
+&gt;  2 113367. 105000
+&gt;  3 161731. 172000
+&gt;  4 248964. 244000
+&gt;  5 195239. 189900
+&gt;  6 192447. 195500
+&gt;  7 162736. 213500
+&gt;  8 156258. 191500
+&gt;  9 193787. 236500
+&gt; 10 214786. 189000
+&gt; # … with 2,920 more rows
+```
+
+---
+template: handout
+
+--
+
+data `(x)` + fitted model = predictions
+
+---
+template: predictions
+
+---
+name: accurate-predictions
+class: middle, center, frame
+
+# Goal of Machine Learning
+
+## 🎯 generate .display[accurate predictions]
+
+???
+
+Now we have predictions from our model. What can we do with them? If we already know the truth, that is, the outcome variable that was observed, we can compare them!
+
+---
+class: middle, center, frame
+
+# Axiom
+
+Better Model = Better Predictions (Lower error rate)
+
+---
+template: lm-predict
+
+---
+class: middle, center
+
+# Residuals
+
+&lt;img src="figs/01-predicting/lm-resid-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+class: middle, center
+
+# RMSE
+
+Root Mean Squared Error - The standard deviation of the residuals about zero.
+
+$$ \sqrt{\frac{1}{n} \sum_{i=1}^n (\hat{y}_i - {y}_i)^2 }$$ 
+
+---
+class: middle, center
+
+# `rmse()*`
+
+Calculates the RMSE based on two columns in a dataframe: 
+
+The .display[truth]: `\({y}_i\)` 
+
+The predicted .display[estimate]: `\(\hat{y}_i\)` 
+
+
+```r
+rmse(data, truth, estimate)
+```
+
+
+.footnote[`*` from `yardstick`]
+
+---
+
+
+```r
+lm_fit &lt;- 
+  lm_spec %&gt;% 
+  fit(Sale_Price ~ Gr_Liv_Area, 
+      data = ames)
+
+price_pred &lt;- 
+  lm_fit %&gt;% 
+  predict(new_data = ames) %&gt;% 
+  mutate(price_truth = ames$Sale_Price)
+
+price_pred %&gt;% 
+* rmse(truth = price_truth, estimate = .pred)
+&gt; # A tibble: 1 x 3
+&gt;   .metric .estimator .estimate
+&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+&gt; 1 rmse    standard      56505.
+```
+
+
+
+---
+template: step1
+
+---
+template: step2
+
+---
+name: step3
+background-image: url("images/predicting/predicting.004.jpeg")
+background-size: contain
+
+---
+template: handout
+
+--
+
+data `(x)` + fitted model = predictions
+
+--
+
+data `(y)` + predictions = metrics
+
+---
+class: middle, center, inverse
+
+# A model doesn't have to be a straight line!
+
+---
+exclude: true
+
+
+
+
+
+```r
+rt_spec &lt;- 
+  decision_tree() %&gt;%          
+  set_engine(engine = "rpart") %&gt;% 
+  set_mode("regression")
+
+rt_fit     &lt;- rt_spec %&gt;% 
+              fit(Sale_Price ~ Gr_Liv_Area, 
+                  data = ames)
+
+price_pred &lt;- rt_fit %&gt;% 
+              predict(new_data = ames) %&gt;% 
+              mutate(price_truth = ames$Sale_Price)
+
+rmse(price_pred, truth = price_truth, estimate = .pred)
+```
+
+---
+class: middle, center
+
+&lt;img src="figs/01-predicting/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle, center
+
+&lt;img src="figs/01-predicting/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: middle, inverse, center
+
+# Do you trust it?
+
+
+
+---
+class: middle, inverse, center
+
+# Overfitting
+
+---
+
+
+
+&lt;img src="figs/01-predicting/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-30-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+
+
+
+.pull-left[
+
+&lt;img src="figs/01-predicting/unnamed-chunk-32-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+&lt;img src="figs/01-predicting/unnamed-chunk-33-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+class: your-turn
+
+# Your turn 4
+
+.pull-left[
+In your teams, decide which model:
+
+1. Has the smallest residuals  
+2. Will have lower prediction error. Why?  
+]
+
+.pull-right[
+&lt;img src="figs/01-predicting/unnamed-chunk-34-1.png" width="50%" style="display: block; margin: auto;" /&gt;&lt;img src="figs/01-predicting/unnamed-chunk-34-2.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+]
+
+<div class="countdown" id="timer_5ea0c2c7" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">30</span></code>
+</div>
+
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-36-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-37-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: middle, center, frame
+
+# Axiom 1
+
+The best way to measure a model's performance at predicting new data is to .display[predict new data].
+
+---
+class: middle, center, frame
+
+# Goal of Machine Learning
+
+--
+
+
+## 🔨 build .display[models] that
+
+--
+
+
+## 🎯 generate .display[accurate predictions]
+
+--
+
+
+## 🔮 for .display[future, yet-to-be-seen data]
+
+
+
+--
+
+.footnote[Max Kuhn &amp; Kjell Johnston, http://www.feat.engineering/]
+
+
+???
+
+But need new data...
+
+
+---
+class: middle, center, frame
+
+# Method #1
+
+## Data splitting
+
+---
+class: middle, center
+
+&lt;img src="figs/01-predicting/all-split-1.png" width="864" style="display: block; margin: auto;" /&gt;
+
+???
+
+
+We refer to the group for which we know the outcome, and use to develop the algorithm, as the training set. We refer to the group for which we pretend we don’t know the outcome as the test set.
+
+---
+class: center
+
+# `initial_split()`
+
+"Splits" data randomly into a single testing and a single training set.
+
+
+```r
+initial_split(data, prop = 3/4)
+```
+
+
+---
+
+
+```r
+ames_split &lt;- initial_split(ames, prop = 0.75)
+ames_split
+&gt; &lt;Training/Validation/Total&gt;
+&gt; &lt;2198/732/2930&gt;
+```
+
+???
+
+data splitting
+
+---
+class: center
+
+# `training()` and `testing()`
+
+Extract training and testing sets from an rsplit
+
+
+```r
+training(ames_split)
+testing(ames_split)
+```
+
+---
+
+```r
+train_set &lt;- training(ames_split) 
+train_set
+&gt; # A tibble: 2,198 x 81
+&gt;    MS_SubClass MS_Zoning Lot_Frontage Lot_Area Street Alley
+&gt;    &lt;fct&gt;       &lt;fct&gt;            &lt;dbl&gt;    &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;
+&gt;  1 One_Story_… Resident…          141    31770 Pave   No_A…
+&gt;  2 One_Story_… Resident…           80    11622 Pave   No_A…
+&gt;  3 One_Story_… Resident…           81    14267 Pave   No_A…
+&gt;  4 One_Story_… Resident…           93    11160 Pave   No_A…
+&gt;  5 Two_Story_… Resident…           74    13830 Pave   No_A…
+&gt;  6 Two_Story_… Resident…           78     9978 Pave   No_A…
+&gt;  7 One_Story_… Resident…           41     4920 Pave   No_A…
+&gt;  8 One_Story_… Resident…           43     5005 Pave   No_A…
+&gt;  9 One_Story_… Resident…           39     5389 Pave   No_A…
+&gt; 10 Two_Story_… Resident…           60     7500 Pave   No_A…
+&gt; # … with 2,188 more rows, and 75 more variables:
+&gt; #   Lot_Shape &lt;fct&gt;, Land_Contour &lt;fct&gt;, Utilities &lt;fct&gt;,
+&gt; #   Lot_Config &lt;fct&gt;, Land_Slope &lt;fct&gt;, …
+```
+
+
+---
+class: middle, center
+
+# Quiz
+
+Now that we have training and testing sets...
+
+--
+
+Which dataset do you think we use for .display[fitting]?
+
+--
+
+Which do we use for .display[predicting]?
+
+---
+template: step1
+
+---
+template: step2
+
+---
+template: step3
+background-image: url("images/predicting/predicting.004.jpeg")
+background-size: contain
+
+---
+name: holdout-step1
+background-image: url("images/predicting/predicting.005.jpeg")
+background-size: contain
+
+---
+name: holdout-step2
+background-image: url("images/predicting/predicting.006.jpeg")
+background-size: contain
+
+---
+name: holdout-step3
+background-image: url("images/predicting/predicting.007.jpeg")
+background-size: contain
+
+---
+name: holdout-step4
+background-image: url("images/predicting/predicting.008.jpeg")
+background-size: contain
+
+---
+name: holdout
+background-image: url("images/predicting/predicting.009.jpeg")
+background-size: contain
+
+---
+class: your-turn
+
+# Your turn 5
+
+Fill in the blanks. 
+
+Use `initial_split()`, `training()`, `testing()`, `lm()` and `rmse()` to:
+
+1. Split **ames** into training and test sets. Save the rsplit!
+
+1. Extract the training data. Fit a linear model to it. Save the model!
+
+1. Measure the RMSE of your linear model with your test set.  
+
+Keep `set.seed(100)` at the start of your code.
+
+<div class="countdown" id="timer_5ea0c40f" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+```r
+set.seed(100) # Important!
+
+ames_split  &lt;- initial_split(ames)
+ames_train  &lt;- training(ames_split)
+ames_test   &lt;- testing(ames_split)
+
+lm_fit      &lt;- lm_spec %&gt;% 
+               fit(Sale_Price ~ Gr_Liv_Area, 
+                   data = ames_train)
+
+price_pred  &lt;- lm_fit %&gt;% 
+               predict(new_data = ames_test) %&gt;% 
+               mutate(price_truth = ames_test$Sale_Price)
+
+rmse(price_pred, truth = price_truth, estimate = .pred)
+```
+
+
+
+RMSE = 53884.78; compare to 56504.88
+
+---
+class: middle, center
+
+.pull-left[
+
+### Training RMSE = 57367.26
+&lt;img src="figs/01-predicting/unnamed-chunk-45-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+--
+
+.pull-right[
+
+### Testing RMSE = 53884.78
+&lt;img src="figs/01-predicting/lm-test-resid-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+name: holdout-handout
+class: center, middle
+
+old data `(x, y)` + model = fitted model
+
+--
+
+new data `(x)` + fitted model = predictions
+
+--
+
+new data `(y)` + predictions = metrics
+
+---
+class: middle, center
+
+# Quiz
+
+How much data should you set aside for testing?
+
+--
+
+If .display[testing set] is small, 
+performance metrics may be unreliable
+
+--
+
+If .display[training set] is small, model fit may be poor
+
+---
+class: middle, center, inverse
+
+# Stratified sampling
+
+
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-47-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-48-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-49-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-50-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-51-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="figs/01-predicting/unnamed-chunk-52-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="figs/01-predicting/unnamed-chunk-53-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-54-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-55-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-predicting/unnamed-chunk-56-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+
+```r
+set.seed(100) # Important!
+
+ames_split  &lt;- initial_split(ames, 
+*                            strata = Sale_Price,
+*                            breaks = 4)
+ames_train  &lt;- training(ames_split)
+ames_test   &lt;- testing(ames_split)
+
+lm_fit      &lt;- lm_spec %&gt;% 
+               fit(Sale_Price ~ Gr_Liv_Area, 
+                   data = ames_train)
+
+price_pred  &lt;- lm_fit %&gt;% 
+               predict(new_data = ames_test) %&gt;% 
+               mutate(price_truth = ames_test$Sale_Price)
+
+rmse(price_pred, truth = price_truth, estimate = .pred)
+```
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLanguage": "r",
+"highlightStyle": "xcode",
+"slideNumberFormat": "",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
