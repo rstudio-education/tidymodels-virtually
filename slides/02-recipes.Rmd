@@ -1,0 +1,890 @@
+---
+title: "Preprocess your data"
+subtitle: "Tidymodels, Virtually"
+session: 01
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(comment = ">",
+                      message = FALSE,
+                      warning = FALSE, 
+                      collapse = TRUE,
+                      fig.retina = 3,
+                      fig.align = 'center',
+                      fig.path = "figs/01-predicting/",
+                      R.options = list(tibble.max_extra_cols=5, 
+                                       tibble.print_max=5, 
+                                       tibble.width=60))
+options("scipen" = 16)
+library(tidymodels)
+yt_counter <- 0
+```
+
+```{r packages, include=FALSE}
+library(countdown)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(scico)
+library(gganimate)
+library(AmesHousing)
+library(tune)
+library(viridis)
+ames <- make_ames()
+theme_set(theme_minimal())
+
+set.seed(100) # Important!
+ames_split  <- initial_split(ames)
+ames_train  <- training(ames_split)
+ames_test   <- testing(ames_split)
+
+lm_spec <- 
+  linear_reg() %>% 
+  set_engine("lm") %>% 
+  set_mode("regression")
+
+# for figures
+not_col <- scico(1, palette = "acton", begin = .6)
+uni_col <- scico(1, palette = "acton", begin = 0)
+train_color <- viridis(1, option="magma", begin = .4)
+test_color  <- viridis(1, option="magma", begin = .7)
+data_color  <- viridis(1, option="magma", begin = .1)
+assess_color <- viridis(1, option="magma", begin = 1)
+splits_pal <- c(data_color, train_color, test_color)
+```
+
+
+layout: true
+
+<a class="footer-link" href="TBD">TBD</a>
+
+---
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle`: `r rmarkdown::metadata$session`
+
+### `r rmarkdown::metadata$author` 
+
+
+---
+name: clouds
+class: center, middle
+background-image: url(images/Clouds.jpg)
+background-size: cover
+
+---
+name: clouds2
+background-image: url(images/Clouds2.jpg)
+background-size: cover
+
+---
+template: clouds2
+class: middle, center
+
+
+### Alison Hill 
+
+<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/>
+
+[`r icon::fa("github")` @apreshill](https://github.com/apreshill)  
+[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)
+
+
+
+???
+
+My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+
+
+---
+class: middle, center, frame
+
+# Goal of Predictive Modeling
+
+--
+
+
+## `r emo::ji("hammer")` build .display[models] that
+
+--
+
+
+## `r emo::ji("target")` generate .display[accurate predictions]
+
+--
+
+
+## `r emo::ji("crystal_ball")` for .display[future, yet-to-be-seen data]
+
+
+
+--
+
+.footnote[Max Kuhn & Kjell Johnston, http://www.feat.engineering/]
+
+
+???
+
+This is our whole game vision for today. This is the main goal for predictive modeling broadly, and for machine learning specifically.
+
+We'll use this goal to drive learning of 3 core tidymodels packages:
+
+- parsnip
+- yardstick
+- and rsample
+
+---
+class: inverse, middle, center
+
+# `r emo::ji("stew")` Build a recipe
+
+---
+class: middle, center, frame
+
+# Recipes
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/recipes/")
+```
+
+---
+background-image: url(images/workflows/workflows.013.jpeg)
+background-size: contain
+background-position: center
+
+---
+background-image: url(images/recipe-hex/recipe-hex.001.jpeg)
+background-size: contain
+background-position: center
+
+---
+background-image: url(images/recipe-hex/recipe-hex.002.jpeg)
+background-size: contain
+background-position: center
+
+---
+background-image: url(images/recipe-hex/recipe-hex.003.jpeg)
+background-size: contain
+background-position: center
+
+---
+background-image: url(images/recipe-hex/recipe-hex.004.jpeg)
+background-size: contain
+background-position: center
+
+---
+background-image: url(images/recipe-hex/recipe-hex.005.jpeg)
+background-size: contain
+background-position: center
+
+---
+background-image: url(images/recipe-hex/recipe-hex.006.jpeg)
+background-size: contain
+background-position: center
+
+---
+class: middle, center
+
+# Quiz
+
+What is multicollinearity?
+
+--
+
+When multiple predictors are strongly correlated. It can impair linear models.
+
+---
+class: middle, center
+
+# Principle Components Analysis
+
+Transforms variables into the orthogonal "components" that most concisely capture all of the variation.
+
+```{r include=FALSE}
+uni_train <- iris %>% 
+  janitor::clean_names() %>% 
+  mutate(unicorn = as.factor(if_else(species == "versicolor", 1, 0))) %>% 
+  mutate_at(vars(starts_with("sepal")), .funs = ~(.*10)) %>% 
+  select(n_butterflies = sepal_width, n_kittens = sepal_length, unicorn)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, out.width='38%'}
+library(ggfortify)
+df <- uni_train[c(1, 2)]
+autoplot(prcomp(df), data = uni_train, size = 4, alpha = .8, colour = 'unicorn',
+         loadings = TRUE, loadings.colour = 'dodgerblue',
+         loadings.label = TRUE, loadings.label.size = 8,
+         loadings.label.colour = "dodgerblue",
+         loadings.label.family = "Karla",
+         loadings.label.repel = TRUE) +
+  scale_colour_manual(values = c(not_col, uni_col), guide = FALSE) +
+  theme(text = element_text(family = "Amatic SC", size = 40))
+```
+
+---
+class: middle, center, frame
+
+# Goal
+
+To fit a linear model to the main Principal Components of the ames data
+
+
+---
+class: middle, center, frame
+
+# To build a recipe
+
+1\. Start the `recipe()`
+
+2\. Define the .display[variables] involved
+
+3\. Describe **prep**rocessing .display[step-by-step]
+
+---
+class: middle, center
+
+# `recipe()`
+
+Creates a recipe for a set of variables
+
+```{r eval=FALSE}
+recipe(Sale_Price ~ ., data = ames)
+```
+
+---
+class: middle
+
+# .center[`step_*()`]
+
+.center[Adds a single transformation to a recipe. 
+Transformations are replayed in order when the recipe is run on data.]
+
+```{r eval=FALSE}
+rec %>% 
+  step_novel(all_nominal()) %>%
+  step_zv(all_predictors())
+```
+
+---
+class: middle, center
+
+# .center[`step_*()`]
+
+Complete list at:
+<https://tidymodels.github.io/recipes/reference/index.html>
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/recipes/reference/index.html")
+```
+
+---
+class: middle
+
+# .center[selectors]
+
+Helper functions for selecting sets of variables
+
+```{r eval=FALSE}
+rec %>% 
+  step_novel(all_nominal()) %>%
+  step_zv(all_predictors())
+```
+
+---
+class: middle
+
+```{r include=FALSE}
+all <- tribble(
+  ~ selector, ~ description,
+  "`all_predictors()`", "Each x variable  (right side of ~)",
+  "`all_outcomes()`", "Each y variable  (left side of ~)",
+  "`all_numeric()`", "Each numeric variable",
+  "`all_nominal()`", "Each categorical variable (e.g. factor, string)",
+  "`dplyr::select()` helpers", "`starts_with('Lot_')`, etc."
+)
+```
+
+```{r echo=FALSE, out.width='80%'}
+library(gt)
+gt(all)  %>%
+  fmt_markdown(columns = TRUE) %>%
+  tab_options(
+    table.width = pct(10),
+    table.font.size = "200px"
+  )
+```
+
+---
+class: middle
+
+# .center[Combining selectors]
+
+Use commas to separate
+
+```{r eval=FALSE}
+rec %>% 
+  step_novel(all_nominal(), -all_outcomes()) %>% #<<
+  step_zv(all_predictors())
+```
+
+
+
+---
+class: middle
+
+.center[
+# Quiz
+
+How does recipes know what is a **predictor** and what is an **outcome**?
+]
+--
+
+```{r eval=FALSE}
+rec <-
+  recipe(Sale_Price ~ ., #<<
+         data = ames)
+```
+
+--
+
+.center[The .display[formula] `r emo::ji("right_arrow")` *indicates outcomes vs predictors*]
+
+---
+class: middle
+
+.center[
+# Quiz
+
+How does recipes know what is **numeric** and what is **nominal**?
+]
+
+--
+
+```{r eval=FALSE}
+rec <- 
+  recipe(Sale_Price ~ ., 
+         data = ames) #<<
+```
+
+--
+
+.center[The .display[data] `r emo::ji("right_arrow")` *is only used to catalog the names and types of each variable*]
+
+---
+class: middle, center
+
+# Quiz
+
+PCA requires variables to be **centered** and **scaled**. What does that mean?
+
+---
+background-image: url(images/pca/pca.001.jpeg)
+background-size: contain
+
+---
+class: middle
+
+.center[
+# `step_center()`
+
+Centers numeric variables by subtracting the mean
+
+]
+
+```{r eval=FALSE}
+rec <- 
+  recipe(Sale_Price ~ ., 
+         data = ames) %>% 
+  step_center(all_numeric()) #<<
+```
+
+---
+class: middle
+
+.center[
+# `step_scale()`
+
+Scales numeric variables by dividing by the standard deviation
+
+]
+
+```{r results='hide'}
+rec <- 
+  recipe(Sale_Price ~ ., 
+         data = ames) %>% 
+  step_center(all_numeric()) %>% 
+  step_scale(all_numeric()) #<<
+```
+
+---
+class: middle, center
+
+# Quiz
+
+Why do you need to "train" a recipe?
+
+--
+
+Imagine "scaling" a new data point. What do you subtract from it? 
+What do you divide it by?
+
+---
+background-image: url(images/pca/pca.002.jpeg)
+background-size: contain
+
+---
+background-image: url(images/pca/pca.003.jpeg)
+background-size: contain
+
+---
+background-image: url(images/pca/pca.004.jpeg)
+background-size: contain
+
+---
+background-image: url(images/pca/pca.005.jpeg)
+background-size: contain
+
+---
+class: middle
+
+.center[
+# `prep()` and `bake()`
+
+"trains" a recipe and then transforms data with the prepped recipe
+]
+
+```{r results='hide'}
+rec %>% 
+  prep(training = ames_train) %>%
+  bake(new_data = ames_test) # or ames_train
+```
+
+--
+
+.footnote[.display[You don't need to do this!
+The fit functions do 
+it for you]]
+
+
+---
+background-image: url(images/recipes.png)
+background-size: cover
+
+---
+
+```{r include=FALSE}
+rec <- 
+  recipe(Sale_Price ~ ., 
+         data = ames) %>% 
+  step_center(all_numeric()) %>% 
+  step_scale(all_numeric()) 
+```
+
+```{r}
+rec %>% 
+  prep(ames_train) %>%
+  bake(ames_test) 
+```
+
+
+
+---
+
+.center[
+
+# Quiz
+]
+
+.left-column[
+```{r echo=FALSE, comment = NA}
+ames %>%
+  distinct(Roof_Style)
+```
+]
+
+.right-column[
+```{r echo=FALSE, comment = NA}
+ames %>% 
+  select(Roof_Style) %>% 
+  mutate(val = 1, home = dplyr::row_number()) %>% 
+  pivot_wider(id_col = home, 
+              names_from = Roof_Style, 
+              values_from = val, 
+              values_fill = list(val = 0)) %>% 
+  select(-home)
+```
+
+]
+
+---
+class: middle, center
+
+# Dummy Variables
+
+```{r results='hide'}
+lm(Sale_Price ~ Roof_Style, data = ames)
+```
+
+```{r echo=FALSE}
+lm(Sale_Price ~ Roof_Style, data = ames) %>% 
+  broom::tidy()
+```
+
+---
+class: middle
+
+.center[
+# `step_dummy()`
+
+Converts nominal data into dummy variables
+which, numeric, are suitable for linear algebra.
+
+]
+
+```{r results='hide'}
+rec %>% 
+  step_dummy(all_nominal()) #<<
+```
+
+.footnote[You *don't* need this for decision trees or ensembles of trees]
+
+---
+class: middle, center
+
+# Quiz
+
+Let's think about the modeling. 
+
+What if there were no homes with shed roofs in the training data?
+
+--
+
+Will the model have a coefficient for shed roof?
+
+--
+
+.display[No]
+
+--
+
+What will happen if the test data has a home with a shed roof?
+
+--
+
+.display[Error!]
+
+---
+class: middle
+
+.center[
+# `step_novel()`
+
+Adds a catch-all level to a factor for any new values, 
+which lets R intelligently predict new levels in the test set.
+
+]
+
+```{r results='hide'}
+rec %>% 
+  step_novel(all_nominal()) %>% #<<
+  step_dummy(all_nominal()) 
+```
+
+.footnote[Use *before* `step_dummy()` so new level is dummified]
+
+---
+class: middle, center
+
+# Quiz
+
+What would happen if you try to scale a variable that doesn't vary?
+
+--
+
+Error! You'd be dividing by zero!
+
+---
+class: middle
+
+.center[
+# `step_zv()`
+
+Intelligently handles zero variance variables 
+(variables that contain only a single value)
+
+]
+
+
+```{r results='hide'}
+rec %>% 
+  step_novel(all_nominal()) %>%
+  step_dummy(all_nominal()) %>%
+  step_zv(all_predictors()) #<<
+```
+
+
+---
+class: middle, center
+
+# Quiz
+
+What step function would do PCA?
+
+--
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/recipes/reference/step_pca.html")
+```
+
+---
+class: middle
+
+.center[
+# `step_pca()`
+
+Replaces variables with components
+
+]
+
+
+```{r results='hide'}
+rec %>%  
+  step_pca(all_numeric(),
+           num_comp = 5) #<<
+```
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Write a recipe for the `Sale_Price ~ .` variables that:
+
+1. Adds a novel level to all factors
+1. Converts all factors to dummy variables
+1. Catches any zero variance variables
+1. Centers all of the predictors
+1. Scales all of the predictors
+1. Computes the first 5 principal components
+
+Save the result as `pca_rec`
+
+```{r echo=FALSE}
+countdown(minutes = 5)
+```
+
+---
+```{r}
+pca_rec <- 
+  recipe(Sale_Price ~ ., data = ames) %>%
+  step_novel(all_nominal()) %>%
+  step_dummy(all_nominal()) %>%
+  step_zv(all_predictors()) %>%
+  step_center(all_predictors()) %>%
+  step_scale(all_predictors()) %>%
+  step_pca(all_predictors(), num_comp = 5)
+pca_rec
+```
+
+---
+class: middle
+
+.center[
+# roles
+
+You can also give variables a "role" within a recipe and then select by roles.
+
+]
+
+
+```{r results='hide', warning=FALSE, message=FALSE}
+has_role(match = "privacy")
+add_role(rec, Fence, new_role = "privacy")
+update_role(rec, Fence, new_role = "privacy", old_role = "yard")
+remove_role(rec, Fence, old_role = "yard")
+```
+
+
+---
+class: middle, center
+
+# Quiz
+
+If we use `add_model()` to add a model to a workflow, what would we use to add a recipe?
+
+--
+
+Let's see!
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Make a workflow that combines `pca_rec` and with `lm_spec`.
+
+```{r echo=FALSE}
+countdown(minutes = 1)
+```
+
+---
+
+```{r}
+pca_wf <-
+  workflow() %>% 
+  add_recipe(pca_rec) %>% 
+  add_model(lm_spec)
+pca_wf
+```
+
+
+---
+class: middle
+
+.center[
+# `add_recipe()`
+
+Adds a recipe to a workflow.
+
+]
+
+```{r}
+pca_wf <- 
+  workflow() %>%
+  add_recipe(pca_rec) %>% #<<
+  add_model(lm_spec)
+```
+
+---
+class: middle
+
+.center[
+# Quiz
+
+Do you need to add a formula if you have a recipe?
+]
+--
+.center[
+Nope!
+]
+```{r}
+rec <- 
+  recipe(Sale_Price ~ ., #<<
+         data = ames)
+```
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Try our pca workflow to predict sale price with the `ames_test` data. What is the RMSE?
+
+```{r echo=FALSE}
+countdown(minutes = 5)
+```
+
+
+---
+
+```{r}
+pca_wf %>% 
+  fit(data = ames_train) %>% 
+  predict(ames_test) %>% 
+  mutate(truth = ames_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+```
+
+---
+class: middle
+
+.center[
+# `update_recipe()`
+
+Replace the recipe in a workflow.
+
+]
+
+```{r eval=FALSE}
+pca_wf %>%
+  update_recipe(bc_rec) #<<
+```
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Modify the code to build a new pca recipe that uses a BoxCox transformation instead of centering and scaling the data. 
+
+Then update `pca_wf` to use the new recipe.
+
+*Hint: Guess. Use tab completion. Or visit http://tidymodels.github.io/recipes/reference/index.html.*
+
+```{r echo=FALSE}
+countdown(minutes=3)
+```
+
+---
+
+```{r}
+bc_rec <- 
+  recipe(Sale_Price ~ ., data = ames) %>%
+  step_novel(all_nominal()) %>%
+  step_dummy(all_nominal()) %>%
+  step_zv(all_predictors()) %>%
+  step_BoxCox(all_predictors()) %>% #<<
+  step_pca(all_predictors(), num_comp = 5)
+
+bc_wf <- 
+  pca_wf %>% 
+    update_recipe(bc_rec)
+```
+
+---
+
+```{r}
+bc_wf %>% 
+  fit(data = ames_train) %>% 
+  predict(ames_test) %>% 
+  mutate(truth = ames_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+```
+
+---
+class: middle, center
+
+# Feature Engineering
+
+.pull-left[
+Before
+
+![](https://media.giphy.com/media/Wn74RUT0vjnoU98Hnt/giphy.gif)
+]
+
+--
+
+.pull-right[
+After
+
+![](https://media.giphy.com/media/108GZES8iG0myc/giphy.gif)
+]
+

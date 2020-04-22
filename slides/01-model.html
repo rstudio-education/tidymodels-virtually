@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Predictive Modeling</title>
+    <title>Build a model</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
     <meta name="date" content="2020-04-22" />
@@ -30,7 +30,7 @@ layout: true
 
 class: title-slide, center, bottom
 
-# Predictive Modeling
+# Build a model
 
 ## Tidymodels, Virtually: 1
 
@@ -351,7 +351,7 @@ Write a pipe that creates a model that uses `lm()` to fit a linear regression. S
 *Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
 
 
-<div class="countdown" id="timer_5ea0c2a0" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea0cdd0" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -423,7 +423,7 @@ give the same results as
 lm(Sale_Price ~ Gr_Liv_Area, data = ames)
 ```
 
-<div class="countdown" id="timer_5ea0c4cd" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea0cd54" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -446,7 +446,7 @@ lm(Sale_Price ~ Gr_Liv_Area, data = ames)
 lm_fit
 &gt; parsnip model object
 &gt; 
-&gt; Fit time:  2ms 
+&gt; Fit time:  1ms 
 &gt; 
 &gt; Call:
 &gt; stats::lm(formula = formula, data = data)
@@ -518,7 +518,7 @@ class: middle, center
 
 # Predictions
 
-&lt;img src="figs/01-predicting/lm-predict-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/lm-predict-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 class: your-turn
@@ -532,7 +532,7 @@ Fill in the blanks. Use `predict()` to
 
 *Hint: Be sure to remove every `_` before running the code!*
 
-<div class="countdown" id="timer_5ea0c2bf" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea0ccf2" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -604,7 +604,7 @@ class: middle, center
 
 # Residuals
 
-&lt;img src="figs/01-predicting/lm-resid-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/lm-resid-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 
@@ -714,12 +714,12 @@ rmse(price_pred, truth = price_truth, estimate = .pred)
 ---
 class: middle, center
 
-&lt;img src="figs/01-predicting/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 class: middle, center
 
-&lt;img src="figs/01-predicting/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -738,16 +738,16 @@ class: middle, inverse, center
 
 
 
-&lt;img src="figs/01-predicting/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-30-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-30-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -757,12 +757,12 @@ class: middle, inverse, center
 
 .pull-left[
 
-&lt;img src="figs/01-predicting/unnamed-chunk-32-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-32-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ]
 
 .pull-right[
-&lt;img src="figs/01-predicting/unnamed-chunk-33-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-33-1.png" width="504" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -778,22 +778,22 @@ In your teams, decide which model:
 ]
 
 .pull-right[
-&lt;img src="figs/01-predicting/unnamed-chunk-34-1.png" width="50%" style="display: block; margin: auto;" /&gt;&lt;img src="figs/01-predicting/unnamed-chunk-34-2.png" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-34-1.png" width="50%" style="display: block; margin: auto;" /&gt;&lt;img src="figs/01-model/unnamed-chunk-34-2.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ]
 
-<div class="countdown" id="timer_5ea0c2c7" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea0cdb6" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">30</span></code>
 </div>
 
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-36-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-36-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-37-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-37-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -845,7 +845,7 @@ class: middle, center, frame
 ---
 class: middle, center
 
-&lt;img src="figs/01-predicting/all-split-1.png" width="864" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/all-split-1.png" width="864" style="display: block; margin: auto;" /&gt;
 
 ???
 
@@ -984,7 +984,7 @@ Use `initial_split()`, `training()`, `testing()`, `lm()` and `rmse()` to:
 
 Keep `set.seed(100)` at the start of your code.
 
-<div class="countdown" id="timer_5ea0c40f" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea0ca48" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1019,7 +1019,7 @@ class: middle, center
 .pull-left[
 
 ### Training RMSE = 57367.26
-&lt;img src="figs/01-predicting/unnamed-chunk-45-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-45-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 ]
@@ -1029,7 +1029,7 @@ class: middle, center
 .pull-right[
 
 ### Testing RMSE = 53884.78
-&lt;img src="figs/01-predicting/lm-test-resid-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/lm-test-resid-1.png" width="504" style="display: block; margin: auto;" /&gt;
 ]
 
 
@@ -1072,41 +1072,41 @@ class: middle, center, inverse
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-47-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-47-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-48-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-48-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-49-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-49-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-50-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-50-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-51-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-51-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
-&lt;img src="figs/01-predicting/unnamed-chunk-52-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-52-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
-&lt;img src="figs/01-predicting/unnamed-chunk-53-1.png" width="504" style="display: block; margin: auto;" /&gt;
-
----
-
-&lt;img src="figs/01-predicting/unnamed-chunk-54-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-53-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-55-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-54-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="figs/01-predicting/unnamed-chunk-56-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/01-model/unnamed-chunk-55-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/01-model/unnamed-chunk-56-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 
