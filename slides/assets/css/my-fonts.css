@@ -30,8 +30,9 @@ h3 {
   font-family: 'Lato', sans-serif;
   text-transform: uppercase;
   font-weight: 400;
-  color: #003366;
+  color: #767381;
   font-size: 1.3em !important;
+  letter-spacing: 1pt;
 }
 
 h4, h5, h6 {

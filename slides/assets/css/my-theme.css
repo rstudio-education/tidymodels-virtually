@@ -469,3 +469,16 @@ pre {
   font-family: 'Noto Serif JP';
   font-size: 1.2em;
 }
+
+/* Specific slide styling */
+
+#-span-class-center-to-specify-a-model-with-parsnip-span- + .right-column,
+.fade + .right-column {
+  font-family: 'Lato', sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #767381;
+  font-size: 1.3em !important;
+  letter-spacing: 1pt;
+}
+
