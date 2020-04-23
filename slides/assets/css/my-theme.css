@@ -270,17 +270,17 @@ a.footer-link {
 }
 
 .your-turn a {
-  color: #fff!important;
+  color: #fff !important;
 }
 
 .your-turn a:hover,
 .your-turn a:active {
-  color: #f1fa8c!important;
+  color: #ca225e !important;
 }
 
 
 .your-turn h1 {
-  color: #ca225e;
+  color: #cd4173; /* less intense magenta */
   font-size: 3.5em;
 }
 
@@ -335,7 +335,7 @@ h1#pop-quiz:after {
 
 .your-turn .remark-inline-code,
 .live-code .remark-inline-code {
-  color: #e87ca2;
+  color: #84cae1; /* perch-bird blue */
 }
 
 
