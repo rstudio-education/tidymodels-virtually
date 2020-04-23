@@ -54,12 +54,10 @@ ames_train  <- training(ames_split)
 ames_test   <- testing(ames_split)
 
 # for figures
-not_col <- scico(1, palette = "acton", begin = .6)
-uni_col <- scico(1, palette = "acton", begin = 0)
 train_color <- viridis(1, option="magma", begin = .4)
 test_color  <- viridis(1, option="magma", begin = .7)
 data_color  <- viridis(1, option="magma", begin = .1)
-assess_color <- viridis(1, option="magma", begin = 1)
+assess_color <- viridis(1, option="magma", begin = 0)
 splits_pal <- c(data_color, train_color, test_color)
 
 lm_spec <- 
@@ -154,27 +152,16 @@ We'll use this goal to drive learning of 3 core tidymodels packages:
 ---
 class: inverse, middle, center
 
-# `r emo::ji("hammer")` Build models 
+# `r emo::ji("dango")` Resample models
 
 --
 
-## with parsnip
+## with rsample
 
 
 ???
 
-Enter the parsnip package
-
----
-class: middle, center
-
-# Quiz
-
-What property of models is Machine Learning most concerned about?
-
---
-
-Predictions.
+Enter the rsample package
 
 
 ---
@@ -186,6 +173,15 @@ class: middle, center, frame
 knitr::include_url("https://tidymodels.github.io/rsample/")
 ```
 
+---
+background-image: url("images/saw.jpg")
+background-size: contain
+background-position: left
+class: middle, right
+
+.pull-right[
+# *"Measure twice, <br>cut once"*
+]
 
 ---
 class: your-turn

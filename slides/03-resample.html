@@ -107,27 +107,16 @@ We'll use this goal to drive learning of 3 core tidymodels packages:
 ---
 class: inverse, middle, center
 
-# 🔨 Build models 
+# 🍡 Resample models
 
 --
 
-## with parsnip
+## with rsample
 
 
 ???
 
-Enter the parsnip package
-
----
-class: middle, center
-
-# Quiz
-
-What property of models is Machine Learning most concerned about?
-
---
-
-Predictions.
+Enter the rsample package
 
 
 ---
@@ -137,6 +126,15 @@ class: middle, center, frame
 
 &lt;iframe src="https://tidymodels.github.io/rsample/" width="100%" height="400px"&gt;&lt;/iframe&gt;
 
+---
+background-image: url("images/saw.jpg")
+background-size: contain
+background-position: left
+class: middle, right
+
+.pull-right[
+# *"Measure twice, &lt;br&gt;cut once"*
+]
 
 ---
 class: your-turn
@@ -151,7 +149,7 @@ Run the first code chunk. Then fill in the blanks to
 
 1. Extract the rmse of the fit.
 
-<div class="countdown" id="timer_5ea1178d" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea121c4" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -187,7 +185,7 @@ What would happen if you repeated this process? Would you get the same answers? 
 
 Then rerun the last code chunk from Your Turn 1. Do you get the same answer?
 
-<div class="countdown" id="timer_5ea11696" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea12304" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -343,7 +341,7 @@ class: your-turn
 
 Rerun the code below 10 times and then compute the mean of the results (you will need to jot them down as you go).
 
-<div class="countdown" id="timer_5ea1176d" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea12268" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -470,7 +468,7 @@ cv_folds &lt;-
 cv_folds
 ```
 
-<div class="countdown" id="timer_5ea11a5e" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea12331" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -632,7 +630,7 @@ all_wf %&gt;%
   rmse(truth, .pred)
 ```
 
-<div class="countdown" id="timer_5ea11a18" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea12436" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -667,7 +665,7 @@ and one that fits the square foot model,
 
 Then use `fit_resamples` and `cv_folds` to compare the performance of each.
 
-<div class="countdown" id="timer_5ea116ae" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea122ae" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">06</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -756,7 +754,7 @@ class: your-turn
 
 Work together with your teammates to complete the Cross-Validation handout.
 
-<div class="countdown" id="timer_5ea11a79" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea12105" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -924,7 +922,7 @@ class: your-turn
 Modify the code below to return the **Mean Absolute Error.** Visit 
 &lt;https://tidymodels.github.io/yardstick/reference/index.html&gt; to find the right function to use.
 
-<div class="countdown" id="timer_5ea11a42" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea122c0" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
