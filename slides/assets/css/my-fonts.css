@@ -4,6 +4,8 @@
 
 @import url('https://fonts.googleapis.com/css?family=Amiri:400,400i,700&display=swap');
 
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif+JP:400,700&display=swap');
+
 @import url('https://fonts.googleapis.com/css?family=Lato:400,400i,700&display=swap');
 
 body { 
@@ -13,13 +15,13 @@ body {
 }
 
 h1 {
-  font-family: 'Amiri', serif;
-  font-weight: 700;
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 400;
   color: #1a162d99;
 }
 
 h2 {
-  font-family: 'Amiri', serif;
+  font-family: 'Noto Serif JP', serif;
   font-weight: 400;
   color: #767381;
 }
@@ -47,6 +49,7 @@ h4, h5, h6 {
   body {
     font-family: 'Lato', sans-serif;
     font-weight: 400;
+}
 }
 
 

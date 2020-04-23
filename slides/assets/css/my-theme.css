@@ -45,7 +45,7 @@ pre code {
 }
 
 .title {
-  font-family: 'Amiri', serif;
+  font-family: 'Noto Serif JP', serif;
   font-weight: 400;
 }
 
@@ -173,7 +173,7 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
 
 
 .title-slide h1 {
-  font-family: 'Amiri', serif;
+  font-family: 'Noto Serif JP', serif;
   color: #1a162d;
   font-size: 3em;
   word-wrap: break-word;
@@ -446,6 +446,6 @@ pre {
 }
 
 .word-bubble {
-  font-family: 'Amiri';
+  font-family: 'Noto Serif JP';
   font-size: 1.2em;
 }
