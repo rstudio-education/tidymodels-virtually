@@ -1,5 +1,5 @@
 ---
-title: "Build a model"
+title: "Build A Model"
 subtitle: "Tidymodels, Virtually"
 session: 01
 author: Alison Hill
@@ -70,7 +70,7 @@ class: title-slide, center, bottom
 
 # `r rmarkdown::metadata$title`
 
-## `r rmarkdown::metadata$subtitle`: `r rmarkdown::metadata$session`
+## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
 
 ### `r rmarkdown::metadata$author` 
 
@@ -104,6 +104,15 @@ class: middle, center
 
 My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
 
+---
+class: middle, center, inverse
+
+
+# What is the goal of predictive modeling?
+
+--
+
+# What is the goal of machine learning?
 
 ---
 class: middle, center, frame

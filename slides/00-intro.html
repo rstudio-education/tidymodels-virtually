@@ -4,7 +4,7 @@
     <title>Tidymodels, Virtually</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-22" />
+    <meta name="date" content="2020-04-23" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <meta name="description" content="Tidymodels, Virtually"/>
@@ -43,7 +43,7 @@ class: title-slide, center, bottom
 
 # Tidymodels, Virtually
 
-## Virtual Workshop for CHOP
+## A Virtual Workshop for CHOP
 
 ### Alison Hill 
 
@@ -63,7 +63,7 @@ template: clouds
 
 ???
 
-So hello- we're so happy you could join us today. 
+Hello- I'm so happy you could join us today. 
 
 ---
 name: clouds2
@@ -74,116 +74,104 @@ background-size: cover
 template: clouds2
 class: middle, center
 
-.pull-left[
+
 ### Alison Hill 
 
-&lt;img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/&gt;
+&lt;img style="border-radius: 50%;" src="https://github.com/apreshill.png" width="150px"/&gt;
 
 [<i class="fab  fa-github "></i> @apreshill](https://github.com/apreshill)  
-[<i class="fab  fa-twitter "></i> @apreshill](https://twitter.com/apreshill)
+[<i class="fab  fa-twitter "></i> @apreshill](https://twitter.com/apreshill)  
+[<i class="fas  fa-link "></i> alison.rbind.io](https://alison.rbind.io)
 
-]
+
 
 ???
 
 My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
-
---
-
-.pull-right[
-### Desirée De Leon  
-
-&lt;img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/desiree/avatar.jpg" width="150px"/&gt;
-
-[<i class="fab  fa-github "></i> @dcossyleon](https://github.com/dcossyleon)  
-[<i class="fab  fa-twitter "></i> @dcossyle](https://twitter.com/dcossyle)
-
-]
-
-???
-
-And I'm Desirée De Leon. I interned with Alison last summer at RStudio on the education team.
-
----
-class: freight-slide, center, middle, inverse
-
-# .shadow-text[We ship a lot of websites.]
-
-???
-
-I am a developmental psychologist
-
-Desirée is a neuroscientist
-
-Neither of us is a web developer
-
-But we both ship a lot of websites for teaching data science.
-
-Here are just a few of them.
-
-
----
-class: freight-slide, center, middle, inverse
-
-# .shadow-text[We ship a lot of websites.]
-
-http://bit.ly/giraffe-stats
-
-https://education.rstudio.com/
-
-https://bookdown.org/yihui/blogdown/
-
-https://stat545.com/
-
-https://conf20-intro-ml.netlify.com/
-
-https://summer-of-blogdown.netlify.com/
-
-https://apreshill.github.io/data-vis-labs-2018/
-
-
-???
-
-If you type the short link on the bottom right of this slide into your browser right now, you'll be able to follow along.
-
-All of these links are clickable from the slides.
-
-Each site was built using R Markdown, with different tools chosen depending on what we needed.
-
----
-template: clouds
-
-# Who are you?
-
-???
-
-So that's us. Who are you?
 
 ---
 background-image: url(images/tm-org.png)
 background-size: contain
 
 ---
+class: middle, inverse, center
 
-# Block 1: Model
+# Today
 
-9-9:50
+--
+
+Build a model
+
+--
+
+Resample a model
+
+--
+
+Create a recipe
+
+--
+
+Resample an ensemble model
+
+
+---
+class: frame, middle, center
+
+# Session 01
+
+## Build a model
+
+EDT: 12-12:50
+
+PDT: 9-9:50
+
+???
 
 kind of whole game-ish
 
 packages: parsnip / rsample / yardstick
 
-concepts: modeling + predicting / splitting / metric
+concepts: modeling + predicting / splitting + strata / metric
 
 models: lm
 
 data: continuous
 
 ---
+class: frame, middle, center
 
-# Block 2: Preprocess
+# Session 02
 
-10-10:50
+## Resample a model
+
+EDT: 01-01:50
+
+PDT: 10-10:50
+
+
+???
+
+
+packages: rsample / tune
+
+concepts: cross-validation + strata
+
+models: decision tree
+
+---
+class: frame, middle, center
+
+# Session 03
+
+## Create a recipe
+
+EDT: 02-02:50
+
+PDT: 11-11:50
+
+???
+
 
 packages: rsample / recipes / workflows
 
@@ -192,25 +180,22 @@ concepts: splitting + strata / data leakage
 models: logistic regression
 
 
----
 
-# Block 3: Resample
-
-11-11:50
-
-packages: rsample / tune
-
-concepts: cross-validation
-
-models: decision tree
 
 ---
+class: frame, middle, center
 
-# Block 4: Ensembles I
+# Session 04
 
-12-12:50
+## Resample an ensemble model
 
-packages: baguette
+EDT: 03-03:50
+
+PDT: 12-12:50
+
+???
+
+packages: tune
 
 concepts: bootstrapping / aggregating --&gt; bagging
 
@@ -218,17 +203,51 @@ models: bagging decision trees
 
 
 ---
-class: inverse
+class: inverse, middle, center
+
+# Logistics
+
+---
+class: frame, middle, center
+
+# Zoom reactions
+
+![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
+
+---
+class: frame, middle, center
+
+# Mute/unmute
+
+![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
+
+---
+class: frame, middle, center
+
+# Our Google Doc
+
+https://bit.ly/tmv-chop
+
+---
+class: inverse, middle, center
 
 # Day Two
 
 ---
+class: frame, middle, center
 
-# Block 1: Ensembles II
+# Session 01
+
+## Ensembles II
 
 models: random forests
 
-# Block 2: Tune I
+---
+class: frame, middle, center
+
+# Session 02
+
+## Tune I
 
 package: tune / dials / vip 
 
@@ -236,17 +255,28 @@ concepts: hyperparameters / grids / variable importance
 
 models: decision tree
 
-# Block 3: Tune II
+---
+class: frame, middle, center
+
+# Session 03:
+
+## Tune II
 
 models: random forests / KNN?
 
-# Block 4: Case Study
+---
+class: frame, middle, center
+
+# Session 04:
+
+## Case Study
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "solarized-light",
-"highlightLanguage": ["r", "css", "yaml"],
+"highlightLanguage": "r",
+"highlightStyle": "xcode",
 "slideNumberFormat": "",
 "highlightLines": true,
 "countIncrementalSlides": false,
@@ -291,6 +321,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -308,17 +364,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {

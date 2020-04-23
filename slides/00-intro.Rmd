@@ -1,6 +1,6 @@
 ---
 title: "Tidymodels, Virtually"
-subtitle: "Virtual Workshop for CHOP"
+subtitle: "A Virtual Workshop for CHOP"
 author: Alison Hill
 date: "`r Sys.Date()`"
 output:
@@ -9,9 +9,8 @@ output:
     seal: false 
     lib_dir: libs
     nature:
-      # autoplay: 5000
-      highlightStyle: solarized-light
-      highlightLanguage: ["r", "css", "yaml"]
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
       slideNumberFormat: "" 
       highlightLines: true
       countIncrementalSlides: false
@@ -71,7 +70,7 @@ template: clouds
 
 ???
 
-So hello- we're so happy you could join us today. 
+Hello- I'm so happy you could join us today. 
 
 ---
 name: clouds2
@@ -82,100 +81,59 @@ background-size: cover
 template: clouds2
 class: middle, center
 
-.pull-left[
+
 ### Alison Hill 
 
-<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/>
+<img style="border-radius: 50%;" src="https://github.com/apreshill.png" width="150px"/>
 
 [`r icon::fa("github")` @apreshill](https://github.com/apreshill)  
-[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)
+[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)  
+[`r icon::fa("link")` alison.rbind.io](https://alison.rbind.io)
 
-]
+
 
 ???
 
 My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
-
---
-
-.pull-right[
-### Desirée De Leon  
-
-<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/desiree/avatar.jpg" width="150px"/>
-
-[`r icon::fa("github")` @dcossyleon](https://github.com/dcossyleon)  
-[`r icon::fa("twitter")` @dcossyle](https://twitter.com/dcossyle)
-
-]
-
-???
-
-And I'm Desirée De Leon. I interned with Alison last summer at RStudio on the education team.
-
----
-class: freight-slide, center, middle, inverse
-
-# .shadow-text[We ship a lot of websites.]
-
-???
-
-I am a developmental psychologist
-
-Desirée is a neuroscientist
-
-Neither of us is a web developer
-
-But we both ship a lot of websites for teaching data science.
-
-Here are just a few of them.
-
-
----
-class: freight-slide, center, middle, inverse
-
-# .shadow-text[We ship a lot of websites.]
-
-http://bit.ly/giraffe-stats
-
-https://education.rstudio.com/
-
-https://bookdown.org/yihui/blogdown/
-
-https://stat545.com/
-
-https://conf20-intro-ml.netlify.com/
-
-https://summer-of-blogdown.netlify.com/
-
-https://apreshill.github.io/data-vis-labs-2018/
-
-
-???
-
-If you type the short link on the bottom right of this slide into your browser right now, you'll be able to follow along.
-
-All of these links are clickable from the slides.
-
-Each site was built using R Markdown, with different tools chosen depending on what we needed.
-
----
-template: clouds
-
-# Who are you?
-
-???
-
-So that's us. Who are you?
 
 ---
 background-image: url(images/tm-org.png)
 background-size: contain
 
 ---
+class: middle, inverse, center
 
-# Block 1: Model
+# Today
 
-9-9:50
+--
+
+Build a model
+
+--
+
+Resample a model
+
+--
+
+Create a recipe
+
+--
+
+Resample an ensemble model
+
+
+---
+class: frame, middle, center
+
+# Session 01
+
+## Build a model
+
+EDT: 12-12:50
+
+PDT: 9-9:50
+
+???
 
 kind of whole game-ish
 
@@ -188,23 +146,19 @@ models: lm
 data: continuous
 
 ---
+class: frame, middle, center
 
-# Block 2: Preprocess
+# Session 02
 
-10-10:50
+## Resample a model
 
-packages: rsample / recipes / workflows
+EDT: 01-01:50
 
-concepts: splitting + strata / data leakage
-
-models: logistic regression
+PDT: 10-10:50
 
 
----
+???
 
-# Block 3: Resample
-
-11-11:50
 
 packages: rsample / tune
 
@@ -213,12 +167,42 @@ concepts: cross-validation + strata
 models: decision tree
 
 ---
+class: frame, middle, center
 
-# Block 4: Ensembles I
+# Session 03
 
-12-12:50
+## Create a recipe
 
-packages: baguette
+EDT: 02-02:50
+
+PDT: 11-11:50
+
+???
+
+
+packages: rsample / recipes / workflows
+
+concepts: splitting + strata / data leakage
+
+models: logistic regression
+
+
+
+
+---
+class: frame, middle, center
+
+# Session 04
+
+## Resample an ensemble model
+
+EDT: 03-03:50
+
+PDT: 12-12:50
+
+???
+
+packages: tune
 
 concepts: bootstrapping / aggregating --> bagging
 
@@ -226,17 +210,51 @@ models: bagging decision trees
 
 
 ---
-class: inverse
+class: inverse, middle, center
+
+# Logistics
+
+---
+class: frame, middle, center
+
+# Zoom reactions
+
+![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
+
+---
+class: frame, middle, center
+
+# Mute/unmute
+
+![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
+
+---
+class: frame, middle, center
+
+# Our Google Doc
+
+https://bit.ly/tmv-chop
+
+---
+class: inverse, middle, center
 
 # Day Two
 
 ---
+class: frame, middle, center
 
-# Block 1: Ensembles II
+# Session 01
+
+## Ensembles II
 
 models: random forests
 
-# Block 2: Tune I
+---
+class: frame, middle, center
+
+# Session 02
+
+## Tune I
 
 package: tune / dials / vip 
 
@@ -244,8 +262,19 @@ concepts: hyperparameters / grids / variable importance
 
 models: decision tree
 
-# Block 3: Tune II
+---
+class: frame, middle, center
+
+# Session 03:
+
+## Tune II
 
 models: random forests / KNN?
 
-# Block 4: Case Study
+---
+class: frame, middle, center
+
+# Session 04:
+
+## Case Study
+

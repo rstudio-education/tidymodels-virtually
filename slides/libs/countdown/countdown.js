@@ -100,9 +100,8 @@ var counter_update_all = function() {
       update_timer(counters.timer[i]);
 
       // Play countdown sound if data-audio=true on container div
-      let audio = counters.timer[i].div.dataset.audio
-      if (audio && counters.timer[i].value == 5) {
-        counter_play_sound(audio);
+      if (counters.timer[i].div.dataset.audio && counters.timer[i].value == 5) {
+        counter_play_sound();
       }
     }
   }
@@ -118,12 +117,18 @@ var counter_update_all = function() {
   }
 }
 
-var counter_play_sound = function(url) {
-  if (typeof url === 'boolean') {
-    url = 'libs/countdown/smb_stage_clear.mp3';
+var counter_play_sound = function() {
+  try {
+    var finished_sound = new Audio('libs/countdown/smb_stage_clear.mp3');
+    finished_sound.play();
+  } catch (e) {
+    try {
+      var finished_sound = new Audio('smb_stage_clear.mp3');
+      finished_sound.play();
+    } catch (e) {
+      console.log("Unable to locate sound file smb_stage_clear.mp3.")
+    }
   }
-  sound = new Audio(url);
-  sound.play();
 }
 
 var counter_addEventListener = function() {

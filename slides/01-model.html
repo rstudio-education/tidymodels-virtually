@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Build a model</title>
+    <title>Build A Model</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
     <meta name="date" content="2020-04-23" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
     <!---import JQuery-->
-    
+
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous">
     </script>
-    
+
     <!--add parent selector-->
-    
+
     <script>
-    
+
     $( document ).ready( function(){
-    
+
       $( "pre")
           .parents( ".remark-slide-content" )
           .addClass( "code-slide-background" );
@@ -50,9 +51,9 @@ layout: true
 
 class: title-slide, center, bottom
 
-# Build a model
+# Build A Model
 
-## Tidymodels, Virtually: 1
+## Tidymodels, Virtually &amp;mdash; Session 01
 
 ### Alison Hill 
 
@@ -86,6 +87,15 @@ class: middle, center
 
 My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
 
+---
+class: middle, center, inverse
+
+
+# What is the goal of predictive modeling?
+
+--
+
+# What is the goal of machine learning?
 
 ---
 class: middle, center, frame
@@ -371,7 +381,7 @@ Write a pipe that creates a model that uses `lm()` to fit a linear regression. S
 *Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
 
 
-<div class="countdown" id="timer_5ea1f3ef" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2021a" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -443,7 +453,7 @@ give the same results as
 lm(Sale_Price ~ Gr_Liv_Area, data = ames)
 ```
 
-<div class="countdown" id="timer_5ea1f2d9" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2005f" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -466,7 +476,7 @@ lm(Sale_Price ~ Gr_Liv_Area, data = ames)
 lm_fit
 &gt; parsnip model object
 &gt; 
-&gt; Fit time:  2ms 
+&gt; Fit time:  1ms 
 &gt; 
 &gt; Call:
 &gt; stats::lm(formula = formula, data = data)
@@ -552,7 +562,7 @@ Fill in the blanks. Use `predict()` to
 
 *Hint: Be sure to remove every `_` before running the code!*
 
-<div class="countdown" id="timer_5ea1f512" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea20144" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -802,7 +812,7 @@ In your teams, decide which model:
 
 ]
 
-<div class="countdown" id="timer_5ea1f4f6" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea201c2" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">30</span></code>
 </div>
 
@@ -891,6 +901,7 @@ initial_split(data, prop = 3/4)
 ```r
 ames_split &lt;- initial_split(ames, prop = 0.75)
 ames_split
+&gt; &lt;Training/Validation/Total&gt;
 &gt; &lt;2198/732/2930&gt;
 ```
 
@@ -1003,7 +1014,7 @@ Use `initial_split()`, `training()`, `testing()`, `lm()` and `rmse()` to:
 
 Keep `set.seed(100)` at the start of your code.
 
-<div class="countdown" id="timer_5ea1f32b" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea20350" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1151,6 +1162,7 @@ price_pred  &lt;- lm_fit %&gt;%
 
 rmse(price_pred, truth = price_truth, estimate = .pred)
 ```
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -1203,30 +1215,20 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
 })();
 (function() {
   "use strict"
-  /* Replace <script> tags in slides area to make them executable
-   *
-   * Runs after post-processing of markdown source into slides and replaces only
-   * <script>s on the last slide of continued slides using the .has-continuation
-   * class added by xaringan. Finally, any <script>s in the slides area that
-   * aren't executed are commented out.
-   */
+  // Replace <script> tags in slides area to make them executable
   var scripts = document.querySelectorAll(
-    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+    '.remark-slides-area .remark-slide-container script'
   );
   if (!scripts.length) return;
   for (var i = 0; i < scripts.length; i++) {
     var s = document.createElement('script');
     var code = document.createTextNode(scripts[i].textContent);
     s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
     scripts[i].parentElement.replaceChild(s, scripts[i]);
-  }
-  var scriptsNotExecuted = document.querySelectorAll(
-    '.remark-slides-area .remark-slide-container.has-continuation script'
-  );
-  if (!scriptsNotExecuted.length) return;
-  for (var i = 0; i < scriptsNotExecuted.length; i++) {
-    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
-    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
   }
 })();
 (function() {
