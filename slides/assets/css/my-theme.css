@@ -215,6 +215,35 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
   color: #fff;
 }
 
+
+.title-slide {
+    padding: 2em;
+    position: relative;
+}
+
+.title-slide:after,
+.title-slide:before {
+    border: 2pt solid #ca225e3d;
+    bottom: 0;
+    content: '';
+    position: fixed;
+    top: 50px;
+    width: 5%;
+}
+.title-slide:after {
+    border-left: none;
+    right: 47px;
+    height: 83%;
+}
+.title-slide:before {
+    border-right: none;
+    left: 47px;
+    height: 83%;
+}
+
+
+
+
 /* Wider cols */
 
 .right-wide {
@@ -481,4 +510,6 @@ pre {
   font-size: 1.3em !important;
   letter-spacing: 1pt;
 }
+
+
 
