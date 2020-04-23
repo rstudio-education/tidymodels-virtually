@@ -16,6 +16,9 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
 ---
 
 ```{r setup, include=FALSE}
