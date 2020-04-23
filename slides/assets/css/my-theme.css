@@ -84,7 +84,7 @@ a:hover, a:active, a:focus {
 
 .inverse {
   background-color: #1a162d;
-  color: #FFFFFF;
+  color: #f2f2f2;
   text-shadow: none;
 }
 
@@ -175,11 +175,11 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
 .title-slide h1 {
   font-family: 'Noto Serif JP', serif;
   color: #1a162d;
-  font-size: 3em;
+  font-size: 4em;
   word-wrap: break-word;
-  letter-spacing: 1pt;
   font-weight: 400;
   margin-bottom: -10px !important;
+  color: #ca225e;
 }
 
 .title-slide h2 {
@@ -190,6 +190,7 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
   text-shadow: none;
   text-transform: uppercase;
   margin-bottom: 0px !important;
+  letter-spacing: 1pt;
 }
 
 .title-slide h3 {
@@ -261,7 +262,7 @@ a.footer-link {
 
 .your-turn {
   background-color: #1a162d;
-  color: #fff;
+  color: #f2f2f2;
 }
 
 .your-turn a {
@@ -275,7 +276,7 @@ a.footer-link {
 
 
 .your-turn h1 {
-  color: #fff;
+  color: #ca225e;
   font-size: 3.5em;
 }
 
@@ -330,7 +331,7 @@ h1#pop-quiz:after {
 
 .your-turn .remark-inline-code,
 .live-code .remark-inline-code {
-  color: #FE9F6DFF;
+  color: #e87ca2;
 }
 
 
