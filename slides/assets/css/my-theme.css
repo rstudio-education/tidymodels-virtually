@@ -321,6 +321,18 @@ a.footer-link {
 }
 
 
+.your-turn h1:before {
+    content: "";
+    display: inline-block;
+    background-image: url("../../images/bird-turn.png");
+    background-repeat: no-repeat;
+    width: 145px;
+    height: 100px;
+    float: left;
+    background-size: contain;
+    padding-right: 10px;
+}
+
 /* pop quiz */
 
 .pop-quiz h1, h1#pop-quiz {
@@ -333,17 +345,15 @@ a.footer-link {
   color: #bd93f9;
 }
 
-h1#pop-quiz:before,
-h1#pop-quiz:after {
+/* h1#quiz:before {
     content: "";
     display: inline-block;
-    background: url("../question-box.png") no-repeat;
-    width: 70px;
-    height: 70px;
-    background-size: 100%;
+    background: url("../../images/two-birds2-alpha.png") no-repeat;
+    width: 145px;
+    height: 100px;
+    background-size: cover;
     background-position: bottom;
-    margin: 0 7px -10px 7px;
-}
+} */
 
 /* live code */
 
