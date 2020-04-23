@@ -434,8 +434,8 @@ h4 {
 }
 
 pre {
-    border: 1px solid #fff;
-    box-shadow: 0px 0px 4px #1a162d99;
+    border: 1px solid #ca225e5c; /* pink */
+    box-shadow: 0px 0px 1px #ca225e5c;
     padding: 0.25em;
     background-color: #fff;
     overflow-x: auto;
