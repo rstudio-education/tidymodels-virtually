@@ -1,7 +1,7 @@
 ---
 title: "Resample Models"
 subtitle: "Tidymodels, Virtually"
-session: 03
+session: 02
 author: Alison Hill
 date: "`r Sys.Date()`"
 output:
@@ -77,7 +77,7 @@ class: title-slide, center, bottom
 
 # `r rmarkdown::metadata$title`
 
-## `r rmarkdown::metadata$subtitle`: `r rmarkdown::metadata$session`
+## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
 
 ### `r rmarkdown::metadata$author` 
 
