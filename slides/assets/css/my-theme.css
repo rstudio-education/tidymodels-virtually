@@ -13,6 +13,7 @@
 .footnote {
 	bottom: 1em;
 	font-size: 75%;
+	left: 4em;
 }
 
 img {
@@ -34,9 +35,19 @@ pre {
   border-radius: 0px; /*undo rounded corners*/
 }
 
+.code-slide-background {
+  background-color: #fdf7f9;
+}
+
 pre code { 
   background: none; 
   font-size: 0.8rem;
+}
+
+h1 .display, 
+h2 .display {
+  font-weight: 500;
+  color: #CA225E;
 }
 
 .display {
@@ -45,7 +56,7 @@ pre code {
 }
 
 .title {
-  font-family: 'Amiri', serif;
+  font-family: 'Noto Serif JP', serif;
   font-weight: 400;
 }
 
@@ -84,7 +95,7 @@ a:hover, a:active, a:focus {
 
 .inverse {
   background-color: #1a162d;
-  color: #FFFFFF;
+  color: #f2f2f2;
   text-shadow: none;
 }
 
@@ -173,13 +184,13 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
 
 
 .title-slide h1 {
-  font-family: 'Amiri', serif;
+  font-family: 'Noto Serif JP', serif;
   color: #1a162d;
-  font-size: 3em;
+  font-size: 4em;
   word-wrap: break-word;
-  letter-spacing: 1pt;
   font-weight: 400;
   margin-bottom: -10px !important;
+  color: #ca225e;
 }
 
 .title-slide h2 {
@@ -190,6 +201,7 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
   text-shadow: none;
   text-transform: uppercase;
   margin-bottom: 0px !important;
+  letter-spacing: 1pt;
 }
 
 .title-slide h3 {
@@ -203,6 +215,35 @@ thead, tfoot, tr:nth-child(even) { background: #eee }
 .title-slide a {
   color: #fff;
 }
+
+
+.title-slide {
+    padding: 2em;
+    position: relative;
+}
+
+.title-slide:after,
+.title-slide:before {
+    border: 2pt solid #ca225e3d;
+    bottom: 0;
+    content: '';
+    position: fixed;
+    top: 50px;
+    width: 5%;
+}
+.title-slide:after {
+    border-left: none;
+    right: 47px;
+    height: 83%;
+}
+.title-slide:before {
+    border-right: none;
+    left: 47px;
+    height: 83%;
+}
+
+
+
 
 /* Wider cols */
 
@@ -261,24 +302,36 @@ a.footer-link {
 
 .your-turn {
   background-color: #1a162d;
-  color: #fff;
+  color: #f2f2f2;
 }
 
 .your-turn a {
-  color: #fff!important;
+  color: #fff !important;
 }
 
 .your-turn a:hover,
 .your-turn a:active {
-  color: #f1fa8c!important;
+  color: #ca225e !important;
 }
 
 
 .your-turn h1 {
-  color: #fff;
+  color: #cd4173; /* less intense magenta */
   font-size: 3.5em;
 }
 
+
+.your-turn h1:before {
+    content: "";
+    display: inline-block;
+    background-image: url("../../images/bird-turn.png");
+    background-repeat: no-repeat;
+    width: 145px;
+    height: 100px;
+    float: left;
+    background-size: contain;
+    padding-right: 10px;
+}
 
 /* pop quiz */
 
@@ -292,17 +345,15 @@ a.footer-link {
   color: #bd93f9;
 }
 
-h1#pop-quiz:before,
-h1#pop-quiz:after {
+/* h1#quiz:before {
     content: "";
     display: inline-block;
-    background: url("../question-box.png") no-repeat;
-    width: 70px;
-    height: 70px;
-    background-size: 100%;
+    background: url("../../images/two-birds2-alpha.png") no-repeat;
+    width: 145px;
+    height: 100px;
+    background-size: cover;
     background-position: bottom;
-    margin: 0 7px -10px 7px;
-}
+} */
 
 /* live code */
 
@@ -330,7 +381,7 @@ h1#pop-quiz:after {
 
 .your-turn .remark-inline-code,
 .live-code .remark-inline-code {
-  color: #FE9F6DFF;
+  color: #84cae1; /* perch-bird blue */
 }
 
 
@@ -397,6 +448,15 @@ h1#pop-quiz:after {
   border-bottom: 3px solid #CA225E;
 }
 
+
+.inverse h2 {
+  font-family: 'Lato';
+  text-transform: uppercase;
+  font-size: 1.4em;
+  opacity: 0.7;
+  letter-spacing: 2pt;
+}
+
 /* Headers, body */
 
 h4 {
@@ -433,8 +493,8 @@ h4 {
 }
 
 pre {
-    border: 1px solid #fff;
-    box-shadow: 0px 0px 4px #1a162d99;
+    border: 1px solid #ca225e5c; /* pink */
+    box-shadow: 0px 0px 1px #ca225e5c;
     padding: 0.25em;
     background-color: #fff;
     overflow-x: auto;
@@ -446,6 +506,21 @@ pre {
 }
 
 .word-bubble {
-  font-family: 'Amiri';
+  font-family: 'Noto Serif JP';
   font-size: 1.2em;
 }
+
+/* Specific slide styling */
+
+#-span-class-center-to-specify-a-model-with-parsnip-span- + .right-column,
+.fade + .right-column {
+  font-family: 'Lato', sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #767381;
+  font-size: 1.3em !important;
+  letter-spacing: 1pt;
+}
+
+
+

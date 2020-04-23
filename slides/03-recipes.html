@@ -10,6 +10,27 @@
     <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
+    <!---import JQuery-->
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+
+    <!--add parent selector-->
+
+    <script>
+
+    $( document ).ready( function(){
+
+      $( "pre")
+          .parents( ".remark-slide-content" )
+          .addClass( "code-slide-background" );
+      
+    });
+      
+    </script>
     <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
     <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
   </head>
@@ -171,7 +192,7 @@ Transforms variables into the orthogonal "components" that most concisely captur
 
 
 
-&lt;img src="figs/02-recipes/unnamed-chunk-3-1.png" width="38%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/03-recipes/unnamed-chunk-3-1.png" width="38%" style="display: block; margin: auto;" /&gt;
 
 ---
 class: middle, center, frame
@@ -995,7 +1016,7 @@ Write a recipe for the `Sale_Price ~ .` variables that:
 
 Save the result as `pca_rec`
 
-<div class="countdown" id="timer_5ea1d5e0" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea20475" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1067,7 +1088,7 @@ class: your-turn
 
 Make a workflow that combines `pca_rec` and with `lm_spec`.
 
-<div class="countdown" id="timer_5ea1d45b" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea20138" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1080,11 +1101,11 @@ pca_wf &lt;-
   add_recipe(pca_rec) %&gt;% 
   add_model(lm_spec)
 pca_wf
-&gt; ══ Workflow ════════════════════════════════════════════════════════════════════════════════
+&gt; ══ Workflow ═════════════════════════════════════════════════════════════════════════════════
 &gt; Preprocessor: Recipe
 &gt; Model: linear_reg()
 &gt; 
-&gt; ── Preprocessor ────────────────────────────────────────────────────────────────────────────
+&gt; ── Preprocessor ─────────────────────────────────────────────────────────────────────────────
 &gt; 6 Recipe Steps
 &gt; 
 &gt; ● step_novel()
@@ -1094,7 +1115,7 @@ pca_wf
 &gt; ● step_scale()
 &gt; ● step_pca()
 &gt; 
-&gt; ── Model ───────────────────────────────────────────────────────────────────────────────────
+&gt; ── Model ────────────────────────────────────────────────────────────────────────────────────
 &gt; Linear Regression Model Specification (regression)
 &gt; 
 &gt; Computational engine: lm
@@ -1145,7 +1166,7 @@ class: your-turn
 
 Try our pca workflow to predict sale price with the `ames_test` data. What is the RMSE?
 
-<div class="countdown" id="timer_5ea1d57f" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea20236" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1192,7 +1213,7 @@ Then update `pca_wf` to use the new recipe.
 
 *Hint: Guess. Use tab completion. Or visit http://tidymodels.github.io/recipes/reference/index.html.*
 
-<div class="countdown" id="timer_5ea1d2a6" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea20121" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 

@@ -16,6 +16,9 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
 ---
 
 ```{r setup, include=FALSE}
@@ -690,7 +693,7 @@ data `(y)` + predictions = metrics
 ---
 class: middle, center, inverse
 
-# A model doesn't have to be a straight line!
+# A model doesn't have to be a straight&nbsp;line!
 
 ---
 exclude: true
