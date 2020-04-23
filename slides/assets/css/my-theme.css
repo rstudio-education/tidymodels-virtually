@@ -34,6 +34,10 @@ pre {
   border-radius: 0px; /*undo rounded corners*/
 }
 
+.code-slide-background {
+  background-color: #fdf7f9;
+}
+
 pre code { 
   background: none; 
   font-size: 0.8rem;
