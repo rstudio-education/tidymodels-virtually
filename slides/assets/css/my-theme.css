@@ -43,6 +43,12 @@ pre code {
   font-size: 0.8rem;
 }
 
+h1 .display, 
+h2 .display {
+  font-weight: 500;
+  color: #CA225E;
+}
+
 .display {
   font-weight: 700;
   color: #CA225E;
