@@ -54,6 +54,11 @@ test_color  <- viridis(1, option="magma", begin = .7)
 data_color  <- viridis(1, option="magma", begin = .1)
 assess_color <- viridis(1, option="magma", begin = 1)
 splits_pal <- c(data_color, train_color, test_color)
+
+penguins <- 
+  readr::read_csv(
+    here::here("slides/data/penguins.csv")) %>% 
+  mutate_if(is.character, as.factor)
 ```
 
 
@@ -172,14 +177,23 @@ class: middle, center, frame
 ## `r emo::ji("crystal_ball")` generate accurate .display[predictions]
 
 ---
+
+```{r echo=FALSE}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(color = "salmon", size = 3, alpha = .9) +
+  geom_smooth(method = "lm")
+```
+
+
+---
 class: middle
 
 # .center[`lm()`]
 
 
 ```{r}
-lm_ames <- lm(Sale_Price ~ Gr_Liv_Area, data = ames)
-lm_ames
+lm_flipper <- lm(body_mass_g ~ flipper_length_mm, data = penguins)
+lm_flipper
 ```
 
 
@@ -222,8 +236,8 @@ class: middle, frame
 
 ```{r eval = FALSE}
 decision_tree() %>%
-  set_engine("C5.0") %>%
-  set_mode("classification")
+  set_engine("rpart") %>%
+  set_mode("regression")
 ```
 
 
@@ -406,7 +420,7 @@ class: middle, center
 Train a model by fitting a model. Returns a parsnip model fit.
 
 ```{r results='hide'}
-fit(lm_spec, Sale_Price ~ Gr_Liv_Area, data = ames)
+fit(lm_spec, body_mass_g ~ flipper_length_mm, data = penguins)
 ```
 
 ---
@@ -420,9 +434,9 @@ Train a model by fitting a model. Returns a parsnip model fit.
 
 ```{r results='hide'}
 fit(
-  lm_spec,                  # parsnip model
-  Sale_Price ~ Gr_Liv_Area, # a formula
-  data = ames               # dataframe
+  lm_spec,                         # parsnip model
+  body_mass_g ~ flipper_length_mm, # a formula
+  data = penguins                  # dataframe
   )
 ```
 
@@ -436,15 +450,15 @@ Double check. Does
 ```{r parsnip-lm, results='hide'}
 lm_fit <- 
   lm_spec %>% 
-  fit(Sale_Price ~ Gr_Liv_Area, 
-      data = ames)
+  fit(body_mass_g ~ flipper_length_mm, 
+      data = penguins)
 lm_fit
 ```
 
 give the same results as
 
 ```{r plain-lm, results='hide'}
-lm(Sale_Price ~ Gr_Liv_Area, data = ames)
+lm(body_mass_g ~ flipper_length_mm, data = penguins)
 ```
 
 ```{r echo=FALSE}
@@ -490,7 +504,7 @@ class: middle, center
 Use a fitted model to predict new `y` values from data. Returns a tibble.
 
 ```{r eval=FALSE}
-predict(lm_fit, new_data = ames) 
+predict(lm_fit, new_data = penguins) 
 ```
 
 
@@ -498,7 +512,7 @@ predict(lm_fit, new_data = ames)
 
 ```{r}
 lm_fit %>% 
-  predict(new_data = ames)
+  predict(new_data = penguins)
 ```
 
 ---
@@ -508,25 +522,20 @@ class: middle, center
 # Predictions
 
 ```{r lm-predict, echo = FALSE, fig.align='center'}
-# smaller for plotting
-set.seed(0)
-small_ames <- ames %>% 
-  sample_n(80) %>% 
-  mutate(.row = dplyr::row_number())
-
 # split
 set.seed(100) # Important!
-small_split  <- initial_split(small_ames)
+small_peng <- penguins %>% 
+  mutate(.row = dplyr::row_number())
+small_split  <- initial_split(small_peng)
 small_train  <- training(small_split)
 small_test   <- testing(small_split)
 
-ggplot(small_train, aes(Gr_Liv_Area, Sale_Price)) +
+ggplot(small_train, aes(flipper_length_mm, body_mass_g)) +
   geom_smooth(method = "lm", se = FALSE, colour = "#4D8DC9") +
   geom_point(size = 3, alpha = .5) +
-  geom_point(aes(Gr_Liv_Area, fitted(lm(Sale_Price ~ Gr_Liv_Area))),
+  geom_point(aes(flipper_length_mm, fitted(lm(body_mass_g ~ flipper_length_mm))),
              color = "#E7553C",
              size = 3) +
-  coord_cartesian(y = c(50000, 500000)) +
   theme(text = element_text(family = "Lato"))
 ```
 
@@ -537,7 +546,7 @@ class: your-turn
 
 Fill in the blanks. Use `predict()` to
 
-1. Use your linear model to predict sale prices; save the tibble as `price_pred`  
+1. Use your linear model to predict sale prices; save the tibble as `peng_pred`  
 1. Add a pipe and use `mutate()` to add a column with the observed sale prices; name it `truth`
 
 *Hint: Be sure to remove every `_` before running the code!*
@@ -551,15 +560,15 @@ countdown(minutes = 2)
 ```{r}
 lm_fit <- 
   lm_spec %>% 
-  fit(Sale_Price ~ Gr_Liv_Area, 
-      data = ames)
+  fit(body_mass_g ~ flipper_length_mm, 
+      data = penguins)
 
-price_pred <- 
+peng_pred <- 
   lm_fit %>% 
-  predict(new_data = ames) %>% 
-  mutate(truth = ames$Sale_Price)
+  predict(new_data = penguins) %>% 
+  mutate(truth = penguins$body_mass_g)
 
-price_pred
+peng_pred
 ```
 
 ---
@@ -600,18 +609,17 @@ class: middle, center
 # Residuals
 
 ```{r lm-resid, echo = FALSE, fig.align='center'}
-ggplot(small_train, aes(Gr_Liv_Area, Sale_Price)) +
-  geom_segment(aes(x = Gr_Liv_Area, 
-                   xend = Gr_Liv_Area, 
-                   y = Sale_Price, 
-                   yend = predict(lm(Sale_Price ~ Gr_Liv_Area))), 
+ggplot(small_train, aes(flipper_length_mm, body_mass_g)) +
+  geom_segment(aes(x = flipper_length_mm, 
+                   xend = flipper_length_mm, 
+                   y = body_mass_g, 
+                   yend = predict(lm(body_mass_g ~ flipper_length_mm))), 
                colour = "#E7553C") +
   geom_smooth(method = "lm", se = FALSE, colour = "#4D8DC9") +
   geom_point(size = 3) +  
-  geom_point(aes(Gr_Liv_Area, fitted(lm(Sale_Price ~ Gr_Liv_Area))),
+  geom_point(aes(flipper_length_mm, fitted(lm(body_mass_g ~ flipper_length_mm))),
              color = "#E7553C",
              size = 3) +
-  coord_cartesian(y = c(50000, 500000)) +
   theme(text = element_text(family = "Lato"))
 ```
 
@@ -649,20 +657,20 @@ rmse(data, truth, estimate)
 ```{r}
 lm_fit <- 
   lm_spec %>% 
-  fit(Sale_Price ~ Gr_Liv_Area, 
-      data = ames)
+  fit(body_mass_g ~ flipper_length_mm, 
+      data = penguins)
 
-price_pred <- 
+peng_pred <- 
   lm_fit %>% 
-  predict(new_data = ames) %>% 
-  mutate(price_truth = ames$Sale_Price)
+  predict(new_data = penguins) %>% 
+  mutate(truth = penguins$body_mass_g)
 
-price_pred %>% 
-  rmse(truth = price_truth, estimate = .pred) #<<
+peng_pred %>% 
+  rmse(truth = truth, estimate = .pred) #<<
 ```
 
 ```{r include = FALSE}
-rmse_full <- rmse(price_pred, truth = price_truth, estimate = .pred) %>% pull(.estimate)
+rmse_full <- rmse(peng_pred, truth = truth, estimate = .pred) %>% pull(.estimate)
 ```
 
 ---
@@ -697,14 +705,14 @@ exclude: true
 
 ```{r include = FALSE}
 set.seed(100)
-small_split_cv <- mc_cv(small_ames, times = 1)
+small_split_cv <- mc_cv(penguins, times = 1)
 rt_spec <- 
   decision_tree() %>%          
   set_engine(engine = "rpart") %>% 
   set_mode("regression")
 
 rt_train <- function(rset) {
-  rpart::rpart(Sale_Price ~ Gr_Liv_Area, 
+  rpart::rpart(body_mass_g ~ flipper_length_mm, 
                data = analysis(rset))
 }
 
@@ -723,14 +731,14 @@ rt_spec <-
   set_mode("regression")
 
 rt_fit     <- rt_spec %>% 
-              fit(Sale_Price ~ Gr_Liv_Area, 
-                  data = ames)
+              fit(body_mass_g ~ flipper_length_mm, 
+                  data = penguins)
 
-price_pred <- rt_fit %>% 
-              predict(new_data = ames) %>% 
-              mutate(price_truth = ames$Sale_Price)
+peng_pred  <- rt_fit %>% 
+              predict(new_data = penguins) %>% 
+              mutate(truth = penguins$body_mass_g)
 
-rmse(price_pred, truth = price_truth, estimate = .pred)
+rmse(peng_pred, truth = truth, estimate = .pred)
 ```
 
 ---
@@ -738,16 +746,16 @@ class: middle, center
 
 ```{r echo = FALSE}
 base_rt_plot <-
-  ggplot(rt_preds, aes(x = Gr_Liv_Area, y = Sale_Price)) +
+  ggplot(rt_preds, aes(x = flipper_length_mm, y = body_mass_g)) +
   scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1)) +
   theme(legend.position="none", 
         text = element_text(family = "Lato")) +
-  coord_cartesian(y = c(50000, 500000), x = c(700, 2750)) +
+  #coord_cartesian(y = c(50000, 500000), x = c(700, 2750)) +
   ggtitle("Regression Tree") 
 
 base_rt_plot +
   geom_point(size = 3, alpha = .7) +
-  geom_line(aes(x=Gr_Liv_Area, y = .fitted_tree), colour="#CA225E", size=2) 
+  geom_line(aes(x=flipper_length_mm, y = .fitted_tree), colour="#CA225E", size=2) 
 ```
 
 ---
@@ -755,13 +763,13 @@ class: middle, center
 
 ```{r echo = FALSE}
 base_rt_plot +
-  geom_segment(aes(x = Gr_Liv_Area, 
-                   xend = Gr_Liv_Area, 
-                   y = Sale_Price, 
+  geom_segment(aes(x = flipper_length_mm, 
+                   xend = flipper_length_mm, 
+                   y = body_mass_g, 
                    yend = .fitted_tree), 
                colour = "#0D0887FF") +
   geom_point(size = 3, alpha = .7) +
-  geom_line(aes(x=Gr_Liv_Area, y = .fitted_tree), colour="#CA225E", size=2)
+  geom_line(aes(x=flipper_length_mm, y = .fitted_tree), colour="#CA225E", size=2)
 ```
 
 
@@ -781,9 +789,9 @@ class: middle, inverse, center
 
 ```{r include = FALSE}
 overfit <-
-  ggplot(small_train, aes(Gr_Liv_Area, Sale_Price)) +
+  ggplot(small_train, aes(flipper_length_mm, body_mass_g)) +
   geom_point(size = 3) +
-  coord_cartesian(y = c(50000, 500000)) +
+  #coord_cartesian(y = c(50000, 500000)) +
   geom_smooth(method = "lm", se = FALSE, colour = "#4D8DC9", lwd = 1) +
   theme(text = element_text(family = "Lato"))
 ```
@@ -812,7 +820,7 @@ overfit +
 ---
 
 ```{r include = FALSE}
-single_pt <- filter(small_train, Sale_Price == max(Sale_Price))
+single_pt <- filter(small_train, body_mass_g == max(body_mass_g))
 ```
 
 
@@ -833,7 +841,7 @@ over1
 .pull-right[
 ```{r echo = FALSE, fig.align='center'}
 over2 <- overfit +
-  stat_smooth(method = "lm", se = FALSE, formula = y ~ poly(x, 9), colour = "#E7553C", lwd = 1) +
+  stat_smooth(method = "lm", se = FALSE, formula = y ~ poly(x, 13), colour = "#E7553C", lwd = 1) +
   geom_point(data = single_pt, 
              fill = "yellow", 
              size = 5, 
@@ -871,28 +879,27 @@ countdown(seconds = 90, minutes = 0)
 
 ```{r echo=FALSE, fig.align='center'}
 set.seed(100)
-mc_split <- mc_cv(small_ames, times = 1)
-poly_rec <- recipe(Sale_Price ~ Gr_Liv_Area, data = small_train) %>% 
-  step_poly(Gr_Liv_Area, degree = tune())
+mc_split <- mc_cv(small_peng, times = 1)
+poly_rec <- recipe(body_mass_g ~ flipper_length_mm, data = small_train) %>% 
+  step_poly(flipper_length_mm, degree = tune())
 
 library(workflows)
 poly_flow <- workflow() %>% 
   add_recipe(poly_rec) %>% 
   add_model(lm_spec)
 
-poly_grid <- expand.grid(degree = 1:12)
+poly_grid <- expand.grid(degree = 1:6)
 
 mc_grid <- tune_grid(poly_flow, 
                      resamples = mc_split,
                      grid = poly_grid,
-                     metrics = metric_set(rmse))
+                     metrics = metric_set(yardstick::rmse))
 
 mc_grid %>% 
   autoplot() +
   geom_line() +
   scale_x_continuous(breaks=pretty_breaks()) +
-  theme(text = element_text(family = "Lato")) +
-  coord_cartesian(y = c(45000, 95000))
+  theme(text = element_text(family = "Lato")) 
 ```
 
 ---
@@ -901,10 +908,10 @@ mc_grid %>%
 mod <- list()
 pred <- list()
 rmse <- list()
-for (i in 1:12) {
-    mod[[i]] <- lm(Sale_Price ~ poly(Gr_Liv_Area, i), small_train)
+for (i in 1:6) {
+    mod[[i]] <- lm(body_mass_g ~ poly(flipper_length_mm, i), small_train)
     pred[[i]] <- predict(mod[[i]])
-    rmse[[i]] <- rmse_vec(truth = small_train %>% pull(Sale_Price),
+    rmse[[i]] <- rmse_vec(truth = small_train %>% pull(body_mass_g),
                           estimate = pred[[i]])
 }
 
@@ -921,7 +928,7 @@ mc_grid %>%
   theme(legend.position="none", 
         text = element_text(family = "Lato")) +
   ylab("rmse") +
-  coord_cartesian(y = c(45000, 95000)) +
+  #coord_cartesian(y = c(45000, 95000)) +
   scale_colour_viridis_d(option = "magma", begin = .2, end = .7)
 ```
 
@@ -977,7 +984,7 @@ class: middle, center
 
 ```{r all-split, echo = FALSE, fig.width = 12, fig.height = 3}
 set.seed(16)
-one_split <- slice(ames, 1:30) %>% 
+one_split <- slice(small_peng, 1:30) %>% 
   initial_split() %>% 
   tidy() %>% 
   add_row(Row = 1:30, Data = "Original") %>% 
@@ -1025,8 +1032,8 @@ initial_split(data, prop = 3/4)
 ---
 
 ```{r}
-ames_split <- initial_split(ames, prop = 0.75)
-ames_split
+peng_split <- initial_split(penguins, prop = 0.75)
+peng_split
 ```
 
 ???
@@ -1041,13 +1048,13 @@ class: center
 Extract training and testing sets from an rsplit
 
 ```{r results='hide'}
-training(ames_split)
-testing(ames_split)
+training(peng_split)
+testing(peng_split)
 ```
 
 ---
 ```{r R.options = list(tibble.max_extra_cols=5, tibble.print_max=5, tibble.width=60)}
-train_set <- training(ames_split) 
+train_set <- training(peng_split) 
 train_set
 ```
 
@@ -1129,26 +1136,26 @@ countdown(minutes = 4)
 ```{r results='hide'}
 set.seed(100) # Important!
 
-ames_split  <- initial_split(ames)
-ames_train  <- training(ames_split)
-ames_test   <- testing(ames_split)
+peng_split  <- initial_split(penguins)
+peng_train  <- training(peng_split)
+peng_test   <- testing(peng_split)
 
 lm_fit      <- lm_spec %>% 
-               fit(Sale_Price ~ Gr_Liv_Area, 
-                   data = ames_train)
+               fit(body_mass_g ~ flipper_length_mm, 
+                   data = peng_train)
 
-price_pred  <- lm_fit %>% 
-               predict(new_data = ames_test) %>% 
-               mutate(price_truth = ames_test$Sale_Price)
+peng_pred  <- lm_fit %>% 
+               predict(new_data = peng_test) %>% 
+               mutate(true_mass = peng_test$body_mass_g)
 
-rmse(price_pred, truth = price_truth, estimate = .pred)
+rmse(peng_pred, truth = true_mass, estimate = .pred)
 ```
 
 ```{r include=FALSE}
-price_resid  <- predict(lm_fit, new_data = ames_train) %>% 
-  mutate(price_truth = ames_train$Sale_Price)
-rmse_train <- rmse(price_resid, truth = price_truth, estimate = .pred) %>% pull(.estimate)
-rmse_test  <- rmse(price_pred, truth = price_truth, estimate = .pred) %>% pull(.estimate)
+peng_resid  <- predict(lm_fit, new_data = peng_train) %>% 
+  mutate(true_mass = peng_train$body_mass_g)
+rmse_train <- rmse(peng_resid, truth = true_mass, estimate = .pred) %>% pull(.estimate)
+rmse_test  <- rmse(peng_pred, truth = true_mass, estimate = .pred) %>% pull(.estimate)
 ```
 
 RMSE = `r round(rmse_test, 2)`; compare to `r round(rmse_full, 2)`
@@ -1172,24 +1179,24 @@ class: middle, center
 
 ### Testing RMSE = `r round(rmse_test, 2)`
 ```{r lm-test-resid, echo=FALSE, message = FALSE, warning = FALSE}
-train_lm <- lm(Sale_Price ~ Gr_Liv_Area, data = small_train)
+train_lm <- lm(body_mass_g ~ flipper_length_mm, data = small_train)
 
 lm_test_pred <- train_lm %>% 
-  broom::augment(newdata = small_test) %>% 
-  select(Sale_Price, Gr_Liv_Area, .fitted, .row)
+  broom::augment(newdata = small_test)
+  #dplyr::select(body_mass_g, flipper_length_mm, .fitted, .row)
 
-ggplot(data = NULL, aes(Gr_Liv_Area, Sale_Price)) +
+ggplot(data = NULL, aes(flipper_length_mm, body_mass_g)) +
   geom_segment(data = lm_test_pred,
-               aes(x = Gr_Liv_Area, 
-                   xend = Gr_Liv_Area, 
-                   y = Sale_Price, 
+               aes(x = flipper_length_mm, 
+                   xend = flipper_length_mm, 
+                   y = body_mass_g, 
                    yend = .fitted), 
                colour = "#E7553C") +
   geom_smooth(data = small_train, method = "lm", se = FALSE, colour = "#4D8DC9",
               fullrange = TRUE) +
   #geom_smooth(data = small_test, method = "lm", se = FALSE, colour = "#2aa198", lty = 4, fullrange = TRUE) +
   geom_point(data = small_test, size = 3) +
-  coord_cartesian(y = c(50000, 500000)) +
+  #coord_cartesian(y = c(50000, 500000)) +
   theme(text = element_text(family = "Lato"))
 ```
 ]
@@ -1231,20 +1238,23 @@ class: middle, center, inverse
 # Stratified sampling
 
 ```{r include=FALSE}
-top_area <- small_ames %>% 
-  top_n(20, Gr_Liv_Area) %>% 
+peng_plots <- penguins %>% 
+  mutate(.row = dplyr::row_number())
+
+top_area <- peng_plots %>% 
+  top_n(20, flipper_length_mm) %>% 
   pull(.row)
 
-top_sale <- small_ames %>% 
-  top_n(20, Sale_Price) %>% 
+top_sale <- peng_plots %>% 
+  top_n(20, body_mass_g) %>% 
   pull(.row)
 
-bot_area <- small_ames %>% 
-  top_n(-20, Gr_Liv_Area) %>% 
+bot_area <- peng_plots %>% 
+  top_n(-20, flipper_length_mm) %>% 
   pull(.row)
 
-bot_sale <- small_ames %>% 
-  top_n(-20, Sale_Price) %>% 
+bot_sale <- peng_plots %>% 
+  top_n(-20, body_mass_g) %>% 
   pull(.row)
 
 tidy_ssplit <- small_split %>% 
@@ -1255,15 +1265,15 @@ tidy_ssplit <- small_split %>%
     TRUE ~ Data
   )) %>% 
   mutate(Data = factor(Data, levels = c("Training", "Testing"))) %>% 
-  left_join(small_ames, by = c("Row" = ".row")) %>% 
-  select(Gr_Liv_Area, Sale_Price, Data, Row) %>% 
+  left_join(small_peng, by = c("Row" = ".row")) %>% 
+  select(flipper_length_mm, body_mass_g, Data, Row) %>% 
   mutate(hi_area = if_else(Row %in% top_area, "Testing", "Training"),
          hi_sale = if_else(Row %in% top_sale, "Testing", "Training"),
          lo_sale = if_else(Row %in% bot_sale, "Testing", "Training"),
          lo_area = if_else(Row %in% bot_area, "Testing", "Training"))
 
 split_plots <- 
-  ggplot(tidy_ssplit, aes(x = Gr_Liv_Area, y = Sale_Price)) +
+  ggplot(tidy_ssplit, aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point(aes(fill = Data), size = 5, shape = 21, alpha = .8) +
   theme(legend.position="none", 
         text = element_text(family = "Lato")) +
@@ -1307,8 +1317,8 @@ split_plots +
 ---
 ```{r echo = FALSE, fig.align='center'}
 set.seed(100)
-small_strata <- initial_split(small_ames, 
-                              strata = Sale_Price, 
+small_strata <- initial_split(small_peng, 
+                              strata = body_mass_g, 
                               breaks = 4)
 
 strata_split <- small_strata %>% 
@@ -1319,11 +1329,11 @@ strata_split <- small_strata %>%
     TRUE ~ Data
   )) %>% 
   mutate(Data = factor(Data, levels = c("Training", "Testing"))) %>% 
-  left_join(small_ames, by = c("Row" = ".row")) %>% 
-  select(Gr_Liv_Area, Sale_Price, Data, Row) %>% 
-  mutate(bucket = ntile(Sale_Price, n = 4))
+  left_join(small_peng, by = c("Row" = ".row")) %>% 
+  select(flipper_length_mm, body_mass_g, Data, Row) %>% 
+  mutate(bucket = ntile(body_mass_g, n = 4))
 
-strata_plot <- ggplot(strata_split, aes(x = Gr_Liv_Area, y = Sale_Price)) +
+strata_plot <- ggplot(strata_split, aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point(size = 5, shape = 21, alpha = .8) +
   theme(legend.position="none", 
         text = element_text(family = "Lato")) +
@@ -1370,20 +1380,20 @@ strata_plot +
 ```{r strata, eval=FALSE}
 set.seed(100) # Important!
 
-ames_split  <- initial_split(ames, 
-                             strata = Sale_Price, #<<
+peng_split  <- initial_split(penguins, 
+                             strata = body_mass_g, #<<
                              breaks = 4) #<<
-ames_train  <- training(ames_split)
-ames_test   <- testing(ames_split)
+peng_train  <- training(peng_split)
+peng_test   <- testing(peng_split)
 
 lm_fit      <- lm_spec %>% 
-               fit(Sale_Price ~ Gr_Liv_Area, 
-                   data = ames_train)
+               fit(body_mass_g ~ flipper_length_mm, 
+                   data = peng_train)
 
-price_pred  <- lm_fit %>% 
-               predict(new_data = ames_test) %>% 
-               mutate(price_truth = ames_test$Sale_Price)
+peng_pred  <- lm_fit %>% 
+               predict(new_data = peng_test) %>% 
+               mutate(true_mass = peng_test$body_mass_g)
 
-rmse(price_pred, truth = price_truth, estimate = .pred)
+rmse(peng_pred, truth = true_mass, estimate = .pred)
 ```
 
