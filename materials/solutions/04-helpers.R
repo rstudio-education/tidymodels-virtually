@@ -34,7 +34,7 @@ get_boot_trees <- function(seed = 1, tree_depth = 4) {
 
 get_boot_votes <- function(seed = 1, team = 1) {
   tree <- get_boot_trees(seed)
-  set.seed(seed * team)
+  set.seed(team)
   start <- sample((nrow(so_test)/2 - 4), 1)
   mini_test <- so_test %>% 
     mutate(obs = row_number()) %>%  

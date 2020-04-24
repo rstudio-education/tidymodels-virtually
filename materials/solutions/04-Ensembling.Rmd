@@ -1,19 +1,13 @@
 ---
-title: "04-Ensembling"
+title: "04-ensembling"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(tidymodels)
-library(tune)
 
 source(here::here("materials/exercises/04-helpers.R"))
-
-fit_split <- function(formula, model, split, ...) {
-  wf <- workflows::add_model(workflows::add_formula(workflows::workflow(), formula, blueprint = hardhat::default_formula_blueprint(indicators = FALSE)), model)
-  tune::last_fit(wf, split, ...)
-}
 
 get_tree_fit <- function(results) {
   results %>% 
@@ -22,13 +16,15 @@ get_tree_fit <- function(results) {
 }
 
 # read in the data
-stackoverflow <- read_rds(here::here("materials/data/stackoverflow.rds"))
+stackoverflow <- read_rds(here::here("materials/data/stackoverflow.rds")) %>% 
+  select(-country)
 
 # split the data
 set.seed(100) # Important!
 so_split <- initial_split(stackoverflow, strata = remote)
 so_train <- training(so_split)
 so_test  <- testing(so_split)
+so_folds <- vfold_cv(so_train, strata = remote)
 ```
 
 # Your turn 1
@@ -42,9 +38,9 @@ vanilla_tree_spec <-
   set_mode("classification")
 
 set.seed(100) # Important!
-_________(remote ~ ., 
-          model = ________, 
-          split = so_split) %>% 
+_________ %>% 
+  _________(remote ~ ., 
+            resamples = so_folds) %>% 
   _________
 ```
 
@@ -55,9 +51,9 @@ vanilla_tree_spec <-
   set_mode("classification")
 
 set.seed(100) # Important!
-fit_split(remote ~ ., 
-          model = vanilla_tree_spec, 
-          split = so_split) %>% 
+vanilla_tree_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
   collect_metrics()
 ```
 
@@ -82,9 +78,9 @@ big_tree_spec <-
   set_mode("classification")
 
 set.seed(100)
-fit_split(remote ~ ., 
-          model = big_tree_spec, 
-          split = so_split) %>% 
+big_tree_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
   collect_metrics()
 ```
 
@@ -116,15 +112,15 @@ rf_spec <-
   set_mode("classification")
 
 set.seed(100)
-fit_split(remote ~ ., 
-          model = rf_spec, 
-          split = so_split) %>% 
+rf_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
   collect_metrics()
 ```
 
 # Your Turn 6
 
-Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 20 variables at each split. Which value maximizes the area under the ROC curve?
+Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 19 variables at each split. Which value maximizes the area under the ROC curve?
 
 *Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
 
@@ -133,9 +129,9 @@ rf4_spec <- rf_spec %>%
   set_args(mtry = 4) #<<
 
 set.seed(100)
-fit_split(remote ~ ., 
-          model = rf4_spec, #<<
-          split = so_split) %>% 
+rf4_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
   collect_metrics()
 ```
 
@@ -144,9 +140,9 @@ rf8_spec <- rf_spec %>%
   set_args(mtry = 8) #<<
 
 set.seed(100)
-fit_split(remote ~ ., 
-          model = rf8_spec, #<<
-          split = so_split) %>% 
+rf8_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
   collect_metrics()
 ```
 
@@ -155,20 +151,20 @@ rf12_spec <- rf_spec %>%
   set_args(mtry = 12) #<<
 
 set.seed(100)
-fit_split(remote ~ ., 
-          model = rf12_spec, #<<
-          split = so_split) %>% 
+rf12_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
   collect_metrics()
 ```
 
 ```{r}
-rf20_spec <- rf_spec %>% 
-  set_args(mtry = 20) #<<
+rf19_spec <- rf_spec %>% 
+  set_args(mtry = 19) #<<
 
 set.seed(100)
-fit_split(remote ~ ., 
-          model = rf20_spec, #<<
-          split = so_split) %>% 
+rf19_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
   collect_metrics()
 ```
 
@@ -178,18 +174,23 @@ fit_split(remote ~ .,
 Make a new model spec called `treebag_imp_spec` to fit a bagged classification tree model. Set the variable `importance` mode to "permutation". Plot the variable importance- which variable was the most important?
 
 ```{r}
-rf_spec <- rand_forest(mtry = .preds()) %>% 
-  set_engine("ranger", importance = "permutation") %>% 
+treebag_imp_spec <-
+  rand_forest(mtry = .preds()) %>% 
+  set_engine("ranger", importance = 'permutation') %>% 
   set_mode("classification")
 
-set.seed(100)
-rf_fitwf <- fit_split(remote ~ ., 
-                    model = rf_spec, 
-                    split = so_split) 
+treebag_wf <-
+  workflow() %>% 
+  add_formula(remote ~ .) %>% 
+  add_model(treebag_imp_spec)
 
-rf_fit <- get_tree_fit(rf_fitwf)
+imp_fit <- 
+  treebag_wf %>% 
+  last_fit(split = so_split)
 
-vip::vip(rf_fit, geom = "point")
+imp_plot <- get_tree_fit(imp_fit)
+
+vip::vip(imp_plot, geom = "point")
 ```
 
 
