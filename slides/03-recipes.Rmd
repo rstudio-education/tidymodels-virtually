@@ -23,7 +23,7 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-knitr::opts_chunk$set(comment = ">",
+knitr::opts_chunk$set(comment = "#",
                       message = FALSE,
                       warning = FALSE, 
                       collapse = TRUE,

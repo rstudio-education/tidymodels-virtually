@@ -20,7 +20,7 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-knitr::opts_chunk$set(comment = ">",
+knitr::opts_chunk$set(comment = "#",
                       message = FALSE,
                       warning = FALSE, 
                       collapse = TRUE,
@@ -127,12 +127,6 @@ get_tree_fit <- function(results = big_tree) {
 }
 ```
 
-
-layout: true
-
-<a class="footer-link" href="TBD">TBD</a>
-
----
 
 class: title-slide, center, bottom
 
@@ -676,35 +670,19 @@ big_tree_cp %>%
 class: middle, center
 
 ```{r echo=FALSE, fig.width=12}
-big_tree_cp %>% 
-  filter(error_type == "rel_error") %>% 
-  ggplot(aes(x = fct_rev(cp_fct), y = error_val, 
+ggplot(big_tree_cp, aes(x = as.factor(nsplit), y = error_val, 
                         group = error_type, color = fct_rev(error_type))) +
   geom_point(size = 3) +
   geom_line() +
-  labs(x = "cost complexity", y = "error", color = NULL) +
-  scale_color_manual(values = splits_pal[3], 
-                     labels = "Training") +
-  theme(text = element_text(family = "Lato")) +
-  scale_x_discrete() +
-  coord_cartesian(ylim = c(0, 1.05), expand = TRUE)
-```
-
----
-class: middle, center
-
-```{r echo=FALSE, fig.width=12}
-ggplot(big_tree_cp, aes(x = fct_rev(cp_fct), y = error_val, 
-                        group = error_type, color = fct_rev(error_type))) +
-  geom_point(size = 3) +
-  geom_line() +
-  labs(x = "cost complexity", y = "error", color = NULL) +
+  labs(x = "number of splits", y = "error", color = NULL) +
   scale_color_manual(values = splits_pal[c(1, 3)], 
                      labels = c("Testing", "Training")) +
   theme(text = element_text(family = "Lato")) +
   scale_x_discrete() +
   coord_cartesian(ylim = c(0, 1.08), expand = TRUE)
 ```
+
+
 
 ---
 class: middle, center
@@ -772,6 +750,42 @@ ggplot(big_tree_cp, aes(x = rev(as.factor(cp)), y = error_val, group = error_typ
                      labels = c("Testing", "Training")) +
   theme(text = element_text(family = "Lato")) +
   scale_x_discrete(breaks=pretty_breaks())
+```
+
+---
+class: middle, center
+
+```{r echo=FALSE, fig.width=12}
+big_tree_cp %>% 
+  filter(error_type == "rel_error") %>% 
+  ggplot(aes(x = fct_rev(cp_fct), y = error_val, 
+                        group = error_type, color = fct_rev(error_type))) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "cost complexity", y = "error", color = NULL) +
+  scale_color_manual(values = splits_pal[3], 
+                     labels = "Training") +
+  theme(text = element_text(family = "Lato")) +
+  scale_x_discrete() +
+  coord_cartesian(ylim = c(0, 1.05), expand = TRUE)
+```
+
+
+
+---
+class: middle, center
+
+```{r echo=FALSE, fig.width=12}
+ggplot(big_tree_cp, aes(x = fct_rev(cp_fct), y = error_val, 
+                        group = error_type, color = fct_rev(error_type))) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "cost complexity", y = "error", color = NULL) +
+  scale_color_manual(values = splits_pal[c(1, 3)], 
+                     labels = c("Testing", "Training")) +
+  theme(text = element_text(family = "Lato")) +
+  scale_x_discrete() +
+  coord_cartesian(ylim = c(0, 1.08), expand = TRUE)
 ```
 
 ---
@@ -1005,41 +1019,6 @@ knitr::include_graphics("images/orchestra.jpg")
 ```
 
 
----
-background-image: url(images/ensemble/ensemble.001.jpeg)
-background-size: cover
-
----
-background-image: url(images/ensemble/ensemble.002.jpeg)
-background-size: contain
-
----
-background-image: url(images/ensemble/ensemble.003.jpeg)
-background-size: contain
-
----
-background-image: url(images/ensemble/ensemble.004.jpeg)
-background-size: contain
-
----
-background-image: url(images/ensemble/ensemble.005.jpeg)
-background-size: contain
-
----
-background-image: url(images/ensemble/ensemble.006.jpeg)
-background-size: contain
-
----
-background-image: url(images/ensemble/ensemble.007.jpeg)
-background-size: contain
-
----
-background-image: url(images/ensemble/ensemble.008.jpeg)
-background-size: contain
-
----
-background-image: url(images/ensemble/ensemble.009.jpeg)
-background-size: contain
 
 ---
 class: middle, frame, center
@@ -1509,6 +1488,7 @@ imp_fit <-
   last_fit(split = so_split)
 
 imp_plot <- get_tree_fit(imp_fit)
+imp_plot
 ```
 
 ---
