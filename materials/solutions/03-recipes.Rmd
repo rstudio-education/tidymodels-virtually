@@ -1,0 +1,118 @@
+---
+title: "03-recipes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(AmesHousing)
+library(tidymodels)
+
+ames <- make_ames() %>% 
+  dplyr::select(-matches("Qu"))
+
+set.seed(100)
+ames_split <- initial_split(ames)
+ames_train <- training(ames_split)
+ames_test  <- testing(ames_split)
+
+# pca_rec <- 
+#   recipe(Sale_Price ~ ., data = ames) %>%
+#     step_novel(all_nominal()) %>%
+#     step_dummy(all_nominal()) %>%
+#     step_zv(all_predictors()) %>%
+#     step_normalize(all_predictors()) %>%
+#     step_pca(all_predictors(), num_comp = 5)
+```
+
+# Your Turn 1
+
+Write a recipe for the `Sale_Price ~ `. variables that:
+1. Adds a novel level to all factors  
+2. Convert all factors to dummy variables  
+3. Catches any zero variance variables  
+4. Normalizes all of the predictors (centers and scales)
+5. Computes the first 5 principal components  
+
+Save the result as `pca_rec`  
+
+```{r}
+pca_rec <- 
+  recipe(Sale_Price ~ ., data = ames) %>%
+    step_novel(all_nominal()) %>%
+    step_dummy(all_nominal()) %>%
+    step_zv(all_predictors()) %>%
+    step_normalize(all_predictors()) %>%
+    step_pca(all_predictors(), num_comp = 5)
+```
+
+
+# Your Turn 2
+
+Make a workflow that combines `pca_rec` and with `lm_spec`.
+
+```{r}
+pca_wf <-
+  workflow() %>% 
+    add_recipe(pca_rec) %>% 
+    add_model(lm_spec)
+```
+
+# Your Turn 3
+
+Run the first chunk. Then try our pca workflow on `ames_folds`. What is the RMSE?
+
+```{r}
+set.seed(100)
+ames_folds <- vfold_cv(ames_train, v = 10, strata = Sale_Price, breaks = 4)
+```
+
+```{r}
+pca_wf %>% 
+  fit_resamples(resamples = ames_folds) %>% 
+  collect_metrics()
+```
+
+# Your Turn 4
+
+Modify the code below to build a new pca recipe that uses `step_other` *first* to collapse infrequently occurring values of `Neighborhood` into an "other" category. Then update `pca_wf` to use the new recipe.
+
+
+```{r eval = FALSE}
+other_rec <- 
+  recipe(Sale_Price ~ ., data = ames) %>%
+    step_novel(all_nominal()) %>%
+    step_dummy(all_nominal()) %>%
+    step_zv(all_predictors()) %>%
+    step_normalize(all_predictors()) %>%
+    step_pca(all_predictors(), num_comp = 5)
+
+other_wf  <- 
+  pca_wf %>% 
+    ____________(other_rec)
+
+_______ %>% 
+  fit_resamples(resamples = cv_folds) %>% 
+  collect_metrics()
+```
+
+```{r}
+other_rec <- 
+  recipe(Sale_Price ~ ., data = ames) %>% 
+    step_other(Neighborhood, threshold = 0.05) %>% 
+    step_novel(all_nominal()) %>%
+    step_dummy(all_nominal()) %>%
+    step_zv(all_predictors()) %>%
+    step_center(all_predictors()) %>%
+    step_scale(all_predictors()) %>%
+    step_pca(all_predictors(), num_comp = 5) 
+
+other_wf <- 
+  pca_wf %>% 
+    update_recipe(other_rec)
+
+other_wf %>% 
+  fit_resamples(resamples = cv_folds) %>% 
+  collect_metrics()
+```
+
