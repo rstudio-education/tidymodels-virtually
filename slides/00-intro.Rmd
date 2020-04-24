@@ -23,11 +23,6 @@ knitr::opts_chunk$set(collapse = TRUE,
                       fig.retina = 3)
 ```
 
-layout: true
-
-<a class="footer-link" href="https://tmv.netlify.app/">https://tmv.netlify.app/</a>
-
----
 
 class: title-slide, center, bottom
 
