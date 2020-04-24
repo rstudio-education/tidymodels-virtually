@@ -72,12 +72,6 @@ splits_pal <- c(data_color, train_color, test_color)
 ```
 
 
-layout: true
-
-<a class="footer-link" href="https://tmv.netlify.app/">https://tmv.netlify.app/</a>
-
-
----
 
 class: title-slide, center, bottom
 
