@@ -1,5 +1,5 @@
 ---
-title: "06-Recipes"
+title: "03-recipes"
 output: html_document
 ---
 
@@ -16,6 +16,11 @@ set.seed(100)
 ames_split <- initial_split(ames)
 ames_train <- training(ames_split)
 ames_test  <- testing(ames_split)
+
+rt_spec <- 
+  decision_tree() %>% 
+  set_engine("rpart") %>% 
+  set_mode("regression")
 
 # pca_rec <- 
 #   recipe(Sale_Price ~ ., data = ames) %>%
@@ -44,7 +49,7 @@ Save the result as `pca_rec`
 
 # Your Turn 2
 
-Make a workflow that combines `pca_rec` and with `lm_spec`.
+Make a workflow that combines `pca_rec` and with `rt_spec`.
 
 ```{r}
 
@@ -52,18 +57,30 @@ Make a workflow that combines `pca_rec` and with `lm_spec`.
 
 # Your Turn 3
 
+Try our pca workflow to predict sale price with the ames_test data. What is the RMSE?
+
+```{r}
+_______ %>% 
+  fit(data = ames_train) %>% 
+  predict(ames_test) %>% 
+  mutate(truth = ames_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+```
+
+# Your Turn 4
+
 Run the first chunk. Then try our pca workflow on `ames_folds`. What is the RMSE?
 
 ```{r}
 set.seed(100)
-ames_folds <- vfold_cv(ames_train, v = 10, strata = Sale_Price, breaks = 4)
+ames_folds <- vfold_cv(ames_train, strata = Sale_Price, breaks = 4)
 ```
 
 ```{r}
 
 ```
 
-# Your Turn 4
+# Your Turn 5
 
 Modify the code below to build a new pca recipe that uses `step_other` *first* to collapse infrequently occurring values of `Neighborhood` into an "other" category. Then update `pca_wf` to use the new recipe.
 
@@ -79,9 +96,9 @@ other_rec <-
 
 other_wf  <- 
   pca_wf %>% 
-    ____________(other_rec)
+    ____________
 
 _______ %>% 
-  fit_resamples(resamples = cv_folds) %>% 
+  fit_resamples(resamples = _______) %>% 
   collect_metrics()
 ```

@@ -4,10 +4,9 @@
     <title>Preprocess Your Data</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-23" />
+    <meta name="date" content="2020-04-24" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
-    <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
     <!---import JQuery-->
@@ -59,76 +58,160 @@ class: title-slide, center, bottom
 
 
 ---
-name: clouds
-class: center, middle
-background-image: url(images/Clouds.jpg)
-background-size: cover
-
----
-name: clouds2
-background-image: url(images/Clouds2.jpg)
-background-size: cover
-
----
-template: clouds2
+background-image: url(images/garbage.jpg)
+background-size: contain
+background-position: left
 class: middle, center
+background-color: #f5f5f5
+
+.pull-right[
+## GIGO
+
+]
+
+---
+class: middle, center, inverse
+
+# &lt;i class="fas fa-bomb"&gt;&lt;/i&gt; Data Leakage &lt;i class="fas fa-bomb"&gt;&lt;/i&gt;
+
+---
+
+# What will this code do?
 
 
-### Alison Hill 
+```r
+ames_zsplit &lt;- ames %&gt;% 
+  mutate(z_price = 
+           (Sale_Price - mean(Sale_Price)) / sd(Sale_Price)) %&gt;% 
+  initial_split()
+```
 
-&lt;img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/&gt;
-
-[<i class="fab  fa-github "></i> @apreshill](https://github.com/apreshill)  
-[<i class="fab  fa-twitter "></i> @apreshill](https://twitter.com/apreshill)
+--
 
 
+```
+&gt; # A tibble: 2,198 x 2
+&gt;    Sale_Price  z_price
+&gt;         &lt;int&gt;    &lt;dbl&gt;
+&gt;  1     105000 -0.949  
+&gt;  2     172000 -0.110  
+&gt;  3     244000  0.791  
+&gt;  4     213500  0.409  
+&gt;  5     191500  0.134  
+&gt;  6     236500  0.697  
+&gt;  7     189000  0.103  
+&gt;  8     175900 -0.0613 
+&gt;  9     185000  0.0526 
+&gt; 10     180400 -0.00496
+&gt; # … with 2,188 more rows
+```
 
-???
+---
 
-My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+# Guess
 
+What could go wrong?
+
+1. Take the `mean` and `sd` of `Sale_Price`
+
+1. Transform all sale prices in `ames`
+
+1. Train with .display[training] set
+
+1. Predict sale prices with .display[testing] set
+
+---
+
+# What (else) could go wrong?
+
+
+
+```r
+ames_train &lt;- training(ames_split) %&gt;% 
+  mutate(z_price = (Sale_Price - mean(Sale_Price)) / sd(Sale_Price))
+
+ames_test &lt;- testing(ames_split) %&gt;% 
+  mutate(z_price = (Sale_Price - mean(Sale_Price)) / sd(Sale_Price))
+
+rt_fit &lt;- fit_data(Sale_Price ~ Gr_Liv_Area, 
+                   model = rt_spec, 
+                   data = ames_train)
+
+price_pred  &lt;- rt_fit %&gt;% 
+  predict(new_data = ames_test) %&gt;% 
+  mutate(price_truth = ames_test$Sale_Price)
+
+rmse(price_pred, truth = price_truth, estimate = .pred)
+```
+
+
+
+---
+
+# Better
+
+1. Split the data
+
+1. Transform training set sale prices based on `mean` and `sd` of `Sale_Price` of the training set
+
+1. Train with training set
+
+1. Transform testing set sale prices based on `mean` and `sd` of `Sale_Price` of the **training set**
+
+1. Predict sale prices with testing set
 
 ---
 class: middle, center, frame
 
-# Goal of Predictive Modeling
+# Data Leakage
+
+"When the data you are using to train a machine learning algorithm happens to have the information you are trying to predict."
+
+.footnote[Daniel Gutierrez, [Ask a Data Scientist: Data Leakage](http://insidebigdata.com/2014/11/26/ask-data-scientist-data-leakage/)]
+
+---
+class: middle, center, frame
+
+# Axiom
+
+Your learner is more than a model.
+
+---
+class: middle, center, frame
+
+# Lemma #1
+
+Your learner is more than a model.
 
 --
 
+Your learner is only as good as your data.
 
-## 🔨 build .display[models] that
+---
+class: middle, center, frame
 
---
+# Lemma #2
 
+Your learner is more than a model.
 
-## 🎯 generate .display[accurate predictions]
-
---
-
-
-## 🔮 for .display[future, yet-to-be-seen data]
-
-
+Your learner is only as good as your data.
 
 --
 
-.footnote[Max Kuhn &amp; Kjell Johnston, http://www.feat.engineering/]
+Your data is only as good as your workflow.
 
+---
+class: middle, center, inverse
 
-???
+&lt;img src="images/pink-thunder.png" width="618" style="display: block; margin: auto;" /&gt;
 
-This is our whole game vision for today. This is the main goal for predictive modeling broadly, and for machine learning specifically.
-
-We'll use this goal to drive learning of 3 core tidymodels packages:
-
-- parsnip
-- yardstick
-- and rsample
 
 ---
 class: inverse, middle, center
 
-# 🍲 Build a recipe
+# Build a recipe
+
+## With recipes
 
 ---
 class: middle, center, frame
@@ -142,35 +225,7 @@ background-image: url(images/workflows/workflows.013.jpeg)
 background-size: contain
 background-position: center
 
----
-background-image: url(images/recipe-hex/recipe-hex.001.jpeg)
-background-size: contain
-background-position: center
 
----
-background-image: url(images/recipe-hex/recipe-hex.002.jpeg)
-background-size: contain
-background-position: center
-
----
-background-image: url(images/recipe-hex/recipe-hex.003.jpeg)
-background-size: contain
-background-position: center
-
----
-background-image: url(images/recipe-hex/recipe-hex.004.jpeg)
-background-size: contain
-background-position: center
-
----
-background-image: url(images/recipe-hex/recipe-hex.005.jpeg)
-background-size: contain
-background-position: center
-
----
-background-image: url(images/recipe-hex/recipe-hex.006.jpeg)
-background-size: contain
-background-position: center
 
 ---
 class: middle, center
@@ -192,7 +247,7 @@ Transforms variables into the orthogonal "components" that most concisely captur
 
 
 
-&lt;img src="figs/03-recipes/unnamed-chunk-3-1.png" width="38%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/03-recipes/unnamed-chunk-7-1.png" width="38%" style="display: block; margin: auto;" /&gt;
 
 ---
 class: middle, center, frame
@@ -273,7 +328,7 @@ class: middle
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#xbvharnqej .gt_table {
+#dpcdubdxdy .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -290,7 +345,7 @@ class: middle
   border-bottom-color: #A8A8A8;
 }
 
-#xbvharnqej .gt_heading {
+#dpcdubdxdy .gt_heading {
   background-color: #FFFFFF;
   border-bottom-color: #FFFFFF;
   border-left-style: hidden;
@@ -301,7 +356,7 @@ class: middle
   border-right-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_title {
+#dpcdubdxdy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -311,7 +366,7 @@ class: middle
   border-bottom-width: 0;
 }
 
-#xbvharnqej .gt_subtitle {
+#dpcdubdxdy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -321,13 +376,13 @@ class: middle
   border-top-width: 0;
 }
 
-#xbvharnqej .gt_bottom_border {
+#dpcdubdxdy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_col_headings {
+#dpcdubdxdy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -342,7 +397,7 @@ class: middle
   border-right-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_col_heading {
+#dpcdubdxdy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -356,7 +411,7 @@ class: middle
   overflow-x: hidden;
 }
 
-#xbvharnqej .gt_column_spanner {
+#dpcdubdxdy .gt_column_spanner {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -373,7 +428,7 @@ class: middle
   width: 97%;
 }
 
-#xbvharnqej .gt_group_heading {
+#dpcdubdxdy .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -395,7 +450,7 @@ class: middle
   vertical-align: middle;
 }
 
-#xbvharnqej .gt_empty_group_heading {
+#dpcdubdxdy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -410,19 +465,19 @@ class: middle
   vertical-align: middle;
 }
 
-#xbvharnqej .gt_striped {
+#dpcdubdxdy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#xbvharnqej .gt_from_md > :first-child {
+#dpcdubdxdy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#xbvharnqej .gt_from_md > :last-child {
+#dpcdubdxdy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#xbvharnqej .gt_row {
+#dpcdubdxdy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -441,7 +496,7 @@ class: middle
   overflow-x: hidden;
 }
 
-#xbvharnqej .gt_stub {
+#dpcdubdxdy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-weight: initial;
@@ -452,7 +507,7 @@ class: middle
   padding-left: 12px;
 }
 
-#xbvharnqej .gt_summary_row {
+#dpcdubdxdy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -462,7 +517,7 @@ class: middle
   padding-right: 5px;
 }
 
-#xbvharnqej .gt_first_summary_row {
+#dpcdubdxdy .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -472,7 +527,7 @@ class: middle
   border-top-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_grand_summary_row {
+#dpcdubdxdy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -482,7 +537,7 @@ class: middle
   padding-right: 5px;
 }
 
-#xbvharnqej .gt_first_grand_summary_row {
+#dpcdubdxdy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -492,7 +547,7 @@ class: middle
   border-top-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_table_body {
+#dpcdubdxdy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -501,7 +556,7 @@ class: middle
   border-bottom-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_footnotes {
+#dpcdubdxdy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -515,13 +570,13 @@ class: middle
   border-right-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_footnote {
+#dpcdubdxdy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#xbvharnqej .gt_sourcenotes {
+#dpcdubdxdy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -535,46 +590,46 @@ class: middle
   border-right-color: #D3D3D3;
 }
 
-#xbvharnqej .gt_sourcenote {
+#dpcdubdxdy .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#xbvharnqej .gt_left {
+#dpcdubdxdy .gt_left {
   text-align: left;
 }
 
-#xbvharnqej .gt_center {
+#dpcdubdxdy .gt_center {
   text-align: center;
 }
 
-#xbvharnqej .gt_right {
+#dpcdubdxdy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#xbvharnqej .gt_font_normal {
+#dpcdubdxdy .gt_font_normal {
   font-weight: normal;
 }
 
-#xbvharnqej .gt_font_bold {
+#dpcdubdxdy .gt_font_bold {
   font-weight: bold;
 }
 
-#xbvharnqej .gt_font_italic {
+#dpcdubdxdy .gt_font_italic {
   font-style: italic;
 }
 
-#xbvharnqej .gt_super {
+#dpcdubdxdy .gt_super {
   font-size: 65%;
 }
 
-#xbvharnqej .gt_footnote_marks {
+#dpcdubdxdy .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="xbvharnqej" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="dpcdubdxdy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   
   <thead class="gt_col_headings">
     <tr>
@@ -653,7 +708,7 @@ rec &lt;-
 
 --
 
-.center[The .display[formula] ➡️ *indicates outcomes vs predictors*]
+.center[The .display[formula] &amp;rarr; *indicates outcomes vs predictors*]
 
 ---
 class: middle
@@ -675,7 +730,7 @@ rec &lt;-
 
 --
 
-.center[The .display[data] ➡️ *is only used to catalog the names and types of each variable*]
+.center[The .display[data] &amp;rarr;  *is only used to catalog the names and types of each variable*]
 
 ---
 class: middle, center
@@ -683,10 +738,6 @@ class: middle, center
 # Quiz
 
 PCA requires variables to be **centered** and **scaled**. What does that mean?
-
----
-background-image: url(images/pca/pca.001.jpeg)
-background-size: contain
 
 ---
 class: middle
@@ -726,6 +777,24 @@ rec &lt;-
 ```
 
 ---
+class: middle
+
+.center[
+# `step_normalize()`
+
+Centers then scales numeric variable (mean = 0, sd = 1)
+
+]
+
+
+```r
+rec &lt;- 
+  recipe(Sale_Price ~ ., 
+         data = ames) %&gt;% 
+* step_normalize(all_numeric())
+```
+
+---
 class: middle, center
 
 # Quiz
@@ -738,57 +807,23 @@ Imagine "scaling" a new data point. What do you subtract from it?
 What do you divide it by?
 
 ---
-background-image: url(images/pca/pca.002.jpeg)
+background-image: url(images/pca.002.jpeg)
 background-size: contain
 
 ---
-background-image: url(images/pca/pca.003.jpeg)
+background-image: url(images/pca.003.jpeg)
 background-size: contain
 
 ---
-background-image: url(images/pca/pca.004.jpeg)
+background-image: url(images/pca.004.jpeg)
 background-size: contain
 
 ---
-background-image: url(images/pca/pca.005.jpeg)
-background-size: contain
-
----
-class: middle
-
-.center[
-# `prep()` and `bake()`
-
-"trains" a recipe and then transforms data with the prepped recipe
-]
 
 
-```r
-rec %&gt;% 
-  prep(training = ames_train) %&gt;%
-  bake(new_data = ames_test) # or ames_train
+
+
 ```
-
---
-
-.footnote[.display[You don't need to do this!
-The fit functions do 
-it for you]]
-
-
----
-background-image: url(images/recipes.png)
-background-size: cover
-
----
-
-
-
-
-```r
-rec %&gt;% 
-  prep(ames_train) %&gt;%
-  bake(ames_test) 
 &gt; # A tibble: 732 x 81
 &gt;    MS_SubClass MS_Zoning Lot_Frontage Lot_Area Street Alley
 &gt;    &lt;fct&gt;       &lt;fct&gt;            &lt;dbl&gt;    &lt;dbl&gt; &lt;fct&gt;  &lt;fct&gt;
@@ -813,7 +848,7 @@ rec %&gt;%
 
 .center[
 
-# Quiz
+# Guess
 ]
 
 .left-column[
@@ -942,9 +977,9 @@ rec %&gt;%
 ---
 class: middle, center
 
-# Quiz
+# Guess
 
-What would happen if you try to scale a variable that doesn't vary?
+What would happen if you try to normalize a variable that doesn't vary?
 
 --
 
@@ -974,7 +1009,7 @@ rec %&gt;%
 ---
 class: middle, center
 
-# Quiz
+# Guess
 
 What step function would do PCA?
 
@@ -1007,16 +1042,15 @@ class: your-turn
 
 Write a recipe for the `Sale_Price ~ .` variables that:
 
-1. Adds a novel level to all factors
-1. Converts all factors to dummy variables
-1. Catches any zero variance variables
-1. Centers all of the predictors
-1. Scales all of the predictors
-1. Computes the first 5 principal components
+1. Adds a novel level to all factors  
+2. Convert all factors to dummy variables  
+3. Catches any zero variance variables  
+4. Normalizes all of the predictors (centers and scales)
+5. Computes the first 5 principal components  
 
 Save the result as `pca_rec`
 
-<div class="countdown" id="timer_5ea20475" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2edd7" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1025,12 +1059,11 @@ Save the result as `pca_rec`
 ```r
 pca_rec &lt;- 
   recipe(Sale_Price ~ ., data = ames) %&gt;%
-  step_novel(all_nominal()) %&gt;%
-  step_dummy(all_nominal()) %&gt;%
-  step_zv(all_predictors()) %&gt;%
-  step_center(all_predictors()) %&gt;%
-  step_scale(all_predictors()) %&gt;%
-  step_pca(all_predictors(), num_comp = 5)
+    step_novel(all_nominal()) %&gt;%
+    step_dummy(all_nominal()) %&gt;%
+    step_zv(all_predictors()) %&gt;%
+    step_normalize(all_predictors()) %&gt;%
+    step_pca(all_predictors(), num_comp = 5)
 pca_rec
 &gt; Data Recipe
 &gt; 
@@ -1045,35 +1078,144 @@ pca_rec
 &gt; Novel factor level assignment for all_nominal
 &gt; Dummy variables from all_nominal
 &gt; Zero variance filter on all_predictors
-&gt; Centering for all_predictors
-&gt; Scaling for all_predictors
+&gt; Centering and scaling for all_predictors
 &gt; No PCA components were extracted.
 ```
 
 ---
-class: middle
-
-.center[
-# roles
-
-You can also give variables a "role" within a recipe and then select by roles.
-
-]
-
 
 
 ```r
-has_role(match = "privacy")
-add_role(rec, Fence, new_role = "privacy")
-update_role(rec, Fence, new_role = "privacy", old_role = "yard")
-remove_role(rec, Fence, old_role = "yard")
+summary(pca_rec)
+&gt; # A tibble: 81 x 4
+&gt;    variable     type    role      source  
+&gt;    &lt;chr&gt;        &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;   
+&gt;  1 MS_SubClass  nominal predictor original
+&gt;  2 MS_Zoning    nominal predictor original
+&gt;  3 Lot_Frontage numeric predictor original
+&gt;  4 Lot_Area     numeric predictor original
+&gt;  5 Street       nominal predictor original
+&gt;  6 Alley        nominal predictor original
+&gt;  7 Lot_Shape    nominal predictor original
+&gt;  8 Land_Contour nominal predictor original
+&gt;  9 Utilities    nominal predictor original
+&gt; 10 Lot_Config   nominal predictor original
+&gt; # … with 71 more rows
 ```
 
 
 ---
+class: center, middle, frame
+
+# Axiom
+
+Feature engineering and modeling are two halves of a single predictive workflow.
+
+---
+background-image: url(images/workflows/workflows.001.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.002.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.003.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.004.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.005.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.006.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.007.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.008.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.009.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.010.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.011.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.012.jpeg)
+background-size: contain
+
+---
+background-image: url(images/workflows/workflows.013.jpeg)
+background-size: contain
+
+
+---
+class: center, middle, inverse
+
+# Workflows
+
+---
 class: middle, center
 
-# Quiz
+# `workflow()`
+
+Creates a workflow to add a model and more to
+
+
+```r
+workflow()
+```
+
+---
+class: middle, center
+
+# `add_formula()`
+
+Adds a formula to a workflow `*`
+
+
+```r
+workflow() %&gt;% add_formula(Sale_Price ~ Year)
+```
+
+.footnote[`*` If you do not plan to do your own preprocessing]
+
+---
+class: middle, center
+
+# `add_model()`
+
+Adds a parsnip model spec to a workflow
+
+
+```r
+workflow() %&gt;% add_model(rt_spec)
+```
+
+---
+background-image: url(images/zestimate.png)
+background-position: center
+background-size: contain
+
+---
+class: middle, center
+
+# Guess
 
 If we use `add_model()` to add a model to a workflow, what would we use to add a recipe?
 
@@ -1086,9 +1228,9 @@ class: your-turn
 
 # Your Turn 2
 
-Make a workflow that combines `pca_rec` and with `lm_spec`.
+Make a workflow that combines `pca_rec` and with `rt_spec`.
 
-<div class="countdown" id="timer_5ea20138" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2ebc9" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1099,26 +1241,25 @@ Make a workflow that combines `pca_rec` and with `lm_spec`.
 pca_wf &lt;-
   workflow() %&gt;% 
   add_recipe(pca_rec) %&gt;% 
-  add_model(lm_spec)
+  add_model(rt_spec)
 pca_wf
-&gt; ══ Workflow ═════════════════════════════════════════════════════════════════════════════════
+&gt; ══ Workflow ════════════════════════════════════════════════════════════════════════════════
 &gt; Preprocessor: Recipe
-&gt; Model: linear_reg()
+&gt; Model: decision_tree()
 &gt; 
-&gt; ── Preprocessor ─────────────────────────────────────────────────────────────────────────────
-&gt; 6 Recipe Steps
+&gt; ── Preprocessor ────────────────────────────────────────────────────────────────────────────
+&gt; 5 Recipe Steps
 &gt; 
 &gt; ● step_novel()
 &gt; ● step_dummy()
 &gt; ● step_zv()
-&gt; ● step_center()
-&gt; ● step_scale()
+&gt; ● step_normalize()
 &gt; ● step_pca()
 &gt; 
-&gt; ── Model ────────────────────────────────────────────────────────────────────────────────────
-&gt; Linear Regression Model Specification (regression)
+&gt; ── Model ───────────────────────────────────────────────────────────────────────────────────
+&gt; Decision Tree Model Specification (regression)
 &gt; 
-&gt; Computational engine: lm
+&gt; Computational engine: rpart
 ```
 
 
@@ -1137,14 +1278,14 @@ Adds a recipe to a workflow.
 pca_wf &lt;- 
   workflow() %&gt;%
 * add_recipe(pca_rec) %&gt;%
-  add_model(lm_spec)
+  add_model(rt_spec)
 ```
 
 ---
 class: middle
 
 .center[
-# Quiz
+# Guess
 
 Do you need to add a formula if you have a recipe?
 ]
@@ -1160,13 +1301,33 @@ rec &lt;-
 ```
 
 ---
+class: middle
+
+.center[
+# `fit()`
+
+Fit a workflow that bundles a recipe`*` and a model.
+
+]
+
+
+```r
+_wf %&gt;% 
+  fit(data = ames_train) %&gt;% 
+  predict(ames_test)...
+```
+
+
+.footnote[`*` or a formula, if you do not plan to do your own preprocessing]
+
+---
 class: your-turn
 
 # Your Turn 3
 
 Try our pca workflow to predict sale price with the `ames_test` data. What is the RMSE?
 
-<div class="countdown" id="timer_5ea20236" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2ea23" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1183,7 +1344,71 @@ pca_wf %&gt;%
 &gt; # A tibble: 1 x 3
 &gt;   .metric .estimator .estimate
 &gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-&gt; 1 rmse    standard      37831.
+&gt; 1 rmse    standard      39181.
+```
+
+
+---
+class: middle
+
+.center[
+# Preprocess k-fold resamples?
+
+]
+
+
+```r
+set.seed(100)
+ames_folds &lt;- vfold_cv(ames_train, strata = Sale_Price, breaks = 4)
+```
+
+
+---
+class: middle
+
+.center[
+# `fit_resamples()`
+
+Fit a workflow that bundles a recipe`*` and a model with resampling.
+
+]
+
+
+```r
+_wf %&gt;% 
+  fit_resamples(resamples = ames_folds)
+```
+
+
+.footnote[`*` or a formula, if you do not plan to do your own preprocessing]
+
+
+---
+class: your-turn
+
+# Your Turn 4
+
+Run the first chunk. Then try our pca workflow on `ames_folds`. What is the RMSE?
+
+<div class="countdown" id="timer_5ea2eac0" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+```r
+set.seed(100)
+ames_folds &lt;- vfold_cv(ames_train, strata = Sale_Price, breaks = 4)
+
+pca_wf %&gt;% 
+  fit_resamples(resamples = ames_folds) %&gt;% 
+  collect_metrics()
+&gt; # A tibble: 2 x 5
+&gt;   .metric .estimator      mean     n   std_err
+&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt;
+&gt; 1 rmse    standard   39498.       10 1385.    
+&gt; 2 rsq     standard       0.753    10    0.0168
 ```
 
 ---
@@ -1199,21 +1424,17 @@ Replace the recipe in a workflow.
 
 ```r
 pca_wf %&gt;%
-* update_recipe(bc_rec)
+* update_recipe(other_rec)
 ```
 
 ---
 class: your-turn
 
-# Your Turn 4
+# Your Turn 5
 
-Modify the code to build a new pca recipe that uses a BoxCox transformation instead of centering and scaling the data. 
+Modify the code below to build a new pca recipe that uses `step_other` *first* to collapse infrequently occurring values of `Neighborhood` into an "other" category. Then update `pca_wf` to use the new recipe.
 
-Then update `pca_wf` to use the new recipe.
-
-*Hint: Guess. Use tab completion. Or visit http://tidymodels.github.io/recipes/reference/index.html.*
-
-<div class="countdown" id="timer_5ea20121" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2eb4a" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1221,32 +1442,26 @@ Then update `pca_wf` to use the new recipe.
 
 
 ```r
-bc_rec &lt;- 
+other_rec &lt;- 
   recipe(Sale_Price ~ ., data = ames) %&gt;%
-  step_novel(all_nominal()) %&gt;%
-  step_dummy(all_nominal()) %&gt;%
-  step_zv(all_predictors()) %&gt;%
-* step_BoxCox(all_predictors()) %&gt;%
-  step_pca(all_predictors(), num_comp = 5)
+    step_novel(all_nominal()) %&gt;%
+    step_dummy(all_nominal()) %&gt;%
+    step_zv(all_predictors()) %&gt;%
+    step_normalize(all_predictors()) %&gt;%
+    step_pca(all_predictors(), num_comp = 5)
 
-bc_wf &lt;- 
+other_wf &lt;- 
   pca_wf %&gt;% 
-    update_recipe(bc_rec)
-```
+    update_recipe(other_rec)
 
----
-
-
-```r
-bc_wf %&gt;% 
-  fit(data = ames_train) %&gt;% 
-  predict(ames_test) %&gt;% 
-  mutate(truth = ames_test$Sale_Price) %&gt;% 
-  rmse(truth, .pred)
-&gt; # A tibble: 1 x 3
-&gt;   .metric .estimator .estimate
-&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-&gt; 1 rmse    standard      40948.
+other_wf %&gt;% 
+  fit_resamples(resamples = ames_folds) %&gt;% 
+  collect_metrics()
+&gt; # A tibble: 2 x 5
+&gt;   .metric .estimator      mean     n   std_err
+&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt;
+&gt; 1 rmse    standard   39498.       10 1385.    
+&gt; 2 rsq     standard       0.753    10    0.0168
 ```
 
 ---
