@@ -7,8 +7,6 @@ output: html_document
 library(tidyverse)
 library(AmesHousing)
 library(tidymodels)
-library(tune)
-library(workflows)
 
 ames <- make_ames() %>% 
   dplyr::select(-matches("Qu"))
