@@ -40,7 +40,7 @@ vanilla_tree_spec <-
 set.seed(100) # Important!
 _________ %>% 
   _________(remote ~ ., 
-            resamples = so_folds) %>% 
+            resamples = _________) %>% 
   _________
 ```
 
