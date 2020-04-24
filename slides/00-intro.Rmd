@@ -21,7 +21,6 @@ output:
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(collapse = TRUE,
                       fig.retina = 3)
-library(tidymodels)
 ```
 
 layout: true
@@ -97,13 +96,111 @@ class: middle, center
 My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
 
 ---
-background-image: url(images/tm-org.png)
+class: middle, center, inverse
+
+# What is machine learning?
+
+---
+background-image: url(https://rejoiner.com/resources/wp-content/uploads/2016/06/recommended-thomas.png)
 background-size: contain
+
+
+---
+background-image: url(https://miro.medium.com/max/1400/1*j5aWfH9t1_EZPJC92CJ7oQ.png)
+background-size: contain
+
+.footnote[https://medium.com/tmobile-tech/small-data-big-value-f783ceca4fdb]
+
+---
+background-image: url(https://techcrunch.com/wp-content/uploads/2017/12/facebook-facial-recognition-photo-review.png?w=730&crop=1)
+background-size: contain
+
+
+---
+class: middle, center
+
+# What is machine learning?
+
+--
+
+```{r echo=FALSE}
+knitr::include_graphics("https://imgs.xkcd.com/comics/machine_learning.png ")
+```
+
+---
+class: top, center
+background-image: url(images/intro.002.jpeg)
+background-size: cover
+
+---
+class: top, center
+background-image: url(images/intro.003.jpeg)
+background-size: cover
+
+
+---
+class: middle, center, frame
+
+# Types of Machine Learning
+
+Supervised
+
+Unsupervised
+
+Reinforcement
+
+---
+class: middle, center, frame
+
+# Examples of Supervised Learning
+
+spam detection
+
+medical diagnosis
+
+ad click prediction
+
+---
+class: middle, center, frame
+
+# Two modes
+
+--
+
+.pull-left[
+
+## Classification
+
+Are you under a stay-at-home order?
+
+]
+
+--
+
+.pull-left[
+
+## Regression
+
+How long has your state had stay-at-home orders in place?
+]
+
+---
+background-image: url(images/train.jpg)
+background-size: contain
+background-color: #f6f6f6
+class: center, top
+
+# Statistics
+
+---
+class: freight-slide, center, inverse
+
+# Predictive modeling
 
 ---
 class: middle, inverse, center
 
-# Today
+# Schedule for Today
 
 --
 
@@ -208,6 +305,22 @@ concepts: bootstrapping / aggregating --> bagging
 
 models: bagging decision trees
 
+---
+class: inverse, middle, center
+
+# tidymodels
+
+---
+background-image: url(images/tm-org.png)
+background-size: contain
+
+---
+
+```{r}
+library(tidymodels)
+```
+
+
 
 ---
 class: inverse, middle, center
@@ -234,6 +347,12 @@ class: frame, middle, center
 # Our Google Doc
 
 https://bit.ly/tmv-chop
+
+
+---
+class: inverse, middle, center
+
+# To the workshop!
 
 ---
 class: inverse, middle, center

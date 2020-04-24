@@ -90,13 +90,109 @@ class: middle, center
 My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
 
 ---
-background-image: url(images/tm-org.png)
+class: middle, center, inverse
+
+# What is machine learning?
+
+---
+background-image: url(https://rejoiner.com/resources/wp-content/uploads/2016/06/recommended-thomas.png)
 background-size: contain
+
+
+---
+background-image: url(https://miro.medium.com/max/1400/1*j5aWfH9t1_EZPJC92CJ7oQ.png)
+background-size: contain
+
+.footnote[https://medium.com/tmobile-tech/small-data-big-value-f783ceca4fdb]
+
+---
+background-image: url(https://techcrunch.com/wp-content/uploads/2017/12/facebook-facial-recognition-photo-review.png?w=730&amp;crop=1)
+background-size: contain
+
+
+---
+class: middle, center
+
+# What is machine learning?
+
+--
+
+![](https://imgs.xkcd.com/comics/machine_learning.png )&lt;!-- --&gt;
+
+---
+class: top, center
+background-image: url(images/intro.002.jpeg)
+background-size: cover
+
+---
+class: top, center
+background-image: url(images/intro.003.jpeg)
+background-size: cover
+
+
+---
+class: middle, center, frame
+
+# Types of Machine Learning
+
+Supervised
+
+Unsupervised
+
+Reinforcement
+
+---
+class: middle, center, frame
+
+# Examples of Supervised Learning
+
+spam detection
+
+medical diagnosis
+
+ad click prediction
+
+---
+class: middle, center, frame
+
+# Two modes
+
+--
+
+.pull-left[
+
+## Classification
+
+Are you under a stay-at-home order?
+
+]
+
+--
+
+.pull-left[
+
+## Regression
+
+How long has your state had stay-at-home orders in place?
+]
+
+---
+background-image: url(images/train.jpg)
+background-size: contain
+background-color: #f6f6f6
+class: center, top
+
+# Statistics
+
+---
+class: freight-slide, center, inverse
+
+# Predictive modeling
 
 ---
 class: middle, inverse, center
 
-# Today
+# Schedule for Today
 
 --
 
@@ -201,6 +297,41 @@ concepts: bootstrapping / aggregating --&gt; bagging
 
 models: bagging decision trees
 
+---
+class: inverse, middle, center
+
+# tidymodels
+
+---
+background-image: url(images/tm-org.png)
+background-size: contain
+
+---
+
+
+```r
+library(tidymodels)
+## ── Attaching packages ─────────────────────────────────────────────────────────────────────────────────── tidymodels 0.1.0 ──
+## ✓ broom     0.5.5      ✓ recipes   0.1.10
+## ✓ dials     0.0.4      ✓ rsample   0.0.6 
+## ✓ dplyr     0.8.5      ✓ tibble    3.0.0 
+## ✓ ggplot2   3.3.0      ✓ tune      0.1.0 
+## ✓ infer     0.5.1      ✓ workflows 0.1.1 
+## ✓ parsnip   0.1.0      ✓ yardstick 0.0.5 
+## ✓ purrr     0.3.3
+## Warning: package 'parsnip' was built under R version 3.6.2
+## Warning: package 'rsample' was built under R version 3.6.2
+## Warning: package 'tibble' was built under R version 3.6.2
+## Warning: package 'tune' was built under R version 3.6.2
+## ── Conflicts ────────────────────────────────────────────────────────────────────────────────────── tidymodels_conflicts() ──
+## x purrr::discard()  masks scales::discard()
+## x dplyr::filter()   masks stats::filter()
+## x dplyr::lag()      masks stats::lag()
+## x ggplot2::margin() masks dials::margin()
+## x recipes::step()   masks stats::step()
+```
+
+
 
 ---
 class: inverse, middle, center
@@ -227,6 +358,12 @@ class: frame, middle, center
 # Our Google Doc
 
 https://bit.ly/tmv-chop
+
+
+---
+class: inverse, middle, center
+
+# To the workshop!
 
 ---
 class: inverse, middle, center
