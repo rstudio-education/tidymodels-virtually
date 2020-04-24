@@ -25,7 +25,7 @@ knitr::opts_chunk$set(collapse = TRUE,
 
 layout: true
 
-<a class="footer-link" href="TBD">TBD</a>
+<a class="footer-link" href="https://tmv.netlify.app/">https://tmv.netlify.app/</a>
 
 ---
 

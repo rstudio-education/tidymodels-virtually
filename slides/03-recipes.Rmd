@@ -74,7 +74,8 @@ splits_pal <- c(data_color, train_color, test_color)
 
 layout: true
 
-<a class="footer-link" href="TBD">TBD</a>
+<a class="footer-link" href="https://tmv.netlify.app/">https://tmv.netlify.app/</a>
+
 
 ---
 
@@ -1021,6 +1022,17 @@ Replace the recipe in a workflow.
 ```{r eval=FALSE}
 pca_wf %>%
   update_recipe(other_rec) #<<
+```
+
+---
+
+```{r echo=FALSE, fig.width=10}
+ames %>% 
+  count(Neighborhood) %>% 
+  ggplot(aes(x = Neighborhood, y = n)) +
+  geom_col(fill = "#CA225E", alpha = .7) +
+  coord_flip() +
+  theme(text = element_text(family = "Lato"))
 ```
 
 ---

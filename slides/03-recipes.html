@@ -44,7 +44,8 @@
 
 layout: true
 
-&lt;a class="footer-link" href="TBD"&gt;TBD&lt;/a&gt;
+&lt;a class="footer-link" href="https://tmv.netlify.app/"&gt;https://tmv.netlify.app/&lt;/a&gt;
+
 
 ---
 
@@ -1050,7 +1051,7 @@ Write a recipe for the `Sale_Price ~ .` variables that:
 
 Save the result as `pca_rec`
 
-<div class="countdown" id="timer_5ea2edd7" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea3003c" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1230,7 +1231,7 @@ class: your-turn
 
 Make a workflow that combines `pca_rec` and with `rt_spec`.
 
-<div class="countdown" id="timer_5ea2ebc9" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2fe4e" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1327,7 +1328,7 @@ class: your-turn
 
 Try our pca workflow to predict sale price with the `ames_test` data. What is the RMSE?
 
-<div class="countdown" id="timer_5ea2ea23" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2fddd" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1390,7 +1391,7 @@ class: your-turn
 
 Run the first chunk. Then try our pca workflow on `ames_folds`. What is the RMSE?
 
-<div class="countdown" id="timer_5ea2eac0" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea2fd50" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1428,13 +1429,17 @@ pca_wf %&gt;%
 ```
 
 ---
+
+&lt;img src="figs/03-recipes/unnamed-chunk-49-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
 class: your-turn
 
 # Your Turn 5
 
 Modify the code below to build a new pca recipe that uses `step_other` *first* to collapse infrequently occurring values of `Neighborhood` into an "other" category. Then update `pca_wf` to use the new recipe.
 
-<div class="countdown" id="timer_5ea2eb4a" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5ea3000d" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
