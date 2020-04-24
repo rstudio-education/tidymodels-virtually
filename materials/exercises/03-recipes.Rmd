@@ -4,6 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+options(scipen = 999)
 library(tidyverse)
 library(AmesHousing)
 library(tidymodels)

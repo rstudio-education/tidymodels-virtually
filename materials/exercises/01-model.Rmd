@@ -4,6 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+options(scipen = 999)
 library(tidyverse)
 library(AmesHousing)
 library(tidymodels)
@@ -25,7 +26,7 @@ Write a pipe that creates a learner that uses `lm()` to fit a linear regression.
 Double check. Does
 
 ```{r}
-lm_fit <- fit(Sale_Price ~ Gr_Liv_Area, model = lm_spec, data = ames)
+lm_fit <- lm_spec %>% fit(Sale_Price ~ Gr_Liv_Area, data = ames)
 lm_fit
 ```
 
