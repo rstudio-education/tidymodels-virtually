@@ -470,7 +470,7 @@ h4 {
       rgba(59, 66, 69, .8)
     ),
     /* your image */
-    url(../../images/rawpixel/freight.jpg);
+    url(../../images/freight.jpg);
   background-size: cover;
 }
 
