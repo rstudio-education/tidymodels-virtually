@@ -23,7 +23,7 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-knitr::opts_chunk$set(comment = ">",
+knitr::opts_chunk$set(comment = "#",
                       message = FALSE,
                       warning = FALSE, 
                       collapse = TRUE,
@@ -57,15 +57,15 @@ ames_train  <- training(ames_split)
 ames_test   <- testing(ames_split)
 
 # for figures
-train_color <- viridis(1, option="magma", begin = .4)
-test_color  <- viridis(1, option="magma", begin = .7)
+train_color <- viridis(1, option="plasma", begin = .5)
+test_color  <- viridis(1, option="plasma", begin = .8)
+assess_color <- viridis(1, option="plasma", begin = .1)
 data_color  <- viridis(1, option="magma", begin = .1)
-assess_color <- viridis(1, option="magma", begin = 0)
 splits_pal <- c(data_color, train_color, test_color)
 
-lm_spec <- 
-  linear_reg() %>% 
-  set_engine("lm") %>% 
+rt_spec <- 
+  decision_tree() %>% 
+  set_engine("rpart") %>% 
   set_mode("regression")
 ```
 
@@ -83,36 +83,6 @@ class: title-slide, center, bottom
 ## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
 
 ### `r rmarkdown::metadata$author` 
-
-
----
-name: clouds
-class: center, middle
-background-image: url(images/Clouds.jpg)
-background-size: cover
-
----
-name: clouds2
-background-image: url(images/Clouds2.jpg)
-background-size: cover
-
----
-template: clouds2
-class: middle, center
-
-
-### Alison Hill 
-
-<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/>
-
-[`r icon::fa("github")` @apreshill](https://github.com/apreshill)  
-[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)
-
-
-
-???
-
-My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
 
 
 ---
@@ -155,7 +125,7 @@ We'll use this goal to drive learning of 3 core tidymodels packages:
 ---
 class: inverse, middle, center
 
-# `r emo::ji("dango")` Resample models
+# Resample models
 
 --
 
@@ -193,11 +163,9 @@ class: your-turn
 
 Run the first code chunk. Then fill in the blanks to 
 
-1. Create a split object that apportions 75% of ames to a training set and the remainder to a testing set.
-
-1. Fit the all_wf to the split object.
-
-1. Extract the rmse of the fit.
+1. Create a split object that apportions 75% of `ames` to a training set and the remainder to a testing set.
+2. Fit the `rt_spec` to the training set.
+3. Predict with the testing set and compute the rmse of the fit.
 
 ```{r echo=FALSE}
 countdown(minutes = 3)
@@ -206,16 +174,12 @@ countdown(minutes = 3)
 ---
 
 ```{r warnings = FALSE, message = FALSE}
-all_wf <- 
-  workflow() %>% 
-  add_formula(Sale_Price ~ .) %>% 
-  add_model(lm_spec)
-
 new_split <- initial_split(ames)
 new_train <- training(new_split)
 new_test  <- testing(new_split)
-all_wf %>% 
-  fit(data = new_train) %>% 
+
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = new_train) %>% 
   predict(new_test) %>% 
   mutate(truth = new_test$Sale_Price) %>% 
   rmse(truth, .pred)
@@ -226,9 +190,9 @@ class: your-turn
 
 # Your Turn `r (yt_counter <- yt_counter + 1)`
 
-What would happen if you repeated this process? Would you get the same answers? Discuss in your team. 
+What would happen if you repeated this process? Would you get the same answers? 
 
-Then rerun the last code chunk from Your Turn 1. Do you get the same answer?
+Then rerun the last code chunk from Your Turn 1. Do you get the same answer? Try it a few times.
 
 ```{r echo=FALSE}
 countdown(minutes = 2)
@@ -241,8 +205,8 @@ countdown(minutes = 2)
 new_split <- initial_split(ames)
 new_train <- training(new_split)
 new_test  <- testing(new_split)
-all_wf %>% 
-  fit(data = new_train) %>% 
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = new_train) %>% 
   predict(new_test) %>% 
   mutate(truth = new_test$Sale_Price) %>% 
   rmse(truth, .pred)
@@ -277,7 +241,6 @@ class: middle, center
 
 Why is the new estimate different?
 
----
 
 ```{r include=FALSE}
 plot_split <- function(seed = 1, arrow = FALSE) {
@@ -324,11 +287,6 @@ plot_split <- function(seed = 1, arrow = FALSE) {
 class: middle, center
 
 # Data Splitting
-
-```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center', warning = FALSE, message = FALSE}
-plot_split() + scale_fill_manual(values = rep("gray80", 2),
-                       guide = FALSE)
-```
 
 --
 
@@ -432,15 +390,13 @@ plot_split(seed = 321, arrow = TRUE)
 .right[Mean RMSE]
 
 ---
-class: your-turn
+class: frame, center, middle
 
-# Your Turn `r (yt_counter <- yt_counter + 1)`
+# Resampling
 
-Rerun the code below 10 times and then compute the mean of the results (you will need to jot them down as you go).
+Let's resample 10 times 
 
-```{r echo=FALSE}
-countdown(minutes = 3)
-```
+then compute the mean of the results...
 
 ---
 
@@ -456,8 +412,8 @@ for (i in 1:10) {
   new_train <- training(new_split)
   new_test  <- testing(new_split)
   rmses[i] <-
-    all_wf %>% 
-      fit(data = new_train) %>% 
+    rt_spec %>% 
+      fit(Sale_Price ~ ., data = new_train) %>% 
       predict(new_test) %>% 
       mutate(truth = new_test$Sale_Price) %>% 
       rmse(truth, .pred) %>% 
@@ -473,14 +429,24 @@ mean(rmses)
 ---
 class: middle, center
 
-# Discuss
+# Guess
 
-Which do you think is more accurate, the best result or the mean of the results? Why? Discuss with your team.
+Which do you think is a better estimate?
+
+The best result or the mean of the results? Why? 
 
 ---
-class: middle, center, inverse
+class: middle, center
 
-# Cross-validation
+# But also...
+
+Fit with .display[training set]
+
+Predict with .display[testing set]
+
+--
+
+Rinse and repeat?
 
 ---
 
@@ -489,6 +455,28 @@ class: middle, center, inverse
 ```{r ref.label='cv-for-loop', eval = FALSE}
 ```
 
+---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
+class: middle, center
+background-color: #f5f5f5
+
+.pull-right[
+## The .display[testing set] is precious...
+
+## we can only use it once!
+
+]
+
+---
+background-image: url(https://www.tidymodels.org/start/resampling/img/resampling.svg)
+background-size: 60%
+
+---
+class: middle, center, inverse
+
+# Cross-validation
 
 ---
 class: middle, center
@@ -501,6 +489,7 @@ vfold_cv(data, v = 10, ...)
 
 
 ---
+exclude: true
 
 ```{r cv, fig.height=4, echo=FALSE}
 set.seed(1)
@@ -523,28 +512,6 @@ folds <- ggplot(folds10, aes(x = Row, y = fct_rev(Fold), fill = Data)) +
   coord_equal() +
   labs(x = NULL, y = NULL, fill = NULL) 
 ```
-
-```{r anim-cv, echo=FALSE, fig.path="figs/gif/", gganimate = list(nframes = 100, fps = 5), fig.height=4, eval=FALSE}
-anim_folds <- folds + 
-    theme(axis.text.y = element_blank()) +
-    transition_states(Fold) +
-    shadow_mark(past = TRUE)
-anim2 <- gganimate::animate(anim_folds, nframes = 100, fps = 5, detail = 5, width = 1000, 
-                           height = 600, res = 330, 
-                           type = "cairo", renderer = gifski_renderer(loop = FALSE))
-anim <- gganimate::animate(anim_folds, nframes = 100, fps = 5, detail = 5, width = 1500, 
-                           height = 1000, res = 500, 
-                           type = "cairo", renderer = gifski_renderer(loop = FALSE))
-gganimate::anim_save(filename = "cv.gif",
-          animation = anim,
-          path = here::here("Day-2/slides/images/"))
-```
-
-
-```{r echo=FALSE, fig.align='center'}
-knitr::include_graphics("images/cv.gif")
-```
-
 
 ---
 class: middle, center
@@ -646,8 +613,8 @@ split1       <- cv_folds %>% pluck("splits", 1)
 split1_train <- training(split1)
 split1_test  <- testing(split1)
 
-all_wf %>% 
-  fit(data = split1_train) %>% 
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = split1_train) %>% 
   predict(split1_test) %>% 
   mutate(truth = split1_test$Sale_Price) %>% 
   rmse(truth, .pred)
@@ -658,9 +625,21 @@ split2 <- ...
 
 
 ---
-class: inverse, middle, center
+class: middle
 
+.center[
 # `fit_resamples()`
+
+Trains and tests a resampled model.
+]
+
+```{r fit-ames-cv1, results='hide'}
+fit_resamples(
+  rt_spec,
+  Sale_Price ~ Gr_Liv_Area, 
+  resamples = cv_folds
+)
+```
 
 ---
 class: middle
@@ -668,15 +647,15 @@ class: middle
 .center[
 # `fit_resamples()`
 
-Trains and tests a model with cross-validation.
+Trains and tests a resampled model.
 ]
 
 ```{r fit-ames-cv, results='hide'}
-fit_resamples(
-  Sale_Price ~ Gr_Liv_Area, 
-  model = lm_spec,          
-  resamples = cv_folds
-)
+rt_spec %>% 
+  fit_resamples(
+    Sale_Price ~ Gr_Liv_Area, 
+    resamples = cv_folds
+    )
 ```
 
 ---
@@ -684,32 +663,6 @@ fit_resamples(
 ```{r ref.label='fit-ames-cv', warning=FALSE, messages=FALSE}
 
 ```
-
-
----
-
-# `fit_resamples()`
-
-.pull-left[
-Fit with formula and model
-```{r eval=FALSE}
-fit_resamples(
-  Sale_Price ~ Gr_Liv_Area, #<<
-  model = lm_spec,        #<<  
-  resamples = cv_folds
-)
-```
-]
-
-.pull-right[
-Fit with workflow
-```{r eval=FALSE}
-fit_resamples(
-  all_wf, #<<
-  resamples = cv_folds
-)
-```
-]
 
 
 ---
@@ -728,19 +681,43 @@ _results %>% collect_metrics(summarize = TRUE)
 .footnote[`TRUE` is actually the default; averages across folds]
 
 ---
+```{r}
+rt_spec %>% 
+  fit_resamples(
+    Sale_Price ~ Gr_Liv_Area, 
+    resamples = cv_folds
+    ) %>% 
+  collect_metrics(summarize = FALSE)
+```
+
+---
+class: middle, center, frame
+
+# 10-fold CV
+
+### 10 different analysis/assessment sets
+
+### 10 different models (trained on .display[analysis] sets)
+
+### 10 different sets of performance statistics (on .display[assessment] sets)
+
+
+
+---
 class: your-turn
 
 # Your Turn `r (yt_counter <- yt_counter + 1)`
 
-Modify the code below to use `fit_resamples()` and `cv_folds` to cross-validate the `all_wf` workflow. 
+Modify the code below to use `fit_resamples()` and `cv_folds` to cross-validate the regression tree model.
 
 Which RMSE do you collect at the end?
 
 ```{r eval=FALSE}
-all_wf %>% 
-  fit(data = new_split) %>% 
-  predict(split1_test) %>% 
-  mutate(truth = split1_test$Sale_Price) %>% 
+set.seed(100)
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = new_train) %>% 
+  predict(new_test) %>% 
+  mutate(truth = new_test$Sale_Price) %>% 
   rmse(truth, .pred)
 ```
 
@@ -750,133 +727,31 @@ countdown(minutes = 3)
 
 
 ---
-```{r warning=FALSE, message=FALSE}
-all_wf %>% 
-  fit_resamples(resamples = cv_folds,
-                metrics = metric_set(rmse)) %>% 
+```{r rt-rs, warning=FALSE, message=FALSE}
+set.seed(100)
+rt_spec %>% 
+  fit_resamples(Sale_Price ~ ., 
+                resamples = cv_folds) %>% 
   collect_metrics()
 ```
 
 ---
-class: inverse, middle, center
 
-# Comparing Models
+# How did we do?
 
----
-class: your-turn
-
-# Your Turn `r (yt_counter <- yt_counter + 1)`
-
-Create two new workflows, one that fits the bedbath model, 
-`Sale_Price ~ Bedroom_AbvGr + Full_Bath + Half_Bath` 
-and one that fits the square foot model, 
-`Sale_Price ~ Gr_Liv_Area`
-
-Then use `fit_resamples` and `cv_folds` to compare the performance of each.
-
-```{r echo=FALSE}
-countdown(minutes = 6)
-```
-
----
-```{r results='hide'}
-bb_wf <- 
-  workflow() %>% 
-    add_formula(Sale_Price ~ Bedroom_AbvGr + Full_Bath + Half_Bath) %>% 
-    add_model(lm_spec)
-
-sqft_wf <- 
-  workflow() %>% 
-    add_formula(Sale_Price ~ Gr_Liv_Area) %>% 
-    add_model(lm_spec)
-
-bb_wf %>% 
-  fit_resamples(resamples = cv_folds) %>% 
-  collect_metrics()
-
-sqft_wf %>% 
-  fit_resamples(resamples = cv_folds) %>% 
-  collect_metrics()
-```
-
----
-class: middle
-
-.pull-left[
 ```{r}
-bb_wf %>% 
-  fit_resamples(resamples = cv_folds) %>% 
-  collect_metrics()
-```
-
-]
-
-.pull-right[
-```{r}
-sqft_wf %>% 
-  fit_resamples(resamples = cv_folds) %>% 
-  collect_metrics()
+rt_spec %>% 
+  fit(Sale_Price ~ ., ames_train) %>% 
+  predict(ames_test) %>% 
+  mutate(truth = ames_test$Sale_Price) %>% 
+  rmse(truth, .pred)
 ```
 
 
-]
+```{r ref.label='rt-rs', echo=FALSE}
 
----
-class: middle, center
-
-# Quiz
-
-Why should you use the same data splits to compare each model?
-
---
-
-`r emo::ji("apple")` to `r emo::ji("apple")`
-
----
-class: middle, center
-
-# Quiz
-
-Does Cross-Validation measure the accuracy of just your model, or your entire workflow?
-
---
-
-Your entire workflow
-
----
-class: your-turn
-
-# Your Turn `r (yt_counter <- yt_counter + 1)`
-
-Work together with your teammates to complete the Cross-Validation handout.
-
-```{r echo=FALSE}
-countdown(minutes = 5)
 ```
 
----
-background-image: url(images/cv-match.jpeg)
-background-size: contain
-
----
-background-image: url(images/vfoldcv/vfoldcv.001.jpeg)
-background-size: contain
-
----
-background-image: url(images/vfoldcv/vfoldcv.002.jpeg)
-background-size: contain
-
----
-background-image: url(images/vfoldcv/vfoldcv.003.jpeg)
-background-size: contain
-
----
-background-image: url(images/vfoldcv/vfoldcv.004.jpeg)
-background-size: contain
-
----
-background-image: url(images/vfoldcv/vfoldcv.005.jpeg)
-background-size: contain
 
 ---
 class: middle, center, inverse
@@ -1091,30 +966,3 @@ class: middle, center, frame
 ```{r echo=FALSE, out.width="100%"}
 knitr::include_url("https://tidymodels.github.io/yardstick/reference/index.html")
 ```
-
----
-class: your-turn
-
-# Your Turn `r (yt_counter <- yt_counter + 1)`
-
-
-Modify the code below to return the **Mean Absolute Error.** Visit 
-<https://tidymodels.github.io/yardstick/reference/index.html> to find the right function to use.
-
-```{r echo=FALSE}
-countdown(minutes = 3)
-```
-
----
-```{r}
-bb_wf %>% 
-  fit_resamples(resamples = cv_folds, 
-  metrics = metric_set(mae)) %>% 
-  collect_metrics()
-
-sqft_wf %>% 
-  fit_resamples(resamples = cv_folds, 
-  metrics = metric_set(mae)) %>% 
-  collect_metrics()
-```
-
