@@ -111,10 +111,13 @@ a:hover, a:active, a:focus {
   color: #bed3ec;
 }
 
+.inverse h1, .inverse h2, .inverse h3 {
+	color: #fff;
+}
 
 /* Two-column layout */
 .left-column {
-  color: #777;
+  color: #fff;
   width: 30%;
   height: 92%;
   float: left;

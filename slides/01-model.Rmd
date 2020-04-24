@@ -23,7 +23,7 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-knitr::opts_chunk$set(comment = ">",
+knitr::opts_chunk$set(comment = "#",
                       message = FALSE,
                       warning = FALSE, 
                       collapse = TRUE,
@@ -75,34 +75,50 @@ class: title-slide, center, bottom
 ### `r rmarkdown::metadata$author` 
 
 
----
-name: clouds
-class: center, middle
-background-image: url(images/Clouds.jpg)
-background-size: cover
 
 ---
-name: clouds2
-background-image: url(images/Clouds2.jpg)
-background-size: cover
+class: center, middle, inverse
 
----
-template: clouds2
-class: middle, center
-
-
-### Alison Hill 
-
-<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/>
-
-[`r icon::fa("github")` @apreshill](https://github.com/apreshill)  
-[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)
-
-
+# What is Machine Learning?
 
 ???
 
-My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+Machine Learning is usually thought of as a subfield of artificial intelligence that itself contains other hot sub-fields.
+
+Let's start somewhere familiar. I have a data set and I want to analyze it. 
+
+The actual data set is named `ames` and it comes in the `AmesHousing` R package. No need to open your computers. Let's just discuss for a few minutes.
+
+
+
+---
+class: middle
+
+# .center[AmesHousing]
+
+Descriptions of 2,930 houses sold in Ames, IA from 2006 to 2010, collected by the Ames Assessor’s Office.
+
+```{r}
+# install.packages("AmesHousing")
+library(AmesHousing)
+ames <- make_ames() %>% 
+  dplyr::select(-matches("Qu"))
+```
+
+???
+
+`ames` contains descriptions of 2,930 houses sold in Ames, IA from 2006 to 2010. The data comes from the Ames Assessor’s Office and contains things like the square footage of a house, its lot size, and its sale price.
+
+---
+class: middle
+
+```{r}
+glimpse(ames)
+```
+
+---
+background-image: url(images/zestimate.png)
+background-size: contain
 
 ---
 class: middle, center, inverse
@@ -110,14 +126,15 @@ class: middle, center, inverse
 
 # What is the goal of predictive modeling?
 
---
+---
+class: middle, center, inverse
 
 # What is the goal of machine learning?
 
 ---
 class: middle, center, frame
 
-# Goal of Predictive Modeling
+# Goal
 
 --
 
@@ -195,7 +212,6 @@ This type of formula interface may look familiar
 How would we use parsnip to build this kind of linear regression model?
 
 ---
-exclude: true
 name: step1
 background-image: url("images/predicting/predicting.001.jpeg")
 background-size: contain
@@ -430,6 +446,22 @@ fit(
 ```
 
 ---
+class: middle
+
+.center[
+# `fit()`
+
+Train a model by fitting a model. Returns a parsnip model fit.
+]
+
+```{r results='hide'}
+lm_spec %>%                     # parsnip model
+  fit(Sale_Price ~ Gr_Liv_Area, # a formula
+      data = ames               # dataframe
+  )
+```
+
+---
 class: your-turn
 
 # Your turn `r (yt_counter <- yt_counter + 1)`
@@ -493,15 +525,22 @@ class: middle, center
 Use a fitted model to predict new `y` values from data. Returns a tibble.
 
 ```{r eval=FALSE}
-predict(lm_fit, new_data = ames) 
+predict(lm_fit, new_data = new_homes) 
 ```
-
 
 ---
 
 ```{r}
 lm_fit %>% 
   predict(new_data = ames)
+```
+
+---
+
+```{r}
+new_homes <- tibble(Gr_Liv_Area = c(334, 1126, 1442, 1500, 1743, 5642))
+lm_fit %>% 
+  predict(new_data = new_homes)
 ```
 
 ---
@@ -532,6 +571,7 @@ ggplot(small_train, aes(Gr_Liv_Area, Sale_Price)) +
   coord_cartesian(y = c(50000, 500000)) +
   theme(text = element_text(family = "Lato"))
 ```
+
 
 ---
 class: your-turn
@@ -850,15 +890,15 @@ class: your-turn
 
 # Your turn `r (yt_counter <- yt_counter + 1)`
 
-.pull-left[
-In your teams, decide which model:
+.left-column[
+Take a minute and decide which model:
 
 1. Has the smallest residuals  
 2. Will have lower prediction error. Why?  
 ]
 
-.pull-right[
-```{r echo=FALSE, out.width='50%'}
+.right-column[
+```{r echo=FALSE, out.width='50%', fig.show='hold', fig.align = "default"}
 over1
 over2
 ```
@@ -866,7 +906,7 @@ over2
 ]
 
 ```{r echo=FALSE}
-countdown(seconds = 90, minutes = 0)
+countdown(seconds = 60, minutes = 0)
 ```
 
 
@@ -971,12 +1011,11 @@ But need new data...
 ---
 class: middle, center, frame
 
-# Method #1
+# Data splitting
 
-## Data splitting
 
----
-class: middle, center
+--
+
 
 ```{r all-split, echo = FALSE, fig.width = 12, fig.height = 3}
 set.seed(16)
@@ -1014,9 +1053,9 @@ all_split
 We refer to the group for which we know the outcome, and use to develop the algorithm, as the training set. We refer to the group for which we pretend we don’t know the outcome as the test set.
 
 ---
-class: center
+class: center, middle
 
-# `initial_split()`
+# `initial_split()*`
 
 "Splits" data randomly into a single testing and a single training set.
 
@@ -1024,7 +1063,7 @@ class: center
 initial_split(data, prop = 3/4)
 ```
 
-
+.footnote[`*` from `rsample`]
 ---
 
 ```{r}
@@ -1037,9 +1076,9 @@ ames_split
 data splitting
 
 ---
-class: center
+class: center, middle
 
-# `training()` and `testing()`
+# `training()` and `testing()*`
 
 Extract training and testing sets from an rsplit
 
@@ -1047,6 +1086,8 @@ Extract training and testing sets from an rsplit
 training(ames_split)
 testing(ames_split)
 ```
+
+.footnote[`*` from `rsample`]
 
 ---
 ```{r R.options = list(tibble.max_extra_cols=5, tibble.print_max=5, tibble.width=60)}
@@ -1079,11 +1120,6 @@ template: step2
 ---
 template: step3
 background-image: url("images/predicting/predicting.004.jpeg")
-background-size: contain
-
----
-name: holdout-step1
-background-image: url("images/predicting/predicting.005.jpeg")
 background-size: contain
 
 ---
@@ -1212,21 +1248,6 @@ new data `(x)` + fitted model = predictions
 
 new data `(y)` + predictions = metrics
 
----
-class: middle, center
-
-# Quiz
-
-How much data should you set aside for testing?
-
---
-
-If .display[testing set] is small, 
-performance metrics may be unreliable
-
---
-
-If .display[training set] is small, model fit may be poor
 
 ---
 class: middle, center, inverse
@@ -1390,3 +1411,15 @@ price_pred  <- lm_fit %>%
 rmse(price_pred, truth = price_truth, estimate = .pred)
 ```
 
+---
+class: inverse, middle, center
+
+# Key concepts
+
+fitting a model (aka training a model)
+
+predicting new data
+
+overfitting
+
+data splitting (+ stratified splits)
