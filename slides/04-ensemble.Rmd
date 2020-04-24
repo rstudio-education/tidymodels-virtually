@@ -144,95 +144,331 @@ class: title-slide, center, bottom
 
 
 ---
-name: clouds
-class: center, middle
-background-image: url(images/Clouds.jpg)
-background-size: cover
+class: middle, frame, center
+
+# Decision Trees
+
+To predict the outcome of a new data point:
+
+Uses rules learned from splits
+
+Each split maximizes information gain
 
 ---
-name: clouds2
-background-image: url(images/Clouds2.jpg)
-background-size: cover
-
----
-template: clouds2
 class: middle, center
 
+![](https://media.giphy.com/media/gj4ZruUQUnpug/source.gif)
 
-### Alison Hill 
+---
+```{r include=FALSE}
+rt_spec <- 
+  decision_tree() %>%          
+  set_engine(engine = "rpart") %>% 
+  set_mode("regression")
 
-<img style="border-radius: 50%;" src="https://conf20-intro-ml.netlify.com/authors/alison/avatar.jpg" width="150px"/>
+set.seed(1)
+rt_fitwf <- 
+  rt_spec %>% 
+  last_fit(Sale_Price ~ Gr_Liv_Area, 
+           split = small_split)
 
-[`r icon::fa("github")` @apreshill](https://github.com/apreshill)  
-[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)
+rt_fit <- rt_fitwf %>% 
+  pluck(".workflow", 1) %>% 
+  pull_workflow_fit() %>% 
+  .$fit
+
+splt <- rt_fit$splits %>% 
+  as_tibble(.) %>% 
+  mutate(order = dplyr::row_number()) 
+```
 
 
 
-???
+```{r echo = FALSE, fig.align='center'}
+ggplot(small_train, aes(x = Gr_Liv_Area, y = Sale_Price)) + 
+  geom_point(size = 3) +
+  geom_vline(data=splt, 
+             aes(xintercept = index, 
+                 colour=factor(order)), 
+             lwd = 5, 
+             alpha = .7) + 
+  geom_text(data=splt, aes(x=index, 
+                           y=max(small_train$Sale_Price), 
+                           label=order), nudge_x=0.02) +
+  scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1)) +
+  scale_colour_scico_d(palette = "buda", end = .8) +
+  theme(legend.position="none", 
+        text = element_text(family = "Lato")) +
+  coord_cartesian(y = c(50000, 500000), x = c(700, 2750))
+```
 
-My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+---
+
+```{r echo = FALSE, fig.align='center', message = FALSE, warning = FALSE}
+rt_preds <- rt_fitwf %>% 
+  collect_predictions() %>% 
+  left_join(select(small_test, .row, Gr_Liv_Area)) 
+
+rt_pred_plot <-
+  ggplot(rt_preds) + 
+  geom_point(aes(x=Gr_Liv_Area, y=Sale_Price), size = 3) +
+  geom_line(aes(x=Gr_Liv_Area, y=.pred), colour="#4D8DC9", size=2) +
+  geom_vline(data=splt, aes(xintercept = index, colour=factor(order)), 
+             lwd = 5, 
+             alpha = .7) + 
+  scale_colour_scico_d(palette = "buda", end = .8) +
+  theme(legend.position="none", 
+        text = element_text(family = "Lato")) +
+  coord_cartesian(y = c(50000, 500000), x = c(700, 2750))
+
+rt_pred_plot
+```
 
 
 ---
-class: middle, center, frame
+class: middle, center
 
-# Goal of Predictive Modeling
+# Quiz
 
---
-
-
-## `r emo::ji("hammer")` build .display[models] that
+How do assess predictions here?
 
 --
 
+RMSE
 
-## `r emo::ji("target")` generate .display[accurate predictions]
+---
+
+```{r rt-test-resid, echo = FALSE, fig.align='center'}
+rt_pred_plot +
+  geom_segment(aes(x = Gr_Liv_Area, 
+                   xend = Gr_Liv_Area, 
+                   y = Sale_Price, 
+                   yend = .pred), 
+               colour = "#E7553C") 
+```
+
+
+
+---
+class: middle, center
+
+.pull-left[
+### LM RMSE = `r round(rmse_test, 2)`
+```{r lm-test-resid, echo=FALSE, message = FALSE, warning = FALSE}
+train_lm <- lm(Sale_Price ~ Gr_Liv_Area, data = small_train)
+
+lm_test_pred <- train_lm %>% 
+  broom::augment(newdata = small_test) %>% 
+  select(Sale_Price, Gr_Liv_Area, .fitted, .row)
+
+ggplot(data = NULL, aes(Gr_Liv_Area, Sale_Price)) +
+  geom_segment(data = lm_test_pred,
+               aes(x = Gr_Liv_Area, 
+                   xend = Gr_Liv_Area, 
+                   y = Sale_Price, 
+                   yend = .fitted), 
+               colour = "#E7553C") +
+  geom_smooth(data = small_train, method = "lm", se = FALSE, colour = "#4D8DC9",
+              fullrange = TRUE) +
+  #geom_smooth(data = small_test, method = "lm", se = FALSE, colour = "#2aa198", lty = 4, fullrange = TRUE) +
+  geom_point(data = small_test, size = 3) +
+  coord_cartesian(y = c(50000, 500000)) +
+  theme(text = element_text(family = "Lato"))
+```
+]
 
 --
 
+.pull-right[
 
-## `r emo::ji("crystal_ball")` for .display[future, yet-to-be-seen data]
+```{r include = FALSE}
+rmse_tree <- rt_fitwf %>% 
+  collect_predictions() %>% 
+  rmse(., truth = Sale_Price, estimate = .pred) %>% 
+  pull(.estimate)
+```
+
+### Tree RMSE = `r round(rmse_tree, 2)`
+```{r ref.label='rt-test-resid', echo=FALSE}
+```
+
+]
 
 
-
---
-
-.footnote[Max Kuhn & Kjell Johnston, http://www.feat.engineering/]
-
-
-???
-
-This is our whole game vision for today. This is the main goal for predictive modeling broadly, and for machine learning specifically.
-
-We'll use this goal to drive learning of 3 core tidymodels packages:
-
-- parsnip
-- yardstick
-- and rsample
 
 ---
 class: inverse, middle, center
 
-# `r emo::ji("baguette")` Bagging models
+.pull-left[
+```{r lm-fig, dev = 'svg', dev.args = list(bg = "transparent"), echo=FALSE, fig.align='center'}
+ggplot(small_train, aes(Gr_Liv_Area, Sale_Price)) +
+  geom_smooth(method = "lm", se = FALSE, colour = "#4D8DC9", lwd=3) +
+  geom_point(size = 3, colour = "white") +  
+  coord_cartesian(y = c(50000, 500000))+
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "transparent", colour = NA), 
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    legend.background = element_rect(fill = "transparent", colour = NA),
+    legend.key = element_rect(fill = "transparent", colour = NA)
+  )
+```
+]
 
---
+.pull-right[
+```{r dt-fig, dev = 'svg', dev.args = list(bg = "transparent"), echo=FALSE, fig.align='center'}
+ggplot(rt_preds) + 
+  geom_point(data = small_train, aes(x=Gr_Liv_Area, y=Sale_Price), colour = "white", size = 3) +
+  geom_line(aes(x=Gr_Liv_Area, y=.pred), colour="#4D8DC9", size=2) + 
+  scale_colour_scico_d(palette = "buda", end = .8) +
+  coord_cartesian(y = c(50000, 500000), x = c(700, 2750)) +  
+  theme_void() +
+  theme(
+    legend.position="none",
+    panel.background = element_rect(fill = "transparent", colour = NA), 
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    legend.background = element_rect(fill = "transparent", colour = NA),
+    legend.key = element_rect(fill = "transparent", colour = NA)
+  )
+```
+]
 
-## with baguette
+---
+class: middle, center
+```{r echo=FALSE, out.width = "70%"}
+knitr::include_graphics("https://raw.githubusercontent.com/EmilHvitfeldt/blog/master/static/blog/2019-08-09-authorship-classification-with-tidymodels-and-textrecipes_files/figure-html/unnamed-chunk-18-1.png")
+```
 
+https://www.hvitfeldt.me/blog/authorship-classification-with-tidymodels-and-textrecipes/
 
-???
+---
+class: middle, center
+```{r echo=FALSE, out.width = "50%"}
+knitr::include_graphics("https://www.kaylinpavlik.com/content/images/2019/12/dt-1.png")
+```
 
-Enter the rsample package
+https://www.kaylinpavlik.com/classifying-songs-genres/
+
+---
+class: middle, center
+
+```{r echo=FALSE, out.width='40%'}
+knitr::include_graphics("https://a3.typepad.com/6a0105360ba1c6970c01b7c95c61fb970b-pi")
+```
+
+.footnote[[tweetbotornot2](https://github.com/mkearney/tweetbotornot2)]
 
 
 ---
-class: middle, center, frame
+name: guess-the-animal
+class: middle, center, inverse
 
-# baguette
 
-```{r echo=FALSE, out.width="100%"}
-knitr::include_url("https://tidymodels.github.io/baguette/")
+```{r echo=FALSE, out.width = '100%'}
+knitr::include_graphics("http://www.atarimania.com/8bit/screens/guess_the_animal.gif")
 ```
+
+
+---
+class: middle, center
+
+# What makes a good guesser?
+
+--
+
+High information gain per question (can it fly?)
+
+--
+
+Clear features (feathers vs. is it "small"?)
+
+--
+
+Order matters
+
+
+---
+background-image: url(images/aus-standard-animals.png)
+background-size: cover
+
+.footnote[[Australian Computing Academy](https://aca.edu.au/resources/decision-trees-classifying-animals/)]
+
+---
+background-image: url(images/aus-standard-tree.png)
+background-size: cover
+
+.footnote[[Australian Computing Academy](https://aca.edu.au/resources/decision-trees-classifying-animals/)]
+
+---
+background-image: url(images/annotated-tree/annotated-tree.001.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.002.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.003.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.004.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.005.png)
+background-size: cover
+
+---
+background-image: url(images/copyingandpasting-big.png)
+background-size: contain
+background-position: center
+class: middle, center
+
+---
+background-image: url(images/so-dev-survey.png)
+background-size: contain
+background-position: center
+class: middle, center
+
+---
+
+```{r echo = FALSE, out.width = '80%'}
+knitr::include_graphics("https://github.com/juliasilge/supervised-ML-case-studies-course/blob/master/img/remote_size.png?raw=true")
+```
+
+.footnote[[Julia Silge](https://supervised-ml-course.netlify.com/)]
+
+???
+
+Notes: The specific question we are going to address is what makes a developer more likely to work remotely. Developers can work in their company offices or they can work remotely, and it turns out that there are specific characteristics of developers, such as the size of the company that they work for, how much experience they have, or where in the world they live, that affect how likely they are to be a remote developer.
+
+---
+
+# StackOverflow Data
+
+```{r}
+# read in the data
+stackoverflow <- read_rds(here::here("materials/data/stackoverflow.rds"))
+
+glimpse(stackoverflow)
+```
+
+
+---
+
+# Data Splitting & Resampling
+
+```{r}
+set.seed(100) # Important!
+so_split <- initial_split(stackoverflow, strata = remote)
+so_train <- training(so_split)
+so_test  <- testing(so_split)
+
+# use 10-fold CV
+so_folds <- vfold_cv(so_train, strata = remote)
+```
+
 
 ---
 class: middle, frame
@@ -292,8 +528,6 @@ countdown(minutes = 2)
 
 ```{r}
 set.seed(100)
-so_folds <- vfold_cv(so_train)
-
 vanilla_tree_spec %>% 
   fit_resamples(remote ~ ., 
                 resamples = so_folds) %>% 
@@ -301,6 +535,7 @@ vanilla_tree_spec %>%
 ```
 
 ```{r vt-metrics, include=FALSE}
+set.seed(100)
 vt_metrics <- 
   vanilla_tree_spec %>% 
   fit_resamples(remote ~ ., 
@@ -927,7 +1162,7 @@ class: your-turn
 
 # Your turn `r (yt_counter <- yt_counter + 1)`
 
-Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 20 variables at each split. Which value maximizes the area under the ROC curve?
+Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 19 variables at each split. Which value maximizes the area under the ROC curve?
 
 *Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
 
@@ -974,11 +1209,11 @@ rf12_spec %>%
 
 ---
 ```{r}
-rf20_spec <- rf_spec %>% 
+rf19_spec <- rf_spec %>% 
   set_args(mtry = 19) #<<
 
 set.seed(100)
-rf20_spec %>% 
+rf19_spec %>% 
   fit_resamples(remote ~ ., 
                 resamples = so_folds) %>% 
   collect_metrics()
