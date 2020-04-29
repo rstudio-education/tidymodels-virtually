@@ -1,5 +1,5 @@
 ---
-title: "Preprocess Your Data"
+title: "Build A Better Training Set"
 subtitle: "Tidymodels, Virtually"
 session: 03
 author: Alison Hill
