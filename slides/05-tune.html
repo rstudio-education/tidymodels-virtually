@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Tune Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alison Hill" />
+    <meta name="date" content="2020-04-28" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/countdown/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown/countdown.js"></script>
+    <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: title-slide, center, bottom
+
+# Tune Models
+
+## Tidymodels, Virtually &amp;mdash; Session 04
+
+### Alison Hill 
+
+
+---
+class: middle, center, frame
+
+
+# tune 
+
+Functions for fitting and tuning models
+
+&lt;tidymodels.github.io/tune/&gt;
+
+&lt;iframe src="https://tidymodels.github.io/tune/" width="100%" height="400px"&gt;&lt;/iframe&gt;
+
+---
+class: middle, center
+
+# `tune()`
+
+A placeholder for hyper-parameters to be "tuned"
+
+
+```r
+nearest_neighbor(neighbors = tune())
+```
+
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+
+```r
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+  grid = 10, 
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+
+```r
+tune_grid(
+* object,
+  resamples, 
+  ..., 
+  grid = 10, 
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+--
+
+.pull-right[
+One of:
+
++ A parsnip `model` object
+
++ A `workflow`
+
+]
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+
+```r
+tune_grid(
+* object,
+* preprocessor,
+  resamples, 
+  ..., 
+  grid = 10, 
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+A `model` + `recipe`
+]
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+
+```r
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+* grid = 10,
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+One of:
+
++ A positive integer. 
+
++ A data frame of tuning combinations.
+
+]
+
+---
+
+.center[
+
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+
+]
+
+.pull-left[
+
+
+```r
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+* grid = 10,
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+Number of candidate parameter sets to be created automatically; `10` is the default.
+]
+
+---
+
+```r
+library(modeldata)
+data(stackoverflow)
+
+# split the data
+set.seed(100) # Important!
+so_split &lt;- initial_split(stackoverflow, strata = Remote)
+so_train &lt;- training(so_split)
+so_test  &lt;- testing(so_split)
+
+# resample training data
+set.seed(100) # Important!
+so_folds &lt;- vfold_cv(so_train, v = 10, strata = Remote)
+```
+
+---
+class: your-turn
+
+# Your Turn 1
+
+Here's a new recipe (also in your .Rmd)…
+
+
+```r
+so_rec &lt;- recipe(Remote ~ ., 
+                 data = so_train) %&gt;% 
+  step_dummy(all_nominal(), -all_outcomes()) %&gt;% 
+  step_lincomb(all_predictors()) %&gt;% 
+  step_downsample(Remote)
+```
+
+---
+class: your-turn
+
+# Your Turn 1
+
+…and a new model plus workflow. Can you tell what type of model this is?…
+
+
+```r
+rf_spec &lt;- 
+  rand_forest() %&gt;% 
+  set_engine("ranger") %&gt;% 
+  set_mode("classification")
+
+rf_workflow &lt;-
+  workflow() %&gt;% 
+  add_recipe(so_rec) %&gt;% 
+  add_model(rf_spec)
+```
+
+---
+class: your-turn
+
+# Your Turn 1
+
+Here is the output from `fit_resamples()`...
+
+
+```r
+rf_results &lt;-
+  rf_workflow %&gt;% 
+  fit_resamples(resamples = so_folds,
+                metrics = metric_set(roc_auc))
+
+rf_results %&gt;% 
+  collect_metrics()
+# # A tibble: 1 x 5
+#   .metric .estimator  mean     n std_err
+#   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+# 1 roc_auc binary     0.684    10  0.0165
+```
+
+
+---
+class: your-turn
+
+# Your Turn 1
+
+Edit the random forest model to create 1000 trees, and tune the `mtry` and `min_n` hyperparameters. 
+
+Update your workflow to use the tuned model.
+
+Then use `tune_grid()` to find the best combination of hyper-parameters to maximize `roc_auc`; let tune set up the grid for you.
+
+How does it compare to the average ROC AUC across folds from `fit_resamples()`?
+
+<div class="countdown" id="timer_5ea8cdcf" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+```r
+rf_tuner &lt;- 
+  rand_forest(mtry = tune(),
+              min_n = tune(),
+              trees = 1000) %&gt;% 
+  set_engine("ranger") %&gt;% 
+  set_mode("classification")
+
+rf_workflow &lt;-
+  rf_workflow %&gt;% 
+  update_model(rf_tuner)
+
+rf_results &lt;-
+  rf_workflow %&gt;% 
+  tune_grid(resamples = so_folds,
+            metrics = metric_set(roc_auc))
+```
+
+---
+
+
+```r
+rf_results %&gt;% 
+  collect_metrics() 
+# # A tibble: 10 x 7
+#     mtry min_n .metric .estimator  mean     n std_err
+#    &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+#  1     1    33 roc_auc binary     0.689    10  0.0178
+#  2     4    17 roc_auc binary     0.685    10  0.0169
+#  3     7    11 roc_auc binary     0.678    10  0.0161
+#  4     8    32 roc_auc binary     0.689    10  0.0185
+#  5    11     3 roc_auc binary     0.664    10  0.0148
+#  6    13    24 roc_auc binary     0.680    10  0.0181
+#  7    15    15 roc_auc binary     0.672    10  0.0181
+#  8    17    38 roc_auc binary     0.681    10  0.0201
+#  9    19     6 roc_auc binary     0.660    10  0.0163
+# 10    22    26 roc_auc binary     0.673    10  0.0192
+```
+
+---
+
+```r
+rf_results %&gt;% 
+  collect_metrics(summarize = FALSE) 
+# # A tibble: 100 x 6
+#    id      mtry min_n .metric .estimator .estimate
+#    &lt;chr&gt;  &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+#  1 Fold01    17    38 roc_auc binary         0.713
+#  2 Fold01     8    32 roc_auc binary         0.721
+#  3 Fold01    22    26 roc_auc binary         0.707
+#  4 Fold01    15    15 roc_auc binary         0.707
+#  5 Fold01     4    17 roc_auc binary         0.720
+#  6 Fold01    13    24 roc_auc binary         0.714
+#  7 Fold01     7    11 roc_auc binary         0.715
+#  8 Fold01    11     3 roc_auc binary         0.708
+#  9 Fold01     1    33 roc_auc binary         0.699
+# 10 Fold01    19     6 roc_auc binary         0.703
+# # … with 90 more rows
+```
+
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+
+]
+
+.pull-left[
+
+
+```r
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+* grid = df,
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+A data frame of tuning combinations.
+]
+
+---
+class: middle, center
+
+# `expand_grid()`
+
+Takes one or more vectors, and returns a data frame holding all combinations of their values.
+
+
+```r
+expand_grid(mtry = c(1, 5), min_n = 1:3)
+# # A tibble: 6 x 2
+#    mtry min_n
+#   &lt;dbl&gt; &lt;int&gt;
+# 1     1     1
+# 2     1     2
+# 3     1     3
+# 4     5     1
+# 5     5     2
+# 6     5     3
+```
+
+--
+
+.footnote[tidyr package; see also base `expand.grid()`]
+
+
+---
+class: middle
+name: show-best
+
+.center[
+# `show_best()`
+
+Shows the .display[n] most optimum combinations of hyper-parameters
+]
+
+
+```r
+rf_results %&gt;% 
+  show_best(metric = "roc_auc", n = 5)
+```
+
+---
+template: show-best
+
+
+```
+# # A tibble: 5 x 7
+#    mtry min_n .metric .estimator  mean     n std_err
+#   &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+# 1     1    33 roc_auc binary     0.689    10  0.0178
+# 2     8    32 roc_auc binary     0.689    10  0.0185
+# 3     4    17 roc_auc binary     0.685    10  0.0169
+# 4    17    38 roc_auc binary     0.681    10  0.0201
+# 5    13    24 roc_auc binary     0.680    10  0.0181
+```
+
+
+---
+class: middle, center
+
+# `autoplot()`
+
+Quickly visualize tuning results
+
+
+
+```r
+rf_results %&gt;% autoplot()
+```
+
+&lt;img src="figs/04-ensemble/rf-plot-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle, center
+
+&lt;img src="figs/04-ensemble/unnamed-chunk-18-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+# You can tune models *and* recipes!
+
+---
+
+# What next?
+
+
+---
+class: middle
+name: show-best
+
+.center[
+# `show_best()`
+
+Shows the .display[n] most optimum combinations of hyper-parameters.
+]
+
+
+```r
+rf_results %&gt;% 
+  show_best(metric = "roc_auc")
+# # A tibble: 5 x 7
+#    mtry min_n .metric .estimator  mean     n std_err
+#   &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+# 1     1    33 roc_auc binary     0.689    10  0.0178
+# 2     8    32 roc_auc binary     0.689    10  0.0185
+# 3     4    17 roc_auc binary     0.685    10  0.0169
+# 4    17    38 roc_auc binary     0.681    10  0.0201
+# 5    13    24 roc_auc binary     0.680    10  0.0181
+```
+
+---
+class: middle
+name: select-best
+
+.center[
+# `select_best()`
+
+Shows the .display[top] combination of hyper-parameters.
+]
+
+
+```r
+so_best &lt;-
+  rf_results %&gt;% 
+    select_best(metric = "roc_auc")
+
+so_best
+```
+
+---
+template: select-best
+
+
+```
+# # A tibble: 1 x 2
+#    mtry min_n
+#   &lt;int&gt; &lt;int&gt;
+# 1     1    33
+```
+
+---
+
+.center[
+# `finalize_workflow()`
+
+Replaces `tune()` placeholders in a model/recipe/workflow with a set of hyper-parameter values.
+]
+
+
+```r
+last_rf_workflow &lt;- 
+  rf_workflow %&gt;%
+    finalize_workflow(so_best) 
+```
+
+---
+class: middle, center
+
+# The test set
+
+Remember me?
+
+
+---
+class: middle
+
+.center[
+
+# `last_fit()`
+
+]
+
+
+```r
+last_rf_fit &lt;-
+  last_rf_workflow %&gt;% 
+    last_fit(split = so_split)
+```
+
+---
+
+
+```r
+last_rf_fit
+# # Monte Carlo cross-validation (0.75/0.25) with 1 resamples  
+# # A tibble: 1 x 6
+#   splits   id      .metrics  .notes  .predictions  .workflow
+#   &lt;list&gt;   &lt;chr&gt;   &lt;list&gt;    &lt;list&gt;  &lt;list&gt;        &lt;list&gt;   
+# 1 &lt;split … train/… &lt;tibble … &lt;tibbl… &lt;tibble [1,3… &lt;workflo…
+```
+
+---
+class: your-turn
+
+# Your Turn 2
+
+Use `select_best()`, `finalize_workflow()`, and `last_fit()` to take the best combination of hyper-parameters from `rf_results` and use them to predict the test set.
+
+How does our actual test ROC AUC compare to our cross-validated estimate?
+
+<div class="countdown" id="timer_5ea8ce4a" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+```r
+so_best &lt;-
+  rf_results %&gt;% 
+    select_best(metric = "roc_auc")
+
+last_rf_workflow &lt;- 
+  rf_workflow %&gt;%
+    finalize_workflow(so_best) 
+
+last_rf_fit &lt;-
+  last_rf_workflow %&gt;% 
+    last_fit(split = so_split)
+
+last_rf_fit %&gt;% 
+  collect_metrics()
+```
+
+---
+
+# final final final
+
+---
+class: middle
+
+.center[
+# Final metrics
+]
+
+
+```r
+last_rf_fit %&gt;% 
+  collect_metrics()
+# # A tibble: 2 x 3
+#   .metric  .estimator .estimate
+#   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+# 1 accuracy binary         0.663
+# 2 roc_auc  binary         0.713
+```
+
+
+---
+class: middle
+
+.center[
+# Predict the test set
+]
+
+
+```r
+last_rf_fit %&gt;% 
+  collect_predictions()
+# # A tibble: 1,398 x 6
+#    id    .pred_Remote `.pred_Not remo…  .row .pred_class
+#    &lt;chr&gt;        &lt;dbl&gt;            &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;      
+#  1 trai…        0.491            0.509     1 Not remote 
+#  2 trai…        0.449            0.551     6 Not remote 
+#  3 trai…        0.395            0.605    18 Not remote 
+#  4 trai…        0.578            0.422    23 Remote     
+#  5 trai…        0.511            0.489    30 Remote     
+#  6 trai…        0.526            0.474    50 Remote     
+#  7 trai…        0.622            0.378    53 Remote     
+#  8 trai…        0.519            0.481    56 Remote     
+#  9 trai…        0.556            0.444    63 Remote     
+# 10 trai…        0.416            0.584    68 Not remote 
+# # … with 1,388 more rows, and 1 more variable: Remote &lt;fct&gt;
+```
+
+---
+
+
+```r
+roc_values &lt;- 
+  last_rf_fit %&gt;% 
+    collect_predictions() %&gt;% 
+    roc_curve(truth = Remote, estimate = .pred_Remote)
+autoplot(roc_values)
+```
+
+&lt;img src="figs/04-ensemble/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLanguage": "r",
+"highlightStyle": "xcode",
+"slideNumberFormat": "",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
