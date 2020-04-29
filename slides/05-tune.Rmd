@@ -26,7 +26,7 @@ knitr::opts_chunk$set(comment = "#",
                       collapse = TRUE,
                       fig.retina = 3,
                       fig.align = 'center',
-                      fig.path = "figs/04-ensemble/",
+                      fig.path = "figs/05-tune/",
                       R.options = list(tibble.max_extra_cols=5, 
                                        tibble.print_max=5, 
                                        tibble.width=60))
