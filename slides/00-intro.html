@@ -4,7 +4,7 @@
     <title>Tidymodels, Virtually</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-24" />
+    <meta name="date" content="2020-04-30" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <meta name="description" content="Tidymodels, Virtually"/>
@@ -24,6 +24,27 @@
     <meta name="og:type" content="website"/>
     <meta name="og:locale" content="en_US"/>
     <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+    <!---import JQuery-->
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+
+    <!--add parent selector-->
+
+    <script>
+
+    $( document ).ready( function(){
+
+      $( "pre")
+          .parents( ".remark-slide-content" )
+          .addClass( "code-slide-background" );
+      
+    });
+      
+    </script>
     <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
     <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
   </head>
@@ -405,7 +426,7 @@ background-size: contain
 
 ```r
 library(tidymodels)
-## ── Attaching packages ────────────────────────────────────────────────── tidymodels 0.1.0 ──
+## ── Attaching packages ─────────────────────────────── tidymodels 0.1.0 ──
 ## ✓ broom     0.5.5      ✓ recipes   0.1.10
 ## ✓ dials     0.0.4      ✓ rsample   0.0.6 
 ## ✓ dplyr     0.8.5      ✓ tibble    3.0.0 
@@ -417,7 +438,7 @@ library(tidymodels)
 ## Warning: package 'rsample' was built under R version 3.6.2
 ## Warning: package 'tibble' was built under R version 3.6.2
 ## Warning: package 'tune' was built under R version 3.6.2
-## ── Conflicts ───────────────────────────────────────────────────── tidymodels_conflicts() ──
+## ── Conflicts ────────────────────────────────── tidymodels_conflicts() ──
 ## x purrr::discard()  masks scales::discard()
 ## x dplyr::filter()   masks stats::filter()
 ## x dplyr::lag()      masks stats::lag()

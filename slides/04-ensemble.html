@@ -4,11 +4,32 @@
     <title>Ensemble Models</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-29" />
+    <meta name="date" content="2020-04-30" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
     <script src="libs/countdown/countdown.js"></script>
+    <!---import JQuery-->
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+
+    <!--add parent selector-->
+
+    <script>
+
+    $( document ).ready( function(){
+
+      $( "pre")
+          .parents( ".remark-slide-content" )
+          .addClass( "code-slide-background" );
+      
+    });
+      
+    </script>
     <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
     <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
   </head>
@@ -314,7 +335,7 @@ class: your-turn
 
 Fill in the blanks to return the accuracy and ROC AUC for this model using 10-fold cross-validation.
 
-<div class="countdown" id="timer_5eaa0173" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eab04a7" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -625,7 +646,7 @@ Compare the metrics of the big tree to the vanilla tree- which one predicts the 
 
 *Hint: you'll need https://tidymodels.github.io/parsnip/reference/decision_tree.html*
 
-<div class="countdown" id="timer_5ea9ff9e" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eab0719" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -687,7 +708,7 @@ class: middle
 get_tree_fit(big_tree)
 # parsnip model object
 # 
-# Fit time:  54ms 
+# Fit time:  55ms 
 # n= 864 
 # 
 # node), split, n, loss, yval, (yprob)
@@ -1241,7 +1262,7 @@ Let's combine bootstrapping with decision trees.
 
 Do **Round 1** on your handouts.
 
-<div class="countdown" id="timer_5ea9ff17" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eab078d" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1269,7 +1290,7 @@ Now, let's add the aggregating part.
 Do **Round 2** on your handouts.
 
 
-<div class="countdown" id="timer_5ea9fef8" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eab07a8" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1342,7 +1363,7 @@ Compare the metrics of the random forest to your two single tree models (vanilla
 
 *Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
 
-<div class="countdown" id="timer_5eaa0151" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eab082d" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1426,7 +1447,7 @@ Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 19 va
 
 *Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
 
-<div class="countdown" id="timer_5ea9ff84" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eab05e5" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1721,7 +1742,7 @@ get_tree_fit(imp_fit)
 get_tree_fit(imp_fit)
 # parsnip model object
 # 
-# Fit time:  285ms 
+# Fit time:  284ms 
 # Ranger result
 # 
 # Call:
@@ -1797,7 +1818,7 @@ class: your-turn
 
 Make a new model spec called `treebag_imp_spec` to fit a bagged classification tree model. Set the variable `importance` mode to "permutation". Plot the variable importance- which variable was the most important?
 
-<div class="countdown" id="timer_5eaa0180" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eab05c4" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1829,7 +1850,7 @@ imp_plot
 ```
 # parsnip model object
 # 
-# Fit time:  930ms 
+# Fit time:  913ms 
 # Ranger result
 # 
 # Call:

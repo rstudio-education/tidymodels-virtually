@@ -16,6 +16,9 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
 ---
 
 ```{r setup, include=FALSE}
@@ -187,12 +190,13 @@ class: title-slide, center, bottom
 
 
 ---
-background-image: url(images/bird-lineup.jpg)
+background-image: url(images/cranes.jpg)
 background-position: left
 background-size: contain
 class: middle
 
-.pull-right[
+.right-column[
+
 # Choose from:
 
 + Lasso logistic regression

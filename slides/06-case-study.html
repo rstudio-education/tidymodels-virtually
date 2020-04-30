@@ -4,9 +4,30 @@
     <title>The Great Model-Off</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-29" />
+    <meta name="date" content="2020-04-30" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <!---import JQuery-->
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+
+    <!--add parent selector-->
+
+    <script>
+
+    $( document ).ready( function(){
+
+      $( "pre")
+          .parents( ".remark-slide-content" )
+          .addClass( "code-slide-background" );
+      
+    });
+      
+    </script>
     <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
     <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
   </head>
@@ -184,12 +205,13 @@ class: title-slide, center, bottom
 
 
 ---
-background-image: url(images/bird-lineup.jpg)
+background-image: url(images/cranes.jpg)
 background-position: left
 background-size: contain
 class: middle
 
-.pull-right[
+.right-column[
+
 # Choose from:
 
 + Lasso logistic regression
