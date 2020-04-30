@@ -473,6 +473,46 @@ class: middle, center, inverse
 # Cross-validation
 
 ---
+background-image: url(images/cross-validation/Slide2.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide3.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide4.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide5.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide6.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide7.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide8.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide9.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide10.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide11.png)
+background-size: contain
+
+---
 class: middle, center
 
 # V-fold cross-validation
@@ -489,9 +529,10 @@ exclude: true
 set.seed(1)
 folds10 <- slice(ames, 1:20) %>% 
   vfold_cv() %>% 
-  tidy()
+  tidy() %>% 
+  mutate(split = str_c("Split", str_pad(parse_number(Fold), width = 2, pad = "0")))
 
-folds <- ggplot(folds10, aes(x = Row, y = fct_rev(Fold), fill = Data)) + 
+folds <- ggplot(folds10, aes(x = Row, y = fct_rev(split), fill = Data)) + 
   geom_tile(color = "white",
             width = 1,
             size = 1) + 
