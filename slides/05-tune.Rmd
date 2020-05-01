@@ -255,6 +255,170 @@ set.seed(100) # Important!
 so_folds <- vfold_cv(so_train, v = 10, strata = Remote)
 ```
 
+
+---
+class: inverse, middle, center
+
+
+# Aside:
+
+--
+
+## Sub-class sampling
+
+```{r include=FALSE}
+uni_train <- iris %>% 
+  janitor::clean_names() %>% 
+  mutate(unicorn = as.factor(if_else(species == "versicolor", 1, 0))) %>% 
+  mutate_at(vars(starts_with("sepal")), .funs = ~(.*10)) %>% 
+  select(n_butterflies = sepal_width, n_kittens = sepal_length, unicorn)
+```
+
+---
+class: middle, center
+
+# Downsampling
+
+.pull-left[
+
+
+```{r uni-biscatter, echo=FALSE}
+ggplot(uni_train, aes(x = n_kittens, y = n_butterflies, color = unicorn)) +
+  geom_point(alpha = .8, size = 4) +
+  scale_colour_manual(values = c(train_color, test_color), guide = FALSE) +
+  theme(text = element_text(family = "Lato")) +
+  labs(x = NULL, y = NULL)
+```
+
+]
+
+--
+
+.pull-right[
+```{r echo=FALSE}
+uni_down_rec <- recipe(unicorn ~ ., data = uni_train) %>% 
+  step_downsample(all_outcomes())
+
+uni_down <- uni_down_rec %>% 
+  prep(training = uni_train, 
+       retain = TRUE) %>% 
+  juice()
+
+ggplot(uni_down, aes(x = n_kittens, y = n_butterflies, color = unicorn)) +
+  geom_point(data = filter(uni_down, unicorn == 1), alpha = .8, size = 4) +
+  geom_count(data = filter(uni_down, unicorn == 0), alpha = .8) +
+  scale_colour_manual(values = c(train_color, test_color), guide = FALSE) +
+  theme(text = element_text(family = "Lato")) +
+  labs(x = NULL, y = NULL) +
+  scale_size_area(max_size = 8, guide = FALSE)
+```
+
+]
+
+---
+class: middle, center
+
+# Upsampling
+
+.pull-left[
+
+
+```{r ref.label='uni-biscatter', echo=FALSE}
+```
+
+]
+
+--
+
+.pull-right[
+```{r echo=FALSE}
+uni_up_rec <- recipe(unicorn ~ ., data = uni_train) %>% 
+  step_upsample(all_outcomes())
+
+uni_up <- uni_up_rec %>% 
+  prep(training = uni_train, 
+       retain = TRUE) %>% 
+  juice()
+
+ggplot(uni_down, aes(x = n_kittens, y = n_butterflies, color = unicorn)) +
+  geom_point(data = filter(uni_up, unicorn == 0), alpha = .8, size = 4) +
+  geom_count(data = filter(uni_up, unicorn == 1), alpha = .8) +
+  scale_colour_manual(values = c(train_color, test_color), guide = FALSE) +
+  theme(text = element_text(family = "Lato")) +
+  labs(x = NULL, y = NULL) +
+  scale_size_area(max_size = 8, guide = FALSE)
+```
+
+]
+
+---
+
+# .center[`step_downsample()`]
+
+```{r so-rec, include=FALSE}
+so_rec <- recipe(Remote ~ ., 
+                 data = so_train) %>% 
+  step_zv(all_predictors()) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_lincomb(all_predictors()) %>% 
+  step_downsample(Remote)
+```
+
+Down-sampling is performed on the training set *only*. Default is `skip = TRUE`. 
+
+.pull-left[
+
+## Training Set
+```{r echo=FALSE}
+so_train %>% 
+  count(Remote)
+```
+]
+
+--
+
+.pull-right[
+
+## "Prepped" Training Set
+```{r echo=FALSE}
+so_rec %>% 
+  prep(training = so_train, 
+       retain = TRUE) %>% 
+  juice() %>% #<<
+  count(Remote)
+```
+
+]
+
+---
+
+# .center[`step_downsample()`]
+
+Down-sampling is performed on the training set *only*. Default is `skip = TRUE`. 
+
+.pull-left[
+
+## Test Set
+```{r echo=FALSE}
+so_test %>% 
+  count(Remote)
+```
+]
+
+--
+
+.pull-right[
+
+## "Prepped" Test Set
+```{r echo=FALSE}
+so_rec %>% 
+  prep(training = so_train) %>% 
+  bake(new_data = so_test) %>% 
+  count(Remote)
+```
+
+]
+
 ---
 class: your-turn
 
@@ -262,13 +426,10 @@ class: your-turn
 
 Here's a new recipe (also in your .Rmd)…
 
-```{r}
-so_rec <- recipe(Remote ~ ., 
-                 data = so_train) %>% 
-  step_dummy(all_nominal(), -all_outcomes()) %>% 
-  step_lincomb(all_predictors()) %>% 
-  step_downsample(Remote)
+```{r ref.label='so-rec'}
+
 ```
+
 
 ---
 class: your-turn
@@ -279,7 +440,7 @@ class: your-turn
 
 ```{r}
 rf_spec <- 
-  rand_forest() %>% 
+  rand_forest(trees = 1000) %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 
@@ -297,6 +458,7 @@ class: your-turn
 Here is the output from `fit_resamples()`...
 
 ```{r}
+set.seed(100) # Important!
 rf_results <-
   rf_workflow %>% 
   fit_resamples(resamples = so_folds,
@@ -338,6 +500,7 @@ rf_workflow <-
   rf_workflow %>% 
   update_model(rf_tuner)
 
+set.seed(100) # Important!
 rf_results <-
   rf_workflow %>% 
   tune_grid(resamples = so_folds,
@@ -444,30 +607,6 @@ class: middle, center
 ```
 
 ---
-
-# You can tune models *and* recipes!
-
----
-
-# What next?
-
-
----
-class: middle
-name: show-best
-
-.center[
-# `show_best()`
-
-Shows the .display[n] most optimum combinations of hyper-parameters.
-]
-
-```{r}
-rf_results %>% 
-  show_best(metric = "roc_auc")
-```
-
----
 class: middle
 name: select-best
 
@@ -480,7 +619,7 @@ Shows the .display[top] combination of hyper-parameters.
 ```{r select-best, results='hide'}
 so_best <-
   rf_results %>% 
-    select_best(metric = "roc_auc")
+  select_best(metric = "roc_auc")
 
 so_best
 ```
@@ -492,6 +631,7 @@ template: select-best
 ```
 
 ---
+class: middle
 
 .center[
 # `finalize_workflow()`
@@ -502,15 +642,22 @@ Replaces `tune()` placeholders in a model/recipe/workflow with a set of hyper-pa
 ```{r}
 last_rf_workflow <- 
   rf_workflow %>%
-    finalize_workflow(so_best) 
+  finalize_workflow(so_best) 
 ```
 
 ---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
 class: middle, center
+background-color: #f5f5f5
 
-# The test set
+.pull-right[
+## We are ready to touch the jewels...
 
-Remember me?
+## The .display[testing set]!
+
+]
 
 
 ---
@@ -525,7 +672,7 @@ class: middle
 ```{r}
 last_rf_fit <-
   last_rf_workflow %>% 
-    last_fit(split = so_split)
+  last_fit(split = so_split)
 ```
 
 ---
@@ -552,26 +699,22 @@ countdown(minutes = 5)
 ```{r results='hide'}
 so_best <-
   rf_results %>% 
-    select_best(metric = "roc_auc")
+  select_best(metric = "roc_auc")
 
 last_rf_workflow <- 
   rf_workflow %>%
-    finalize_workflow(so_best) 
+  finalize_workflow(so_best) 
 
 last_rf_fit <-
   last_rf_workflow %>% 
-    last_fit(split = so_split)
+  last_fit(split = so_split)
 
 last_rf_fit %>% 
   collect_metrics()
 ```
 
 ---
-
-# final final final
-
----
-class: middle
+class: middle, frame
 
 .center[
 # Final metrics
@@ -587,7 +730,7 @@ last_rf_fit %>%
 class: middle
 
 .center[
-# Predict the test set
+# Final test predictions
 ]
 
 ```{r}
@@ -600,8 +743,8 @@ last_rf_fit %>%
 ```{r}
 roc_values <- 
   last_rf_fit %>% 
-    collect_predictions() %>% 
-    roc_curve(truth = Remote, estimate = .pred_Remote)
+  collect_predictions() %>% 
+  roc_curve(truth = Remote, estimate = .pred_Remote)
 autoplot(roc_values)
 ```
 

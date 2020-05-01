@@ -1,0 +1,92 @@
+---
+title: "05-tune"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(modeldata)
+data(stackoverflow)
+
+# split the data
+set.seed(100) # Important!
+so_split <- initial_split(stackoverflow, strata = Remote)
+so_train <- training(so_split)
+so_test  <- testing(so_split)
+
+set.seed(100) # Important!
+so_folds <- vfold_cv(so_train, v = 10, strata = Remote)
+
+so_rec <- recipe(Remote ~ ., 
+                 data = so_train) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_lincomb(all_predictors()) %>% 
+  step_downsample(Remote)
+```
+
+
+# Your Turn 1
+
+Edit the random forest model to tune the `mtry` and `min_n` hyper-parameters; call the new model spec `rf_tuner`.
+
+Update your workflow to use the tuned model.
+
+Then use `tune_grid()` to find the best combination of hyper-parameters to maximize `roc_auc`; let tune set up the grid for you.
+
+How does it compare to the average ROC AUC across folds from `fit_resamples()`?
+
+```{r}
+rf_spec <- 
+  rand_forest(trees = 1000) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+rf_workflow <-
+  workflow() %>% 
+  add_recipe(so_rec) %>% 
+  add_model(rf_spec)
+
+set.seed(100) # Important!
+rf_results <-
+  rf_workflow %>% 
+  fit_resamples(resamples = so_folds,
+                metrics = metric_set(roc_auc))
+
+rf_results %>% 
+  collect_metrics()
+```
+
+
+
+# Your Turn 2
+
+Use `select_best()`, `finalize_workflow()`, and `last_fit()` to take the best combination of hyper-parameters from `rf_results` and use them to predict the test set.
+
+How does our actual test ROC AUC compare to our cross-validated estimate?
+
+```{r}
+so_best <-
+  rf_results %>% 
+  __________(metric = "roc_auc")
+last_rf_workflow <- 
+  rf_workflow %>%
+  __________(__________) 
+last_rf_fit <-
+  last_rf_workflow %>% 
+  __________(split = so_split)
+last_rf_fit %>% 
+  collect_metrics()
+```
+
+# Extra
+
+```{r}
+roc_values <- 
+  last_rf_fit %>% 
+  collect_predictions() %>% 
+  roc_curve(truth = Remote, estimate = .pred_Remote)
+autoplot(roc_values)
+```
+

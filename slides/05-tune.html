@@ -4,7 +4,7 @@
     <title>Tune Models</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-30" />
+    <meta name="date" content="2020-05-01" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
@@ -244,6 +244,129 @@ set.seed(100) # Important!
 so_folds &lt;- vfold_cv(so_train, v = 10, strata = Remote)
 ```
 
+
+---
+class: inverse, middle, center
+
+
+# Aside:
+
+--
+
+## Sub-class sampling
+
+
+
+---
+class: middle, center
+
+# Downsampling
+
+.pull-left[
+
+
+&lt;img src="figs/05-tune/uni-biscatter-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+--
+
+.pull-right[
+&lt;img src="figs/05-tune/unnamed-chunk-9-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+class: middle, center
+
+# Upsampling
+
+.pull-left[
+
+
+&lt;img src="figs/05-tune/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+--
+
+.pull-right[
+&lt;img src="figs/05-tune/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# .center[`step_downsample()`]
+
+
+
+Down-sampling is performed on the training set *only*. Default is `skip = TRUE`. 
+
+.pull-left[
+
+## Training Set
+
+```
+# # A tibble: 2 x 2
+#   Remote         n
+#   &lt;fct&gt;      &lt;int&gt;
+# 1 Remote       435
+# 2 Not remote  3761
+```
+]
+
+--
+
+.pull-right[
+
+## "Prepped" Training Set
+
+```
+# # A tibble: 2 x 2
+#   Remote         n
+#   &lt;fct&gt;      &lt;int&gt;
+# 1 Remote       435
+# 2 Not remote   435
+```
+
+]
+
+---
+
+# .center[`step_downsample()`]
+
+Down-sampling is performed on the training set *only*. Default is `skip = TRUE`. 
+
+.pull-left[
+
+## Test Set
+
+```
+# # A tibble: 2 x 2
+#   Remote         n
+#   &lt;fct&gt;      &lt;int&gt;
+# 1 Remote       140
+# 2 Not remote  1258
+```
+]
+
+--
+
+.pull-right[
+
+## "Prepped" Test Set
+
+```
+# # A tibble: 2 x 2
+#   Remote         n
+#   &lt;fct&gt;      &lt;int&gt;
+# 1 Remote       140
+# 2 Not remote  1258
+```
+
+]
+
 ---
 class: your-turn
 
@@ -255,10 +378,12 @@ Here's a new recipe (also in your .Rmd)…
 ```r
 so_rec &lt;- recipe(Remote ~ ., 
                  data = so_train) %&gt;% 
+  step_zv(all_predictors()) %&gt;%
   step_dummy(all_nominal(), -all_outcomes()) %&gt;% 
   step_lincomb(all_predictors()) %&gt;% 
   step_downsample(Remote)
 ```
+
 
 ---
 class: your-turn
@@ -270,7 +395,7 @@ class: your-turn
 
 ```r
 rf_spec &lt;- 
-  rand_forest() %&gt;% 
+  rand_forest(trees = 1000) %&gt;% 
   set_engine("ranger") %&gt;% 
   set_mode("classification")
 
@@ -299,7 +424,7 @@ rf_results %&gt;%
 # # A tibble: 1 x 5
 #   .metric .estimator  mean     n std_err
 #   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-# 1 roc_auc binary     0.684    10  0.0165
+# 1 roc_auc binary     0.680    10  0.0202
 ```
 
 
@@ -316,7 +441,7 @@ Then use `tune_grid()` to find the best combination of hyper-parameters to maxim
 
 How does it compare to the average ROC AUC across folds from `fit_resamples()`?
 
-<div class="countdown" id="timer_5eab324f" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eac26ac" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -350,16 +475,16 @@ rf_results %&gt;%
 # # A tibble: 10 x 7
 #     mtry min_n .metric .estimator  mean     n std_err
 #    &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-#  1     1    33 roc_auc binary     0.689    10  0.0178
-#  2     4    17 roc_auc binary     0.685    10  0.0169
-#  3     7    11 roc_auc binary     0.678    10  0.0161
-#  4     8    32 roc_auc binary     0.689    10  0.0185
-#  5    11     3 roc_auc binary     0.664    10  0.0148
-#  6    13    24 roc_auc binary     0.680    10  0.0181
-#  7    15    15 roc_auc binary     0.672    10  0.0181
-#  8    17    38 roc_auc binary     0.681    10  0.0201
-#  9    19     6 roc_auc binary     0.660    10  0.0163
-# 10    22    26 roc_auc binary     0.673    10  0.0192
+#  1     2    11 roc_auc binary     0.687    10  0.0177
+#  2     4    38 roc_auc binary     0.688    10  0.0196
+#  3     7    27 roc_auc binary     0.684    10  0.0209
+#  4     9    18 roc_auc binary     0.678    10  0.0213
+#  5    12    34 roc_auc binary     0.681    10  0.0222
+#  6    13     5 roc_auc binary     0.663    10  0.0213
+#  7    16    31 roc_auc binary     0.679    10  0.0225
+#  8    17     7 roc_auc binary     0.663    10  0.0220
+#  9    19    15 roc_auc binary     0.668    10  0.0227
+# 10    21    25 roc_auc binary     0.672    10  0.0227
 ```
 
 ---
@@ -370,16 +495,16 @@ rf_results %&gt;%
 # # A tibble: 100 x 6
 #    id      mtry min_n .metric .estimator .estimate
 #    &lt;chr&gt;  &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#  1 Fold01    17    38 roc_auc binary         0.713
-#  2 Fold01     8    32 roc_auc binary         0.721
-#  3 Fold01    22    26 roc_auc binary         0.707
-#  4 Fold01    15    15 roc_auc binary         0.707
-#  5 Fold01     4    17 roc_auc binary         0.720
-#  6 Fold01    13    24 roc_auc binary         0.714
-#  7 Fold01     7    11 roc_auc binary         0.715
-#  8 Fold01    11     3 roc_auc binary         0.708
-#  9 Fold01     1    33 roc_auc binary         0.699
-# 10 Fold01    19     6 roc_auc binary         0.703
+#  1 Fold01    19    15 roc_auc binary         0.709
+#  2 Fold01    13     5 roc_auc binary         0.704
+#  3 Fold01    12    34 roc_auc binary         0.724
+#  4 Fold01    16    31 roc_auc binary         0.715
+#  5 Fold01     7    27 roc_auc binary         0.731
+#  6 Fold01    21    25 roc_auc binary         0.710
+#  7 Fold01     4    38 roc_auc binary         0.738
+#  8 Fold01     9    18 roc_auc binary         0.720
+#  9 Fold01     2    11 roc_auc binary         0.741
+# 10 Fold01    17     7 roc_auc binary         0.698
 # # … with 90 more rows
 ```
 
@@ -463,11 +588,11 @@ template: show-best
 # # A tibble: 5 x 7
 #    mtry min_n .metric .estimator  mean     n std_err
 #   &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-# 1     1    33 roc_auc binary     0.689    10  0.0178
-# 2     8    32 roc_auc binary     0.689    10  0.0185
-# 3     4    17 roc_auc binary     0.685    10  0.0169
-# 4    17    38 roc_auc binary     0.681    10  0.0201
-# 5    13    24 roc_auc binary     0.680    10  0.0181
+# 1     4    38 roc_auc binary     0.688    10  0.0196
+# 2     2    11 roc_auc binary     0.687    10  0.0177
+# 3     7    27 roc_auc binary     0.684    10  0.0209
+# 4    12    34 roc_auc binary     0.681    10  0.0222
+# 5    16    31 roc_auc binary     0.679    10  0.0225
 ```
 
 
@@ -489,40 +614,7 @@ rf_results %&gt;% autoplot()
 ---
 class: middle, center
 
-&lt;img src="figs/05-tune/unnamed-chunk-18-1.png" width="504" style="display: block; margin: auto;" /&gt;
-
----
-
-# You can tune models *and* recipes!
-
----
-
-# What next?
-
-
----
-class: middle
-name: show-best
-
-.center[
-# `show_best()`
-
-Shows the .display[n] most optimum combinations of hyper-parameters.
-]
-
-
-```r
-rf_results %&gt;% 
-  show_best(metric = "roc_auc")
-# # A tibble: 5 x 7
-#    mtry min_n .metric .estimator  mean     n std_err
-#   &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-# 1     1    33 roc_auc binary     0.689    10  0.0178
-# 2     8    32 roc_auc binary     0.689    10  0.0185
-# 3     4    17 roc_auc binary     0.685    10  0.0169
-# 4    17    38 roc_auc binary     0.681    10  0.0201
-# 5    13    24 roc_auc binary     0.680    10  0.0181
-```
+&lt;img src="figs/05-tune/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 class: middle
@@ -551,10 +643,11 @@ template: select-best
 # # A tibble: 1 x 2
 #    mtry min_n
 #   &lt;int&gt; &lt;int&gt;
-# 1     1    33
+# 1     4    38
 ```
 
 ---
+class: middle
 
 .center[
 # `finalize_workflow()`
@@ -570,11 +663,18 @@ last_rf_workflow &lt;-
 ```
 
 ---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
 class: middle, center
+background-color: #f5f5f5
 
-# The test set
+.pull-right[
+## We are ready to touch the jewels...
 
-Remember me?
+## The .display[testing set]!
+
+]
 
 
 ---
@@ -590,7 +690,7 @@ class: middle
 ```r
 last_rf_fit &lt;-
   last_rf_workflow %&gt;% 
-    last_fit(split = so_split)
+  last_fit(split = so_split)
 ```
 
 ---
@@ -614,7 +714,7 @@ Use `select_best()`, `finalize_workflow()`, and `last_fit()` to take the best co
 
 How does our actual test ROC AUC compare to our cross-validated estimate?
 
-<div class="countdown" id="timer_5eab33b0" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5eac2a27" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -624,26 +724,22 @@ How does our actual test ROC AUC compare to our cross-validated estimate?
 ```r
 so_best &lt;-
   rf_results %&gt;% 
-    select_best(metric = "roc_auc")
+  select_best(metric = "roc_auc")
 
 last_rf_workflow &lt;- 
   rf_workflow %&gt;%
-    finalize_workflow(so_best) 
+  finalize_workflow(so_best) 
 
 last_rf_fit &lt;-
   last_rf_workflow %&gt;% 
-    last_fit(split = so_split)
+  last_fit(split = so_split)
 
 last_rf_fit %&gt;% 
   collect_metrics()
 ```
 
 ---
-
-# final final final
-
----
-class: middle
+class: middle, frame
 
 .center[
 # Final metrics
@@ -656,8 +752,8 @@ last_rf_fit %&gt;%
 # # A tibble: 2 x 3
 #   .metric  .estimator .estimate
 #   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-# 1 accuracy binary         0.663
-# 2 roc_auc  binary         0.713
+# 1 accuracy binary         0.680
+# 2 roc_auc  binary         0.733
 ```
 
 
@@ -665,7 +761,7 @@ last_rf_fit %&gt;%
 class: middle
 
 .center[
-# Predict the test set
+# Final test predictions
 ]
 
 
@@ -675,16 +771,16 @@ last_rf_fit %&gt;%
 # # A tibble: 1,398 x 6
 #    id    .pred_Remote `.pred_Not remo…  .row .pred_class
 #    &lt;chr&gt;        &lt;dbl&gt;            &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;      
-#  1 trai…        0.491            0.509     1 Not remote 
-#  2 trai…        0.449            0.551     6 Not remote 
-#  3 trai…        0.395            0.605    18 Not remote 
-#  4 trai…        0.578            0.422    23 Remote     
-#  5 trai…        0.511            0.489    30 Remote     
-#  6 trai…        0.526            0.474    50 Remote     
-#  7 trai…        0.622            0.378    53 Remote     
-#  8 trai…        0.519            0.481    56 Remote     
-#  9 trai…        0.556            0.444    63 Remote     
-# 10 trai…        0.416            0.584    68 Not remote 
+#  1 trai…        0.514            0.486     1 Remote     
+#  2 trai…        0.393            0.607     6 Not remote 
+#  3 trai…        0.232            0.768    18 Not remote 
+#  4 trai…        0.606            0.394    23 Remote     
+#  5 trai…        0.476            0.524    30 Not remote 
+#  6 trai…        0.556            0.444    50 Remote     
+#  7 trai…        0.838            0.162    53 Remote     
+#  8 trai…        0.404            0.596    56 Not remote 
+#  9 trai…        0.578            0.422    63 Remote     
+# 10 trai…        0.300            0.700    68 Not remote 
 # # … with 1,388 more rows, and 1 more variable: Remote &lt;fct&gt;
 ```
 
@@ -694,12 +790,12 @@ last_rf_fit %&gt;%
 ```r
 roc_values &lt;- 
   last_rf_fit %&gt;% 
-    collect_predictions() %&gt;% 
-    roc_curve(truth = Remote, estimate = .pred_Remote)
+  collect_predictions() %&gt;% 
+  roc_curve(truth = Remote, estimate = .pred_Remote)
 autoplot(roc_values)
 ```
 
-&lt;img src="figs/05-tune/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/05-tune/unnamed-chunk-35-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
