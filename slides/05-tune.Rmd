@@ -440,7 +440,7 @@ class: your-turn
 
 ```{r}
 rf_spec <- 
-  rand_forest(trees = 1000) %>% 
+  rand_forest() %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 
@@ -474,7 +474,7 @@ class: your-turn
 
 # Your Turn `r yt_counter`
 
-Edit the random forest model to create 1000 trees, and tune the `mtry` and `min_n` hyperparameters. 
+Edit the random forest model to tune the `mtry` and `min_n` hyperparameters. 
 
 Update your workflow to use the tuned model.
 
@@ -491,8 +491,7 @@ countdown(minutes = 5)
 ```{r results='hide', messages = FALSE, warning = FALSE}
 rf_tuner <- 
   rand_forest(mtry = tune(),
-              min_n = tune(),
-              trees = 1000) %>% 
+              min_n = tune()) %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 

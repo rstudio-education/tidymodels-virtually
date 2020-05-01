@@ -1,3 +1,6 @@
+# if local
+# install.packages("kknn")
+
 library(tidyverse)
 library(tidymodels)
 

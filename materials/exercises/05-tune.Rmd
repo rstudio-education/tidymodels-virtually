@@ -39,7 +39,7 @@ How does it compare to the average ROC AUC across folds from `fit_resamples()`?
 
 ```{r}
 rf_spec <- 
-  rand_forest(trees = 1000) %>% 
+  rand_forest() %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 

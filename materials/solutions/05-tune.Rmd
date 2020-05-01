@@ -61,8 +61,7 @@ rf_results %>%
 ```{r}
 rf_tuner <- 
   rand_forest(mtry = tune(),
-              min_n = tune(),
-              trees = 1000) %>% 
+              min_n = tune()) %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 

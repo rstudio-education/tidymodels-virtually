@@ -230,7 +230,7 @@ class: middle
 
 ```{r}
 rf_spec <- 
-  rand_forest(trees = 1000) %>% 
+  rand_forest() %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 ```
