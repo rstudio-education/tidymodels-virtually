@@ -199,7 +199,7 @@ class: middle
 
 # Choose from:
 
-+ Lasso logistic regression
++ Penalized logistic regression
 
 + Decision tree
 

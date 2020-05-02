@@ -4,7 +4,7 @@
     <title>The Great Model-Off</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-30" />
+    <meta name="date" content="2020-05-01" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <!---import JQuery-->
@@ -214,7 +214,7 @@ class: middle
 
 # Choose from:
 
-+ Lasso logistic regression
++ Penalized logistic regression
 
 + Decision tree
 
@@ -247,7 +247,7 @@ class: middle
 
 ```r
 rf_spec &lt;- 
-  rand_forest(trees = 1000) %&gt;% 
+  rand_forest() %&gt;% 
   set_engine("ranger") %&gt;% 
   set_mode("classification")
 ```
