@@ -85,7 +85,7 @@ Compare the metrics of the random forest to your two single tree models (vanilla
 
 # Your Turn 6
 
-Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 20 variables at each split. Which value maximizes the area under the ROC curve?
+Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 19 variables at each split. Which value maximizes the area under the ROC curve?
 
 *Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
 

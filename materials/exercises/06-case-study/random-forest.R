@@ -24,7 +24,7 @@ val_set <- validation_split(hotel_other,
 # specify un-tuned parsnip model------------------------------------------------
 # EDIT ME TO TUNE!==============================================================
 rf_spec <- 
-  rand_forest(trees = 1000) %>% 
+  rand_forest(mtry = tune(), min_n = tune()) %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 
@@ -41,11 +41,13 @@ rf_workflow <-
   add_model(rf_spec) %>% 
   add_recipe(rf_recipe)
 
+rf_grid <- expand_grid(mtry = c(1, 5, 10), min_n = c(10, 20, 30))
 # train/tune--------------------------------------------------------------------
 set.seed(345)
 # EDIT ME TO TUNE!==============================================================
 rf_results <- 
   rf_workflow %>% 
-  fit_resamples(resamples = val_set,
-                control = control_resamples(save_pred = TRUE),
-                metrics = metric_set(roc_auc))
+  tune_grid(resamples = val_set,
+            grid = rf_grid,
+            control = control_grid(save_pred = TRUE),
+            metrics = metric_set(roc_auc))
