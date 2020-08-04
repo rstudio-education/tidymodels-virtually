@@ -4,7 +4,7 @@
     <title>Build A Better Training Set</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-26" />
+    <meta name="date" content="2020-08-03" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
@@ -326,27 +326,37 @@ class: middle
 #dpcdubdxdy .gt_table {
   display: table;
   border-collapse: collapse;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
   font-size: 200px;
+  font-weight: normal;
+  font-style: normal;
   background-color: #FFFFFF;
   width: 10%;
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
 }
 
 #dpcdubdxdy .gt_heading {
   background-color: #FFFFFF;
+  text-align: center;
   border-bottom-color: #FFFFFF;
-  border-left-style: hidden;
+  border-left-style: none;
   border-left-width: 1px;
   border-left-color: #D3D3D3;
-  border-right-style: hidden;
+  border-right-style: none;
   border-right-width: 1px;
   border-right-color: #D3D3D3;
 }
@@ -398,29 +408,50 @@ class: middle
   font-size: 100%;
   font-weight: normal;
   text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
   vertical-align: bottom;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding-top: 5px;
+  padding-bottom: 6px;
   padding-left: 5px;
   padding-right: 5px;
   overflow-x: hidden;
 }
 
-#dpcdubdxdy .gt_column_spanner {
+#dpcdubdxdy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
   font-weight: normal;
   text-transform: inherit;
-  vertical-align: bottom;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dpcdubdxdy .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dpcdubdxdy .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dpcdubdxdy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
   overflow-x: hidden;
   display: inline-block;
-  width: 97%;
+  width: 100%;
 }
 
 #dpcdubdxdy .gt_group_heading {
@@ -460,16 +491,18 @@ class: middle
   vertical-align: middle;
 }
 
-#dpcdubdxdy .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
 #dpcdubdxdy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
 #dpcdubdxdy .gt_from_md > :last-child {
   margin-bottom: 0;
+}
+
+#dpcdubdxdy .gt_from_md p {
+  line-height: 1em;
+  margin-bottom: 0em;
+  margin-top: 0em;
 }
 
 #dpcdubdxdy .gt_row {
@@ -494,6 +527,7 @@ class: middle
 #dpcdubdxdy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
+  font-size: 100%;
   font-weight: initial;
   text-transform: inherit;
   border-right-style: solid;
@@ -540,6 +574,10 @@ class: middle
   border-top-style: double;
   border-top-width: 6px;
   border-top-color: #D3D3D3;
+}
+
+#dpcdubdxdy .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
 }
 
 #dpcdubdxdy .gt_table_body {
@@ -640,9 +678,9 @@ class: middle
 </div></td>
     </tr>
     <tr>
-      <td class="gt_row gt_left gt_striped"><div class='gt_from_md'><p><code>all_outcomes()</code></p>
+      <td class="gt_row gt_left"><div class='gt_from_md'><p><code>all_outcomes()</code></p>
 </div></td>
-      <td class="gt_row gt_left gt_striped"><div class='gt_from_md'><p>Each y variable  (left side of ~)</p>
+      <td class="gt_row gt_left"><div class='gt_from_md'><p>Each y variable  (left side of ~)</p>
 </div></td>
     </tr>
     <tr>
@@ -652,9 +690,9 @@ class: middle
 </div></td>
     </tr>
     <tr>
-      <td class="gt_row gt_left gt_striped"><div class='gt_from_md'><p><code>all_nominal()</code></p>
+      <td class="gt_row gt_left"><div class='gt_from_md'><p><code>all_nominal()</code></p>
 </div></td>
-      <td class="gt_row gt_left gt_striped"><div class='gt_from_md'><p>Each categorical variable (e.g. factor, string)</p>
+      <td class="gt_row gt_left"><div class='gt_from_md'><p>Each categorical variable (e.g. factor, string)</p>
 </div></td>
     </tr>
     <tr>
@@ -1045,7 +1083,7 @@ Write a recipe for the `Sale_Price ~ .` variables that:
 
 Save the result as `pca_rec`
 
-<div class="countdown" id="timer_5ea65c5a" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f28d91e" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1070,10 +1108,10 @@ pca_rec
 # 
 # Operations:
 # 
-# Novel factor level assignment for all_nominal
-# Dummy variables from all_nominal
-# Zero variance filter on all_predictors
-# Centering and scaling for all_predictors
+# Novel factor level assignment for all_nominal()
+# Dummy variables from all_nominal()
+# Zero variance filter on all_predictors()
+# Centering and scaling for all_predictors()
 # No PCA components were extracted.
 ```
 
@@ -1225,7 +1263,7 @@ class: your-turn
 
 Make a workflow that combines `pca_rec` and with `rt_spec`.
 
-<div class="countdown" id="timer_5ea65922" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f28d8e5" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1322,7 +1360,7 @@ class: your-turn
 
 Try our pca workflow to predict sale price with the `ames_test` data. What is the RMSE?
 
-<div class="countdown" id="timer_5ea6599f" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f28d7fa" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1385,7 +1423,7 @@ class: your-turn
 
 Run the first chunk. Then try our pca workflow on `ames_folds`. What is the RMSE?
 
-<div class="countdown" id="timer_5ea65aaf" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f28d97b" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1433,7 +1471,7 @@ class: your-turn
 
 Modify the code below to build a new pca recipe that uses `step_other` *first* to collapse infrequently occurring values of `Neighborhood` into an "other" category. Then update `pca_wf` to use the new recipe.
 
-<div class="countdown" id="timer_5ea65bec" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f28d7fb" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
