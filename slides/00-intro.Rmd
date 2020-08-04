@@ -1,6 +1,6 @@
 ---
 title: "Tidymodels, Virtually"
-subtitle: "A Virtual Workshop for CHOP"
+subtitle: "A Virtual Workshop for BD"
 author: Alison Hill
 date: "`r Sys.Date()`"
 output:
@@ -67,19 +67,12 @@ background-size: cover
 template: clouds2
 class: middle, center
 
-.pull-left[
-# <i class="fas fa-cloud"></i>
 
-https://bit.ly/tmv-chop-cloud
-]
-
-.pull-right[
 
 # <i class="fab fa-google"></i>
 
-https://bit.ly/tmv-chop
+https://bit.ly/tmv-bd
 
-]
 
 ---
 name: clouds
@@ -174,11 +167,11 @@ class: middle, center, frame
 
 # Examples of Supervised Learning
 
-spam detection
+Spam detection
 
-medical diagnosis
+Medical diagnosis
 
-ad click prediction
+Ad click prediction
 
 ---
 class: middle, center, frame
@@ -225,7 +218,7 @@ class: middle, center, frame
 
 # Quiz
 
-##Which is which?
+## Which is which?
 
 .pull-left[
 
@@ -246,7 +239,7 @@ class: middle, center, frame
 
 # Quiz
 
-##Which is which?
+## Which is which?
 
 .pull-left[
 
@@ -309,98 +302,47 @@ Resample a model
 
 --
 
-Create a recipe
+Build A Better Training Set
+
+
+
+---
+class: frame, middle, center
+
+## Session 01
+
+EDT: 1:00-1:50
+
+PDT: 10:00-10:50
 
 --
 
-Resample an ensemble model
+## Session 02
 
-
----
-class: frame, middle, center
-
-# Session 01
-
-## Build a model
-
-EDT: 12-12:50
-
-PDT: 9-9:50
-
-???
-
-kind of whole game-ish
-
-packages: parsnip / rsample / yardstick
-
-concepts: modeling + predicting / splitting + strata / metric
-
-models: lm
-
-data: continuous
-
----
-class: frame, middle, center
-
-# Session 02
-
-## Resample a model
-
-EDT: 01-01:50
-
-PDT: 10-10:50
-
-
-???
-
-
-packages: rsample / tune
-
-concepts: cross-validation + strata
-
-models: decision tree
-
----
-class: frame, middle, center
-
-# Session 03
-
-## Create a recipe
 
 EDT: 02-02:50
 
 PDT: 11-11:50
 
-???
 
+--
 
-packages: rsample / recipes / workflows
+## Session 03
 
-concepts: splitting + strata / data leakage
-
-models: logistic regression
-
-
-
-
----
-class: frame, middle, center
-
-# Session 04
-
-## Resample an ensemble model
 
 EDT: 03-03:50
 
 PDT: 12-12:50
 
-???
+--
 
-packages: tune
+## Session 04
 
-concepts: bootstrapping / aggregating --> bagging
 
-models: bagging decision trees
+EDT: 03-03:50
+
+PDT: 01-01:50
+
 
 ---
 class: inverse, middle, center
@@ -427,14 +369,14 @@ class: inverse, middle, center
 ---
 class: frame, middle, center
 
-# Zoom reactions
+# Reactions?
 
 ![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
 
 ---
 class: frame, middle, center
 
-# Mute/unmute
+# Mute/unmute?
 
 ![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
 
@@ -443,9 +385,7 @@ class: frame, middle, center
 
 # Our classroom
 
-Google Doc: https://bit.ly/tmv-chop
-
-RStudio Cloud: https://bit.ly/tmv-chop-cloud
+Google Doc: https://bit.ly/tmv-bd
 
 
 ---
@@ -458,41 +398,9 @@ class: inverse, middle, center
 
 # Day Two
 
----
-class: frame, middle, center
+## Ensembles 
 
-# Session 01
-
-## Ensembles II
-
-models: random forests
-
----
-class: frame, middle, center
-
-# Session 02
-
-## Tune I
-
-package: tune / dials / vip 
-
-concepts: hyperparameters / grids / variable importance
-
-models: decision tree
-
----
-class: frame, middle, center
-
-# Session 03:
-
-## Tune II
-
-models: random forests / KNN?
-
----
-class: frame, middle, center
-
-# Session 04:
+## Tuning
 
 ## Case Study
 

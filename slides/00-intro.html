@@ -4,7 +4,7 @@
     <title>Tidymodels, Virtually</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-04-30" />
+    <meta name="date" content="2020-08-04" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <meta name="description" content="Tidymodels, Virtually"/>
@@ -59,7 +59,7 @@ class: title-slide, center, bottom
 
 # Tidymodels, Virtually
 
-## A Virtual Workshop for CHOP
+## A Virtual Workshop for BD
 
 ### Alison Hill 
 
@@ -79,19 +79,12 @@ background-size: cover
 template: clouds2
 class: middle, center
 
-.pull-left[
-# &lt;i class="fas fa-cloud"&gt;&lt;/i&gt;
 
-https://bit.ly/tmv-chop-cloud
-]
-
-.pull-right[
 
 # &lt;i class="fab fa-google"&gt;&lt;/i&gt;
 
-https://bit.ly/tmv-chop
+https://bit.ly/tmv-bd
 
-]
 
 ---
 name: clouds
@@ -184,11 +177,11 @@ class: middle, center, frame
 
 # Examples of Supervised Learning
 
-spam detection
+Spam detection
 
-medical diagnosis
+Medical diagnosis
 
-ad click prediction
+Ad click prediction
 
 ---
 class: middle, center, frame
@@ -235,7 +228,7 @@ class: middle, center, frame
 
 # Quiz
 
-##Which is which?
+## Which is which?
 
 .pull-left[
 
@@ -256,7 +249,7 @@ class: middle, center, frame
 
 # Quiz
 
-##Which is which?
+## Which is which?
 
 .pull-left[
 
@@ -319,98 +312,47 @@ Resample a model
 
 --
 
-Create a recipe
+Build A Better Training Set
+
+
+
+---
+class: frame, middle, center
+
+## Session 01
+
+EDT: 1:00-1:50
+
+PDT: 10:00-10:50
 
 --
 
-Resample an ensemble model
+## Session 02
 
-
----
-class: frame, middle, center
-
-# Session 01
-
-## Build a model
-
-EDT: 12-12:50
-
-PDT: 9-9:50
-
-???
-
-kind of whole game-ish
-
-packages: parsnip / rsample / yardstick
-
-concepts: modeling + predicting / splitting + strata / metric
-
-models: lm
-
-data: continuous
-
----
-class: frame, middle, center
-
-# Session 02
-
-## Resample a model
-
-EDT: 01-01:50
-
-PDT: 10-10:50
-
-
-???
-
-
-packages: rsample / tune
-
-concepts: cross-validation + strata
-
-models: decision tree
-
----
-class: frame, middle, center
-
-# Session 03
-
-## Create a recipe
 
 EDT: 02-02:50
 
 PDT: 11-11:50
 
-???
 
+--
 
-packages: rsample / recipes / workflows
+## Session 03
 
-concepts: splitting + strata / data leakage
-
-models: logistic regression
-
-
-
-
----
-class: frame, middle, center
-
-# Session 04
-
-## Resample an ensemble model
 
 EDT: 03-03:50
 
 PDT: 12-12:50
 
-???
+--
 
-packages: tune
+## Session 04
 
-concepts: bootstrapping / aggregating --&gt; bagging
 
-models: bagging decision trees
+EDT: 03-03:50
+
+PDT: 01-01:50
+
 
 ---
 class: inverse, middle, center
@@ -426,19 +368,23 @@ background-size: contain
 
 ```r
 library(tidymodels)
-## ── Attaching packages ─────────────────────────────── tidymodels 0.1.0 ──
-## ✓ broom     0.5.5      ✓ recipes   0.1.10
-## ✓ dials     0.0.4      ✓ rsample   0.0.6 
-## ✓ dplyr     0.8.5      ✓ tibble    3.0.0 
-## ✓ ggplot2   3.3.0      ✓ tune      0.1.0 
-## ✓ infer     0.5.1      ✓ workflows 0.1.1 
-## ✓ parsnip   0.1.0      ✓ yardstick 0.0.5 
-## ✓ purrr     0.3.3
+## ── Attaching packages ──────────────────────────────────── tidymodels 0.1.0 ──
+## ✓ broom     0.5.5          ✓ recipes   0.1.13    
+## ✓ dials     0.0.4          ✓ rsample   0.0.6     
+## ✓ dplyr     1.0.0          ✓ tibble    3.0.3     
+## ✓ ggplot2   3.3.1.9000     ✓ tune      0.1.0     
+## ✓ infer     0.5.1          ✓ workflows 0.1.1     
+## ✓ parsnip   0.1.0          ✓ yardstick 0.0.5     
+## ✓ purrr     0.3.4
+## Warning: package 'scales' was built under R version 3.6.2
+## Warning: package 'dplyr' was built under R version 3.6.2
 ## Warning: package 'parsnip' was built under R version 3.6.2
+## Warning: package 'purrr' was built under R version 3.6.2
+## Warning: package 'recipes' was built under R version 3.6.2
 ## Warning: package 'rsample' was built under R version 3.6.2
 ## Warning: package 'tibble' was built under R version 3.6.2
 ## Warning: package 'tune' was built under R version 3.6.2
-## ── Conflicts ────────────────────────────────── tidymodels_conflicts() ──
+## ── Conflicts ─────────────────────────────────────── tidymodels_conflicts() ──
 ## x purrr::discard()  masks scales::discard()
 ## x dplyr::filter()   masks stats::filter()
 ## x dplyr::lag()      masks stats::lag()
@@ -456,14 +402,14 @@ class: inverse, middle, center
 ---
 class: frame, middle, center
 
-# Zoom reactions
+# Reactions?
 
 ![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
 
 ---
 class: frame, middle, center
 
-# Mute/unmute
+# Mute/unmute?
 
 ![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
 
@@ -472,9 +418,7 @@ class: frame, middle, center
 
 # Our classroom
 
-Google Doc: https://bit.ly/tmv-chop
-
-RStudio Cloud: https://bit.ly/tmv-chop-cloud
+Google Doc: https://bit.ly/tmv-bd
 
 
 ---
@@ -487,41 +431,9 @@ class: inverse, middle, center
 
 # Day Two
 
----
-class: frame, middle, center
+## Ensembles 
 
-# Session 01
-
-## Ensembles II
-
-models: random forests
-
----
-class: frame, middle, center
-
-# Session 02
-
-## Tune I
-
-package: tune / dials / vip 
-
-concepts: hyperparameters / grids / variable importance
-
-models: decision tree
-
----
-class: frame, middle, center
-
-# Session 03:
-
-## Tune II
-
-models: random forests / KNN?
-
----
-class: frame, middle, center
-
-# Session 04:
+## Tuning
 
 ## Case Study
 
