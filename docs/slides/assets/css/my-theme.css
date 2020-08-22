@@ -1,0 +1,529 @@
+.remark-slide-content p, ul, ol, li {
+  font-size: 1.6rem;
+}
+
+.remark-slide-content {
+  background-color: #ffffff;
+}
+
+.remark-slide-content h1 {
+	margin-bottom: 0.5em !important;
+}
+
+.footnote {
+	bottom: 1em;
+	font-size: 75%;
+	left: 4em;
+}
+
+img {
+	margin-bottom: 1.5rem;
+	overflow: hidden;
+	/*background: #fff;*/
+}
+
+
+/* code */
+/* https://github.com/rstudio/blogdown/blob/master/docs/02-hugo.Rmd */
+
+pre {
+  border: 1px solid #fff;
+  box-shadow: 0px 0px 4px #282a36;
+  padding: 0.25em;
+  background-color: #fff;
+  overflow-x: auto;
+  border-radius: 0px; /*undo rounded corners*/
+}
+
+.code-slide-background {
+  background-color: #fdf7f9;
+}
+
+pre code { 
+  background: none; 
+  font-size: 0.8rem;
+}
+
+h1 .display, 
+h2 .display {
+  font-weight: 500;
+  color: #CA225E;
+}
+
+.display {
+  font-weight: 700;
+  color: #CA225E;
+}
+
+.title {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 400;
+}
+
+/* link color */
+a, a > code {
+  color: #ca225ec9;
+}
+
+
+:any-link {
+    color: #ca225ec9;
+    text-decoration: underline;
+}
+
+
+/* mouse over link */
+a:hover, a:active, a:focus {
+    color: #CA225E;
+    text-decoration: underline;
+}
+
+.remark-code {
+  color: #CA225E;
+  font-size: 1.2em;
+}
+
+.remark-inline-code { 
+  color: #CA225E;
+  font-size: 1em;
+}
+
+.remark-code-line-highlighted { 
+  background-color:  #bed3eca1; 
+}
+
+
+.inverse {
+  background-color: #1a162d;
+  color: #f2f2f2;
+  text-shadow: none;
+}
+
+.inverse .remark-inline-code {
+  color: #F2C7D6;
+}
+
+.inverse a {
+  color: #fff;
+}
+
+.inverse a:hover {
+  color: #bed3ec;
+}
+
+.inverse h1, .inverse h2, .inverse h3 {
+	color: #fff;
+}
+
+/* Two-column layout */
+.left-column {
+  color: #fff;
+  width: 30%;
+  height: 92%;
+  float: left;
+  font-size: 18px;
+}
+
+.left-column h2:last-of-type, .left-column h3:last-child {
+  color: #000;
+}
+
+.left-column1 {
+  color: #777;
+  width: 34%;
+  height: 92%;
+  float: left;
+  font-size: 18px;
+}
+
+.right-column {
+  width: 67%;
+  float: right;
+  padding-top: 0em;
+}
+
+.right-column1 {
+  width: 63%;
+  float: right;
+  padding-top: 0em;
+}
+
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+.pull-right ~ * {
+  clear: both;
+}
+
+img, video, iframe {
+  max-width: 100%;
+}
+blockquote {
+  border-left: solid 5px lightgray;
+  padding-left: 1em;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee }
+
+@page { margin: 0; }
+
+.title-slide {
+  background-image: url(../../images/perch-birds-alpha.png);
+  background-position: 50% 20%;
+  background-size: 80%;
+  background-color: #fdf7f9;
+}
+
+
+.title-slide h1 {
+  font-family: 'Noto Serif JP', serif;
+  color: #1a162d;
+  font-size: 4em;
+  word-wrap: break-word;
+  font-weight: 400;
+  margin-bottom: -10px !important;
+  color: #ca225e;
+}
+
+.title-slide h2 {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 1.35em;
+  color: #1a162d;
+  text-shadow: none;
+  text-transform: uppercase;
+  margin-bottom: 0px !important;
+  letter-spacing: 1pt;
+}
+
+.title-slide h3 {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 1.3em;
+  color: #7e7b88;
+  text-transform: none;
+}
+
+.title-slide a {
+  color: #fff;
+}
+
+
+.title-slide {
+    padding: 2em;
+    position: relative;
+}
+
+.title-slide:after,
+.title-slide:before {
+    border: 2pt solid #ca225e3d;
+    bottom: 0;
+    content: '';
+    position: fixed;
+    top: 50px;
+    width: 5%;
+}
+.title-slide:after {
+    border-left: none;
+    right: 47px;
+    height: 83%;
+}
+.title-slide:before {
+    border-right: none;
+    left: 47px;
+    height: 83%;
+}
+
+
+
+
+/* Wider cols */
+
+.right-wide {
+  width: 60%;
+  float: right;
+  padding-top: 1em;
+}
+
+.left-narrow {
+  width: 40%;
+  float: left;
+  padding-top: 1em;
+}
+
+.left-wide {
+  width: 60%;
+  float: left;
+  padding-top: 1em;
+}
+
+.right-narrow {
+  width: 40%;
+  float: right;
+  padding-top: 1em;
+}
+
+/* footer */
+
+div.my-footer {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    height: 20px;
+    width: 100%;
+}
+
+div.my-footer span {
+    font-size: 10pt;
+    color: #ffffff;
+    position: absolute;
+    left: 15px;
+    bottom: 2px;
+}
+
+a.footer-link {
+    position: absolute;
+    bottom: 5px;
+    right: 50px;
+    height: 40px;
+    width: 150px;
+    color: #CA225E;
+}
+
+/* your turns */
+
+.your-turn {
+  background-color: #1a162d;
+  color: #f2f2f2;
+}
+
+.your-turn a {
+  color: #fff !important;
+}
+
+.your-turn a:hover,
+.your-turn a:active {
+  color: #ca225e !important;
+}
+
+
+.your-turn h1 {
+  color: #cd4173; /* less intense magenta */
+  font-size: 3.5em;
+}
+
+
+.your-turn h1:before {
+    content: "";
+    display: inline-block;
+    background-image: url("../../images/bird-turn.png");
+    background-repeat: no-repeat;
+    width: 145px;
+    height: 100px;
+    float: left;
+    background-size: contain;
+    padding-right: 10px;
+}
+
+/* pop quiz */
+
+.pop-quiz h1, h1#pop-quiz {
+  color: #bd93f9;
+  font-size: 3.5em;
+  padding-bottom: .5em;
+}
+
+.pop-quiz h2, h2#pop-quiz {
+  color: #bd93f9;
+}
+
+/* h1#quiz:before {
+    content: "";
+    display: inline-block;
+    background: url("../../images/two-birds2-alpha.png") no-repeat;
+    width: 145px;
+    height: 100px;
+    background-size: cover;
+    background-position: bottom;
+} */
+
+/* live code */
+
+.live-code {
+  background-color: #000;
+  color: #fff;
+}
+
+.live-code h1 {
+  color: #fff;
+  text-shadow: 1px 1px 2px #1f5386;
+  font-size: 3.5em;
+}
+
+.live-code h1:before {
+    content: "";
+    display: inline-block;
+    background: url("../Live-code.png") no-repeat;
+    width: 100px;
+    height: 100px;
+    float: left;
+    background-size: 100px;
+    padding-right: 50px;
+}
+
+.your-turn .remark-inline-code,
+.live-code .remark-inline-code {
+  color: #84cae1; /* perch-bird blue */
+}
+
+
+/* --------------Even split- 3 columns--------------- */
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.column {
+  float: left;
+  width: 25%;
+  text-align: center;
+}
+
+
+/*-------*/
+
+
+.columns {
+  display: flex;
+}
+
+.left-col {
+  width: 33%;
+  text-align: left;
+}
+
+.middle-col {
+  width: 33%;
+  text-align: left;
+  padding-left: 20px;
+}
+
+.right-col {
+  width: 33%;
+  text-align: left;
+  padding-left: 20px;
+}
+
+/* five-column layout */
+
+.column-5 {
+  float: left;
+  width: 20%;
+  text-align: center;
+}
+
+.fade {
+  opacity: 0.5;
+}
+
+.frame h1 {
+  color: #1a162d;
+  padding-bottom: 1.0rem !important;
+  border-bottom: 3px solid #CA225E40;
+}
+
+.inverse .frame h1 {
+  color: #bed3ec;
+  padding-bottom: 1.0em !important;
+  border-bottom: 3px solid #CA225E;
+}
+
+
+.inverse h2 {
+  font-family: 'Lato';
+  text-transform: uppercase;
+  font-size: 1.4em;
+  opacity: 0.7;
+  letter-spacing: 2pt;
+}
+
+/* Headers, body */
+
+h4 {
+  font-size: 1.8em;
+}
+
+.freight-slide {
+  background-image: 
+    linear-gradient(
+      rgba(59, 66, 69, .8),
+      rgba(59, 66, 69, .8)
+    ),
+    /* your image */
+    url(../../images/freight.jpg);
+  background-size: cover;
+}
+
+.emphasis {
+  font-family: 'Kalam';
+  font-weight: normal;
+}
+
+.big-text {
+  font-size: 2.8em !important;
+}
+
+.shadow-text {
+  text-shadow: 2px 2px 0.5em black;
+}
+
+.remark-code-line-highlighted {
+  color: #CA225EFF;
+  background-color: transparent;
+}
+
+pre {
+    border: 1px solid #ca225e5c; /* pink */
+    box-shadow: 0px 0px 1px #ca225e5c;
+    padding: 0.25em;
+    background-color: #fff;
+    overflow-x: auto;
+    border-radius: 0px;
+}
+
+.hidden{
+  visibility: hidden;
+}
+
+.word-bubble {
+  font-family: 'Noto Serif JP';
+  font-size: 1.2em;
+}
+
+/* Specific slide styling */
+
+#-span-class-center-to-specify-a-model-with-parsnip-span- + .right-column,
+.fade + .right-column {
+  font-family: 'Lato', sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #767381;
+  font-size: 1.3em !important;
+  letter-spacing: 1pt;
+}
+
+
+

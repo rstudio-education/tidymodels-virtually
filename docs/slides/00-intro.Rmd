@@ -1,0 +1,420 @@
+---
+title: "Tidymodels, Virtually"
+subtitle: "A Virtual Workshop for BD"
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(collapse = TRUE,
+                      fig.retina = 3)
+```
+
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle`
+
+### `r rmarkdown::metadata$author` 
+
+
+
+
+```{r meta, echo=FALSE}
+library(metathis)
+meta() %>%
+  meta_general(
+    description = "Tidymodels, Virtually",
+    generator = "xaringan and remark.js"
+  ) %>% 
+  meta_name("github-repo" = "rstudio-education/virtual-tidymodels") %>% 
+  meta_social(
+    title = "Tidymodels, Virtually",
+    url = "TBD",
+    image = "https://repository-images.githubusercontent.com/248553842/408a8d80-7363-11ea-96ae-d04b664002df",
+    image_alt = "The first slide features a flying machine",
+    og_type = "website",
+    twitter_card_type = "summary_large_image"
+  )
+```
+
+
+
+---
+name: clouds2
+background-image: url(images/Clouds2.jpg)
+background-size: cover
+
+---
+template: clouds2
+class: middle, center
+
+
+
+# <i class="fab fa-google"></i>
+
+https://bit.ly/tmv-bd
+
+
+---
+name: clouds
+class: center, middle
+background-image: url(images/Clouds.jpg)
+background-size: cover
+
+---
+template: clouds
+
+## .big-text[Hello.]
+
+???
+
+Hello- I'm so happy you could join us today. 
+
+---
+template: clouds
+class: middle, center
+
+
+### Alison Hill 
+
+<img style="border-radius: 50%;" src="https://github.com/apreshill.png" width="150px"/>
+
+[`r icon::fa("github")` @apreshill](https://github.com/apreshill)  
+[`r icon::fa("twitter")` @apreshill](https://twitter.com/apreshill)  
+[`r icon::fa("link")` alison.rbind.io](https://alison.rbind.io)
+
+
+
+???
+
+My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+
+---
+class: middle, center, inverse
+
+# What is machine learning?
+
+---
+background-image: url(https://rejoiner.com/resources/wp-content/uploads/2016/06/recommended-thomas.png)
+background-size: contain
+
+
+---
+background-image: url(https://miro.medium.com/max/1400/1*j5aWfH9t1_EZPJC92CJ7oQ.png)
+background-size: contain
+
+.footnote[https://medium.com/tmobile-tech/small-data-big-value-f783ceca4fdb]
+
+---
+background-image: url(https://techcrunch.com/wp-content/uploads/2017/12/facebook-facial-recognition-photo-review.png?w=730&crop=1)
+background-size: contain
+
+
+---
+class: middle, center
+
+# What is machine learning?
+
+--
+
+```{r echo=FALSE}
+knitr::include_graphics("https://imgs.xkcd.com/comics/machine_learning.png ")
+```
+
+---
+class: top, center
+background-image: url(images/intro.002.jpeg)
+background-size: cover
+
+---
+class: top, center
+background-image: url(images/intro.003.jpeg)
+background-size: cover
+
+
+---
+class: middle, center, frame
+
+# Types of Machine Learning
+
+Supervised
+
+Unsupervised
+
+Reinforcement
+
+---
+class: top, center
+background-image: url(images/all-of-ml.jpg)
+background-size: contain
+
+.footnote[Credit: <https://vas3k.com/blog/machine_learning/>]
+
+---
+
+Why do we want machines to learn?
+
+What are they learning?
+
+What does a machine need to learn?
+---
+class: middle, center, frame
+
+# Examples of Supervised Learning
+
+Spam detection
+
+Medical diagnosis
+
+Ad click prediction
+
+---
+class: middle, center, frame
+
+# Two modes
+
+--
+
+.pull-left[
+
+## Classification
+
+Are you under a stay-at-home order?
+
+]
+
+--
+
+.pull-left[
+
+## Regression
+
+How long has your state had stay-at-home orders in place?
+]
+
+---
+class: middle, center, frame
+
+# Two cultures
+
+.pull-left[
+
+### Statistics
+]
+
+.pull-right[
+
+
+### Machine Learning
+]
+
+---
+class: middle, center, frame
+
+# Quiz
+
+## Which is which?
+
+.pull-left[
+
+model first
+
+inference emphasis
+]
+
+.pull-right[
+
+data first
+
+prediction emphasis
+]
+
+---
+class: middle, center, frame
+
+# Quiz
+
+## Which is which?
+
+.pull-left[
+
+model first
+
+inference emphasis
+
+### Statistics
+]
+
+.pull-right[
+
+data first
+
+prediction emphasis
+
+### Machine Learning
+]
+
+
+
+---
+name: train-love
+background-image: url(images/train.jpg)
+background-size: contain
+background-color: #f6f6f6
+
+---
+template: train-love
+class: center, top
+
+# Statistics
+
+---
+template: train-love
+class: bottom
+
+
+> *"Statisticians, like artists, have the bad habit of falling in love with their models."*
+>
+> &mdash; George Box
+
+---
+class: freight-slide, center, inverse
+
+# Predictive modeling
+
+---
+class: middle, inverse, center
+
+# Schedule for Today
+
+--
+
+Build a model
+
+--
+
+Resample a model
+
+--
+
+Build A Better Training Set
+
+
+
+---
+class: frame, middle, center
+
+## Session 01
+
+EDT: 1:00-1:50
+
+PDT: 10:00-10:50
+
+--
+
+## Session 02
+
+
+EDT: 02-02:50
+
+PDT: 11-11:50
+
+
+--
+
+## Session 03
+
+
+EDT: 03-03:50
+
+PDT: 12-12:50
+
+--
+
+## Session 04
+
+
+EDT: 03-03:50
+
+PDT: 01-01:50
+
+
+---
+class: inverse, middle, center
+
+# tidymodels
+
+---
+background-image: url(images/tm-org.png)
+background-size: contain
+
+---
+
+```{r}
+library(tidymodels)
+```
+
+
+
+---
+class: inverse, middle, center
+
+# Logistics
+
+---
+class: frame, middle, center
+
+# Reactions?
+
+![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
+
+---
+class: frame, middle, center
+
+# Mute/unmute?
+
+![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
+
+---
+class: frame, middle, center
+
+# Our classroom
+
+Google Doc: https://bit.ly/tmv-bd
+
+
+---
+class: inverse, middle, center
+
+# To the workshop!
+
+---
+class: inverse, middle, center
+
+# Day Two
+
+## Ensembles 
+
+## Tuning
+
+## Case Study
+

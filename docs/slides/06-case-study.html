@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>The Great Model-Off</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alison Hill" />
+    <meta name="date" content="2020-05-01" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <!---import JQuery-->
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+
+    <!--add parent selector-->
+
+    <script>
+
+    $( document ).ready( function(){
+
+      $( "pre")
+          .parents( ".remark-slide-content" )
+          .addClass( "code-slide-background" );
+      
+    });
+      
+    </script>
+    <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: title-slide, center, bottom
+
+# The Great Model-Off
+
+## Tidymodels, Virtually &amp;mdash; Session 06
+
+### Alison Hill 
+
+
+---
+class: middle, center
+
+&lt;img src="images/hotel.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+
+```r
+library(tidyverse)
+library(tidymodels)
+
+# read in the data--------------------------------------------------------------
+hotels &lt;-
+  read_csv('https://tidymodels.org/start/case-study/hotels.csv') %&gt;%
+  mutate_if(is.character, as.factor) 
+
+# data splitting----------------------------------------------------------------
+set.seed(123)
+splits      &lt;- initial_split(hotels, strata = children)
+hotel_other &lt;- training(splits)
+hotel_test  &lt;- testing(splits)
+
+# resample once-----------------------------------------------------------------
+set.seed(234)
+val_set &lt;- validation_split(hotel_other, 
+                            strata = children, 
+                            prop = 0.80)
+```
+
+---
+
+```r
+glimpse(hotels)
+# Rows: 50,000
+# Columns: 23
+# $ hotel                          &lt;fct&gt; City_Hotel, City_H…
+# $ lead_time                      &lt;dbl&gt; 217, 2, 95, 143, 1…
+# $ stays_in_weekend_nights        &lt;dbl&gt; 1, 0, 2, 2, 1, 2, …
+# $ stays_in_week_nights           &lt;dbl&gt; 3, 1, 5, 6, 4, 2, …
+# $ adults                         &lt;dbl&gt; 2, 2, 2, 2, 2, 2, …
+# $ children                       &lt;fct&gt; none, none, none, …
+# $ meal                           &lt;fct&gt; BB, BB, BB, HB, HB…
+# $ country                        &lt;fct&gt; DEU, PRT, GBR, ROU…
+# $ market_segment                 &lt;fct&gt; Offline_TA/TO, Dir…
+# $ distribution_channel           &lt;fct&gt; TA/TO, Direct, TA/…
+# $ is_repeated_guest              &lt;dbl&gt; 0, 0, 0, 0, 0, 0, …
+# $ previous_cancellations         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, …
+# $ previous_bookings_not_canceled &lt;dbl&gt; 0, 0, 0, 0, 0, 0, …
+# $ reserved_room_type             &lt;fct&gt; A, D, A, A, F, A, …
+# $ assigned_room_type             &lt;fct&gt; A, K, A, A, F, A, …
+# $ booking_changes                &lt;dbl&gt; 0, 0, 2, 0, 0, 0, …
+# $ deposit_type                   &lt;fct&gt; No_Deposit, No_Dep…
+# $ days_in_waiting_list           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, …
+# $ customer_type                  &lt;fct&gt; Transient-Party, T…
+# $ average_daily_rate             &lt;dbl&gt; 80.75, 170.00, 8.0…
+# $ required_car_parking_spaces    &lt;fct&gt; none, none, none, …
+# $ total_of_special_requests      &lt;dbl&gt; 1, 3, 2, 1, 4, 1, …
+# $ arrival_date                   &lt;date&gt; 2016-09-01, 2017-…
+```
+
+---
+class: middle
+
+.pull-left[
+
+```r
+# training set proportions
+hotel_other %&gt;% 
+  count(children) %&gt;% 
+  mutate(prop = n/sum(n))
+# # A tibble: 2 x 3
+#   children     n   prop
+#   &lt;fct&gt;    &lt;int&gt;  &lt;dbl&gt;
+# 1 children  3048 0.0813
+# 2 none     34452 0.919
+```
+]
+
+.pull-right[
+
+
+```r
+# test set proportions
+hotel_test  %&gt;% 
+  count(children) %&gt;% 
+  mutate(prop = n/sum(n))
+# # A tibble: 2 x 3
+#   children     n   prop
+#   &lt;fct&gt;    &lt;int&gt;  &lt;dbl&gt;
+# 1 children   990 0.0792
+# 2 none     11510 0.921
+```
+
+]
+---
+class: middle, inverse, center
+
+&lt;img src="images/bird-turquoise.png" width="20%" style="display: block; margin: auto;" /&gt;
+
+
+# Classification Challenge!
+
+---
+class: middle, center, frame
+
+# Our Modeling Goal
+
+Predict which hotel stays included children and/or babies
+
+--
+
+Based on the other characteristics of the stays such as:
+
+which hotel the guests stay at, 
+
+how much they pay, 
+
+etc. 
+
+
+---
+class: middle, center, frame
+
+# Your Challenge
+
+Maximize area under the ROC curve (`roc_auc`)
+
+---
+class: middle
+
+.pull-left[
+&lt;img src="images/two-birds2-alpha.png" width="568" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+## Work in groups
+
+## Pick a model
+
+## Tune!
+
+## Select the top model
+
+## FIN!
+]
+
+---
+class: title-slide, center, bottom
+
+# Our tidymodels
+
+
+---
+background-image: url(images/cranes.jpg)
+background-position: left
+background-size: contain
+class: middle
+
+.right-column[
+
+# Choose from:
+
++ Penalized logistic regression
+
++ Decision tree
+
++ K-nearest neighbors
+
++ Random forest
+
++ *Any other classification model/engine you want from parsnip!*
+]
+
+---
+class: middle
+
+# Decision Tree Model
+
+
+```r
+tree_spec &lt;- decision_tree() %&gt;%
+  set_engine("rpart") %&gt;%
+  set_mode("classification")
+```
+
+Docs: https://tidymodels.github.io/parsnip/reference/decision_tree.html
+
+---
+class: middle
+
+# Random Forest Model
+
+
+```r
+rf_spec &lt;- 
+  rand_forest() %&gt;% 
+  set_engine("ranger") %&gt;% 
+  set_mode("classification")
+```
+
+Docs: https://tidymodels.github.io/parsnip/reference/rand_forest.html
+
+---
+class: middle
+
+# K-Nearest Neighbor Model
+
+
+```r
+knn_spec &lt;- nearest_neighbor() %&gt;%
+  set_engine("kknn") %&gt;%
+  set_mode("classification")
+```
+
+Docs: https://tidymodels.github.io/parsnip/reference/nearest_neighbor.html
+
+---
+class: middle
+
+# Lasso Logistic Regression Model
+ 
+
+```r
+lasso_spec &lt;- 
+  logistic_reg(penalty = 0, mixture = 1) %&gt;% 
+  set_engine("glmnet") %&gt;% 
+  set_mode("classification")
+```
+
+Where:
+
++ `mixture = 0` is L2 (ridge) only, and 
+
++ `mixture = 1` is L1 (lasso) only.
+
+
+Docs: https://tidymodels.github.io/parsnip/reference/logistic_reg.html
+
+---
+background-image: url(images/bird-in-hand.jpg)
+background-position: left
+background-size: contain
+class: middle, center
+
+
+.pull-right[
+
+# "A bird in the hand is worth two in the bush..."
+
+]
+
+---
+class: middle, center, frame
+
+# Our top model
+
+Let's pick the best, then finalize with the test set together.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLanguage": "r",
+"highlightStyle": "xcode",
+"slideNumberFormat": "",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+name: "."
+title: "Tidymodels, Virtually"
+description: |
+  Tidymodels, Virtually
+output_dir: "docs"
+include: ["slides/"]
+creative_commons: CC BY-SA
+repository_url: https://github.com/rstudio-education/tidymodels-virtually
+navbar:
+  logo:
+    image: images/logo.png
+    href: https://www.rstudio.com
+  right:
+    - icon: fab fa-github
+      href: https://github.com/rstudio-education/tidymodels-virtually
+output: 
+  distill::distill_article:
+    toc: true
+    css: styles.css

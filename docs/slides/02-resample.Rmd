@@ -1,0 +1,1003 @@
+---
+title: "Resample Models"
+subtitle: "Tidymodels, Virtually"
+session: 02
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(comment = "#",
+                      message = FALSE,
+                      warning = FALSE, 
+                      collapse = TRUE,
+                      fig.retina = 3,
+                      fig.align = 'center',
+                      fig.path = "figs/02-resample/",
+                      R.options = list(tibble.max_extra_cols=5, 
+                                       tibble.print_max=5, 
+                                       tibble.width=60))
+options("scipen" = 16)
+library(tidymodels)
+yt_counter <- 0
+```
+
+```{r packages, include=FALSE}
+library(countdown)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(scico)
+library(gganimate)
+library(AmesHousing)
+library(tune)
+library(viridis)
+ames <- make_ames()
+theme_set(theme_minimal())
+
+set.seed(100) # Important!
+ames_split  <- initial_split(ames)
+ames_train  <- training(ames_split)
+ames_test   <- testing(ames_split)
+
+# for figures
+train_color <- viridis(1, option="plasma", begin = .5)
+test_color  <- viridis(1, option="plasma", begin = .8)
+assess_color <- viridis(1, option="plasma", begin = .1)
+data_color  <- viridis(1, option="magma", begin = .1)
+splits_pal <- c(data_color, train_color, test_color)
+
+rt_spec <- 
+  decision_tree() %>% 
+  set_engine("rpart") %>% 
+  set_mode("regression")
+```
+
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
+
+### `r rmarkdown::metadata$author` 
+
+
+---
+class: middle, center, frame
+
+# Goal of Predictive Modeling
+
+--
+
+
+## `r emo::ji("hammer")` build .display[models] that
+
+--
+
+
+## `r emo::ji("target")` generate .display[accurate predictions]
+
+--
+
+
+## `r emo::ji("crystal_ball")` for .display[future, yet-to-be-seen data]
+
+
+
+--
+
+.footnote[Max Kuhn & Kjell Johnston, http://www.feat.engineering/]
+
+
+???
+
+This is our whole game vision for today. This is the main goal for predictive modeling broadly, and for machine learning specifically.
+
+We'll use this goal to drive learning of 3 core tidymodels packages:
+
+- parsnip
+- yardstick
+- and rsample
+
+---
+class: inverse, middle, center
+
+# Resample models
+
+--
+
+## with rsample
+
+
+???
+
+Enter the rsample package
+
+
+---
+class: middle, center, frame
+
+# rsample
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/rsample/")
+```
+
+---
+background-image: url("images/saw.jpg")
+background-size: contain
+background-position: left
+class: middle, right
+
+.pull-right[
+# *"Measure twice, <br>cut once"*
+]
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Run the first code chunk. Then fill in the blanks to 
+
+1. Create a split object that apportions 75% of `ames` to a training set and the remainder to a testing set.
+2. Fit the `rt_spec` to the training set.
+3. Predict with the testing set and compute the rmse of the fit.
+
+```{r echo=FALSE}
+countdown(minutes = 3)
+```
+
+---
+
+```{r warnings = FALSE, message = FALSE}
+new_split <- initial_split(ames)
+new_train <- training(new_split)
+new_test  <- testing(new_split)
+
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = new_train) %>% 
+  predict(new_test) %>% 
+  mutate(truth = new_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+```
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+What would happen if you repeated this process? Would you get the same answers? 
+
+Then rerun the last code chunk from Your Turn 1. Do you get the same answer? Try it a few times.
+
+```{r echo=FALSE}
+countdown(minutes = 2)
+```
+
+---
+
+.pull-left[
+```{r new-split, echo=FALSE, warnings = FALSE, message = FALSE}
+new_split <- initial_split(ames)
+new_train <- training(new_split)
+new_test  <- testing(new_split)
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = new_train) %>% 
+  predict(new_test) %>% 
+  mutate(truth = new_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+]
+
+--
+
+.pull-right[
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+]
+
+---
+class: middle, center
+
+# Quiz
+
+Why is the new estimate different?
+
+
+```{r include=FALSE}
+plot_split <- function(seed = 1, arrow = FALSE) {
+  set.seed(seed)
+  one_split <- slice(ames, 1:20) %>% 
+    initial_split() %>% 
+    tidy() %>% 
+    add_row(Row = 1:20, Data = "Original") %>% 
+    mutate(Data = case_when(
+      Data == "Analysis" ~ "Training",
+      Data == "Assessment" ~ "Testing",
+      TRUE ~ Data
+    )) %>% 
+    mutate(Data = factor(Data, levels = c("Original", "Training", "Testing")))
+  
+  both_split <-
+    one_split %>% 
+    filter(!Data == "Original") %>% 
+    ggplot(aes(x = Row, y = 1, fill = Data)) + 
+    geom_tile(color = "white",
+              size = 1) + 
+    scale_fill_manual(values = splits_pal[2:3],
+                       guide = FALSE) +
+    theme_void() +
+    #theme(plot.margin = unit(c(-1, -1, -1, -1), "mm")) +
+    coord_equal() + {
+    # arrow is TRUE
+    if (arrow == TRUE) 
+      annotate("segment", x = 31, xend = 32, y = 1, yend = 1, 
+               colour = assess_color, size=1, arrow=arrow())
+    } + {
+    # arrow is TRUE
+    if (arrow == TRUE)
+        annotate("text", x = 33.5, y = 1, colour = assess_color, size=8, 
+                 label = "RMSE", family="Lato")
+    }
+
+  
+  both_split
+}
+```
+
+---
+class: middle, center
+
+# Data Splitting
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 100)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 1)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 10)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 18)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 30)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 31)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 21)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 321)
+```
+
+---
+
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 100, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 1, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 10, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 18, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 30, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 31, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 21, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 321, arrow = TRUE)
+```
+
+--
+
+.right[Mean RMSE]
+
+---
+class: frame, center, middle
+
+# Resampling
+
+Let's resample 10 times 
+
+then compute the mean of the results...
+
+---
+
+```{r include = FALSE}
+set.seed(9)
+```
+
+
+```{r cv-for-loop, include = FALSE}
+rmses <- vector(length = 10, mode = "double")
+for (i in 1:10) {
+  new_split <- initial_split(ames)
+  new_train <- training(new_split)
+  new_test  <- testing(new_split)
+  rmses[i] <-
+    rt_spec %>% 
+      fit(Sale_Price ~ ., data = new_train) %>% 
+      predict(new_test) %>% 
+      mutate(truth = new_test$Sale_Price) %>% 
+      rmse(truth, .pred) %>% 
+      pull(.estimate)
+}
+```
+
+```{r}
+rmses %>% tibble::enframe(name = "rmse")
+mean(rmses)
+```
+
+---
+class: middle, center
+
+# Guess
+
+Which do you think is a better estimate?
+
+The best result or the mean of the results? Why? 
+
+---
+class: middle, center
+
+# But also...
+
+Fit with .display[training set]
+
+Predict with .display[testing set]
+
+--
+
+Rinse and repeat?
+
+---
+
+# There has to be a better way...
+
+```{r ref.label='cv-for-loop', eval = FALSE}
+```
+
+---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
+class: middle, center
+background-color: #f5f5f5
+
+.pull-right[
+## The .display[testing set] is precious...
+
+## we can only use it once!
+
+]
+
+---
+background-image: url(https://www.tidymodels.org/start/resampling/img/resampling.svg)
+background-size: 60%
+
+---
+class: middle, center, inverse
+
+# Cross-validation
+
+---
+background-image: url(images/cross-validation/Slide2.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide3.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide4.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide5.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide6.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide7.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide8.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide9.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide10.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide11.png)
+background-size: contain
+
+---
+class: middle, center
+
+# V-fold cross-validation
+
+```{r eval=FALSE}
+vfold_cv(data, v = 10, ...)
+```
+
+
+---
+exclude: true
+
+```{r cv, fig.height=4, echo=FALSE}
+set.seed(1)
+folds10 <- slice(ames, 1:20) %>% 
+  vfold_cv() %>% 
+  tidy() %>% 
+  mutate(split = str_c("Split", str_pad(parse_number(Fold), width = 2, pad = "0")))
+
+folds <- ggplot(folds10, aes(x = Row, y = fct_rev(split), fill = Data)) + 
+  geom_tile(color = "white",
+            width = 1,
+            size = 1) + 
+  scale_fill_manual(values = c(train_color, assess_color)) +
+  theme(axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato"),
+        legend.key.size = unit(.4, "cm"),
+        legend.text = element_text(size = rel(.4))) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = NULL) 
+```
+
+---
+class: middle, center
+
+# Guess
+
+How many times does in observation/row appear in the assessment set?
+
+```{r vfold-tiles, echo=FALSE, fig.height=6, fig.width = 12, fig.align='center'}
+folds +
+    theme(axis.text.y = element_text(size = rel(2)),
+          legend.key.size = unit(.85, "cm"),
+          legend.text = element_text(size = rel(1)))
+```
+
+---
+
+```{r echo=FALSE, fig.height=6, fig.width = 12, fig.align='center', warning=FALSE, message=FALSE}
+test_folds <- tibble(
+  Row = seq(1, 20, 1),
+  Data = "assessment",
+  Fold = rep(1:10, each = 2)
+) 
+
+# i want all 20 rows, for all 10 folds
+all_rows <- tibble(
+  Row = rep(seq(1, 20, 1), 10),
+  Fold = rep(1:10, each = 20)
+)
+
+train_folds <- all_rows %>% 
+  anti_join(test_folds)
+
+all_folds <- test_folds %>% 
+  full_join(train_folds) %>% 
+  mutate(Fold = as.factor(Fold)) %>% 
+  mutate(Data = replace_na(Data, "analysis"))
+
+ggplot(all_folds, aes(x = Row, y = fct_rev(Fold), fill = Data)) + 
+  geom_tile(color = "white",
+            width = 1,
+            size = 1) + 
+  scale_fill_manual(values = c(train_color, assess_color), guide = FALSE) +
+  theme(axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato"),
+        legend.key.size = unit(.4, "cm"),
+        legend.text = element_text(size = rel(.4))) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = NULL) 
+```
+
+---
+class: middle, center
+
+# Quiz
+
+If we use 10 folds, which percent of our data will end up in the training set and which percent in the testing set for each fold?
+
+--
+
+90% - training
+
+10% - test
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Run the code below. What does it return?
+
+```{r make-ames-cv, results='hide'}
+set.seed(100)
+cv_folds <- 
+    vfold_cv(ames_train, v = 10, strata = Sale_Price, breaks = 4)
+cv_folds
+```
+
+```{r echo=FALSE}
+countdown(minutes = 1)
+```
+
+---
+```{r ref.label='make-ames-cv'}
+```
+
+---
+class: middle
+
+.center[
+# We need a new way to fit
+]
+
+```{r eval=FALSE}
+split1       <- cv_folds %>% pluck("splits", 1)
+split1_train <- training(split1)
+split1_test  <- testing(split1)
+
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = split1_train) %>% 
+  predict(split1_test) %>% 
+  mutate(truth = split1_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+
+# rinse and repeat
+split2 <- ...
+```
+
+
+---
+class: middle
+
+.center[
+# `fit_resamples()`
+
+Trains and tests a resampled model.
+]
+
+```{r fit-ames-cv1, results='hide'}
+fit_resamples(
+  rt_spec,
+  Sale_Price ~ Gr_Liv_Area, 
+  resamples = cv_folds
+)
+```
+
+---
+class: middle
+
+.center[
+# `fit_resamples()`
+
+Trains and tests a resampled model.
+]
+
+```{r fit-ames-cv, results='hide'}
+rt_spec %>% 
+  fit_resamples(
+    Sale_Price ~ Gr_Liv_Area, 
+    resamples = cv_folds
+    )
+```
+
+---
+
+```{r ref.label='fit-ames-cv', warning=FALSE, messages=FALSE}
+
+```
+
+
+---
+class: middle, center
+
+# `collect_metrics()`
+
+Unnest the metrics column from a tidymodels `fit_resamples()`
+
+```{r eval = FALSE}
+_results %>% collect_metrics(summarize = TRUE)
+```
+
+--
+
+.footnote[`TRUE` is actually the default; averages across folds]
+
+---
+```{r}
+rt_spec %>% 
+  fit_resamples(
+    Sale_Price ~ Gr_Liv_Area, 
+    resamples = cv_folds
+    ) %>% 
+  collect_metrics(summarize = FALSE)
+```
+
+---
+class: middle, center, frame
+
+# 10-fold CV
+
+### 10 different analysis/assessment sets
+
+### 10 different models (trained on .display[analysis] sets)
+
+### 10 different sets of performance statistics (on .display[assessment] sets)
+
+
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Modify the code below to use `fit_resamples()` and `cv_folds` to cross-validate the regression tree model.
+
+Which RMSE do you collect at the end?
+
+```{r eval=FALSE}
+set.seed(100)
+rt_spec %>% 
+  fit(Sale_Price ~ ., data = new_train) %>% 
+  predict(new_test) %>% 
+  mutate(truth = new_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+```
+
+```{r echo=FALSE}
+countdown(minutes = 3)
+```
+
+
+---
+```{r rt-rs, warning=FALSE, message=FALSE}
+set.seed(100)
+rt_spec %>% 
+  fit_resamples(Sale_Price ~ ., 
+                resamples = cv_folds) %>% 
+  collect_metrics()
+```
+
+---
+
+# How did we do?
+
+```{r}
+rt_spec %>% 
+  fit(Sale_Price ~ ., ames_train) %>% 
+  predict(ames_test) %>% 
+  mutate(truth = ames_test$Sale_Price) %>% 
+  rmse(truth, .pred)
+```
+
+
+```{r ref.label='rt-rs', echo=FALSE}
+
+```
+
+
+---
+class: middle, center, inverse
+
+# Other types of cross-validation
+
+---
+class: middle, center
+
+# `vfold_cv()` - V Fold cross-validation
+
+```{r ref.label='vfold-tiles', echo=FALSE, fig.height=6, fig.width = 12, fig.align='center'}
+```
+
+---
+class: middle, center
+
+# `loo_cv()` - Leave one out CV
+
+```{r loocv, echo=FALSE, fig.height=7, fig.width = 7, fig.align='center'}
+set.seed(1)
+loo10 <- slice(ames, 1:10) %>% 
+  loo_cv() %>% 
+  tidy() %>% 
+  mutate(Resample = as.factor(parse_number(Resample))) 
+
+loo <- ggplot(loo10, aes(x = Row, 
+                         y = fct_reorder2(Resample, Data, Row), 
+                         fill = Data)) + 
+  geom_tile(color = "white",
+            width = 1,
+            size = 1) + 
+  scale_fill_manual(values = c(train_color, assess_color)) +
+  theme(axis.text.y = element_text(size = rel(2)),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato"),
+        legend.key.size = unit(.85, "cm"),
+        legend.text = element_text(size = rel(1))) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  scale_y_discrete(labels = rev(seq(1, 10, 1)))
+loo
+```
+
+---
+class: middle, center
+
+# `mc_cv()` - Monte Carlo (random) CV
+
+(Test sets sampled without replacement)
+
+```{r mccv, echo=FALSE, fig.height=6, fig.width = 12, fig.align='center'}
+set.seed(1)
+mc10 <- slice(ames, 1:20) %>% 
+  mc_cv(times = 10) %>% 
+  tidy() 
+
+mc <- ggplot(mc10, aes(x = Row, 
+                         y = fct_rev(Resample), 
+                         fill = Data)) + 
+  geom_tile(color = "white",
+            width = 1,
+            size = 1) + 
+  scale_fill_manual(values = c(train_color, assess_color)) +
+  theme(axis.text.y = element_text(size = rel(2)),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato"),
+        legend.key.size = unit(.85, "cm"),
+        legend.text = element_text(size = rel(1))) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = NULL) 
+mc
+```
+
+
+---
+class: middle, center
+
+# `bootstraps()`
+
+(Test sets sampled with replacement)
+
+```{r bootstrap, echo=FALSE, fig.height=6, fig.width = 12, fig.align='center'}
+set.seed(15)
+so_boots <- bootstraps(slice(ames, 1:20), times = 10)
+
+bt_rows <- data.frame(
+  Row = unlist(lapply(so_boots$splits, function(x) sort(x$in_id))),
+  Resample = rep(recipes:::names0(10, "Bootstrap"), 
+                 each = nrow(slice(ames, 1:20)))) %>% 
+  count(Resample, Row, sort = TRUE) %>% 
+  complete(Resample, Row) %>% 
+  mutate(n = factor(n),
+         Resample = factor(Resample)) 
+
+boots <- ggplot(bt_rows , aes(x = Row, y = fct_rev(Resample), fill = n)) + 
+  geom_tile(color = "white",
+            width = 1,
+            size = 1) + 
+  theme(axis.text.y = element_text(size = rel(2)),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato"),
+        legend.key.size = unit(.85, "cm"),
+        legend.text = element_text(size = rel(1))) +
+  scale_fill_scico_d(palette = 'buda', 
+                     begin = 0, 
+                     end = .9, 
+                     direction = -1,
+                     na.value = assess_color,
+                     labels = c("1", "2", "3", "4", "Assessment")) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = NULL) 
+boots
+```
+
+---
+class: middle, center, frame
+
+
+# yardstick
+
+Functions that compute common model metrics
+
+<tidymodels.github.io/yardstick/>
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/yardstick/")
+```
+
+
+---
+class: middle
+
+.center[
+# `fit_resamples()`
+
+Trains and tests a model with cross-validation.
+]
+
+.pull-left[
+
+```{r eval = FALSE}
+fit_resamples(
+  object, 
+  resamples, 
+  ..., 
+  metrics = NULL,  #<<
+  control = control_resamples()
+)
+```
+
+]
+
+.pull-right[
+
+If `NULL`...
+
+regression = `rmse` + `rsq`
+
+classification = `accuracy` + `roc_auc`
+]
+
+---
+class: middle, center
+
+# `metric_set()`
+
+A helper function for selecting yardstick metric functions.
+
+```{r eval=FALSE}
+metric_set(rmse, rsq)
+```
+
+---
+class: middle
+
+.center[
+# `fit_resamples()`
+
+.fade[Trains and tests a model with cross-validation.]
+]
+
+.pull-left[
+
+```{r eval = FALSE}
+fit_resamples(
+  object, 
+  resamples, 
+  ..., 
+  metrics = metric_set(rmse, rsq),  #<<
+  control = control_resamples()
+)
+```
+
+]
+
+---
+class: middle, center, frame
+
+
+# Metric Functions
+
+
+<https://tidymodels.github.io/yardstick/reference/index.html>
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/yardstick/reference/index.html")
+```

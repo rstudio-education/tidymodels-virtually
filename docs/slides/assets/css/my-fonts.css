@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=Kalam:400,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=Amiri:400,400i,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif+JP:400,500,600&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=Lato:400,400i,700&display=swap');
+
+body { 
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  color: #404040;
+}
+
+h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 400;
+  color: #1a162d;
+}
+
+h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 400;
+  color: #767381;
+}
+
+h3 {
+  font-family: 'Lato', sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  color: #767381;
+  font-size: 1.3em !important;
+  letter-spacing: 1pt;
+}
+
+h4, h5, h6 {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  color: #003366;
+}
+
+.remark-code,
+.remark-inline-code{ 
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+@media print {
+  body {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+}
+}
+
+
