@@ -3,7 +3,7 @@ title: "Tidymodels, Virtually"
 author:
 - name: Alison Hill, Ph.D.
   url: https://alison.rbind.io
-  affiliation: RStudio
+  affiliation: RStudio, PBC
   affiliation_url: https://rstudio.com
 date: "`r Sys.Date()`"
 description: |

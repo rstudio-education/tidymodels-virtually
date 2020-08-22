@@ -1,5 +1,5 @@
-name: "."
-title: "Tidymodels, Virtually"
+name: "RStudio"
+title: "RStudio"
 description: |
   Tidymodels, Virtually
 output_dir: "docs"
