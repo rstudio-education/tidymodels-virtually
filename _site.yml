@@ -3,7 +3,6 @@ title: "RStudio"
 description: |
   Tidymodels, Virtually
 output_dir: "site"
-include: ["slides/"]
 creative_commons: CC BY-SA
 repository_url: https://github.com/rstudio-education/tidymodels-virtually
 navbar:
