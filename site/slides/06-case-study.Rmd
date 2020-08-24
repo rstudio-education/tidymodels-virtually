@@ -1,0 +1,292 @@
+---
+title: "The Great Model-Off"
+subtitle: "Tidymodels, Virtually"
+session: 06
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(comment = "#",
+                      message = FALSE,
+                      warning = FALSE, 
+                      collapse = TRUE,
+                      fig.retina = 3,
+                      fig.align = 'center',
+                      fig.path = "figs/06-case-study/",
+                      R.options = list(tibble.max_extra_cols=5, 
+                                       tibble.print_max=5, 
+                                       tibble.width=60))
+options("scipen" = 16)
+library(tidymodels)
+yt_counter <- 0
+```
+
+```{r packages, include=FALSE}
+library(countdown)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(scico)
+library(gganimate)
+library(tune)
+library(viridis)
+theme_set(theme_minimal())
+
+# for figures
+train_color <- viridis(1, option="magma", begin = .4)
+test_color  <- viridis(1, option="magma", begin = .7)
+data_color  <- viridis(1, option="magma", begin = .1)
+assess_color <- viridis(1, option="magma", begin = 0)
+splits_pal <- c(data_color, train_color, test_color)
+```
+
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
+
+### `r rmarkdown::metadata$author` 
+
+
+---
+class: middle, center
+
+```{r echo=FALSE, out.width="80%"}
+knitr::include_graphics("images/hotel.jpg")
+```
+
+
+---
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+
+# read in the data--------------------------------------------------------------
+hotels <-
+  read_csv('https://tidymodels.org/start/case-study/hotels.csv') %>%
+  mutate_if(is.character, as.factor) 
+
+# data splitting----------------------------------------------------------------
+set.seed(123)
+splits      <- initial_split(hotels, strata = children)
+hotel_other <- training(splits)
+hotel_test  <- testing(splits)
+
+# resample once-----------------------------------------------------------------
+set.seed(234)
+val_set <- validation_split(hotel_other, 
+                            strata = children, 
+                            prop = 0.80)
+```
+
+---
+```{r}
+glimpse(hotels)
+```
+
+---
+class: middle
+
+.pull-left[
+```{r}
+# training set proportions
+hotel_other %>% 
+  count(children) %>% 
+  mutate(prop = n/sum(n))
+```
+]
+
+.pull-right[
+
+```{r}
+# test set proportions
+hotel_test  %>% 
+  count(children) %>% 
+  mutate(prop = n/sum(n))
+```
+
+]
+---
+class: middle, inverse, center
+
+```{r echo=FALSE, out.width="20%"}
+knitr::include_graphics("images/bird-turquoise.png")
+```
+
+
+# Classification Challenge!
+
+---
+class: middle, center, frame
+
+# Our Modeling Goal
+
+Predict which hotel stays included children and/or babies
+
+--
+
+Based on the other characteristics of the stays such as:
+
+which hotel the guests stay at, 
+
+how much they pay, 
+
+etc. 
+
+
+---
+class: middle, center, frame
+
+# Your Challenge
+
+Maximize area under the ROC curve (`roc_auc`)
+
+---
+class: middle
+
+.pull-left[
+```{r echo=FALSE}
+knitr::include_graphics("images/two-birds2-alpha.png")
+```
+
+]
+
+.pull-right[
+## Work in groups
+
+## Pick a model
+
+## Tune!
+
+## Select the top model
+
+## FIN!
+]
+
+---
+class: title-slide, center, bottom
+
+# Our tidymodels
+
+
+---
+background-image: url(images/cranes.jpg)
+background-position: left
+background-size: contain
+class: middle
+
+.right-column[
+
+# Choose from:
+
++ Penalized logistic regression
+
++ Decision tree
+
++ K-nearest neighbors
+
++ Random forest
+
++ *Any other classification model/engine you want from parsnip!*
+]
+
+---
+class: middle
+
+# Decision Tree Model
+
+```{r}
+tree_spec <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+```
+
+Docs: https://tidymodels.github.io/parsnip/reference/decision_tree.html
+
+---
+class: middle
+
+# Random Forest Model
+
+```{r}
+rf_spec <- 
+  rand_forest() %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+```
+
+Docs: https://tidymodels.github.io/parsnip/reference/rand_forest.html
+
+---
+class: middle
+
+# K-Nearest Neighbor Model
+
+```{r}
+knn_spec <- nearest_neighbor() %>%
+  set_engine("kknn") %>%
+  set_mode("classification")
+```
+
+Docs: https://tidymodels.github.io/parsnip/reference/nearest_neighbor.html
+
+---
+class: middle
+
+# Lasso Logistic Regression Model
+ 
+```{r}
+lasso_spec <- 
+  logistic_reg(penalty = 0, mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_mode("classification")
+```
+
+Where:
+
++ `mixture = 0` is L2 (ridge) only, and 
+
++ `mixture = 1` is L1 (lasso) only.
+
+
+Docs: https://tidymodels.github.io/parsnip/reference/logistic_reg.html
+
+---
+background-image: url(images/bird-in-hand.jpg)
+background-position: left
+background-size: contain
+class: middle, center
+
+
+.pull-right[
+
+# "A bird in the hand is worth two in the bush..."
+
+]
+
+---
+class: middle, center, frame
+
+# Our top model
+
+Let's pick the best, then finalize with the test set together.

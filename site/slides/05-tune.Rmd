@@ -1,0 +1,749 @@
+---
+title: "Tune Models"
+subtitle: "Tidymodels, Virtually"
+session: 05
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(comment = "#",
+                      message = FALSE,
+                      warning = FALSE, 
+                      collapse = TRUE,
+                      fig.retina = 3,
+                      fig.align = 'center',
+                      fig.path = "figs/05-tune/",
+                      R.options = list(tibble.max_extra_cols=5, 
+                                       tibble.print_max=5, 
+                                       tibble.width=60))
+options("scipen" = 16)
+library(tidymodels)
+yt_counter <- 0
+```
+
+```{r packages, include=FALSE}
+library(countdown)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(scico)
+library(gganimate)
+library(tune)
+library(viridis)
+theme_set(theme_minimal())
+
+# for figures
+train_color <- viridis(1, option="magma", begin = .4)
+test_color  <- viridis(1, option="magma", begin = .7)
+data_color  <- viridis(1, option="magma", begin = .1)
+assess_color <- viridis(1, option="magma", begin = 0)
+splits_pal <- c(data_color, train_color, test_color)
+```
+
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
+
+### `r rmarkdown::metadata$author` 
+
+
+---
+class: middle, center, frame
+
+
+# tune 
+
+Functions for fitting and tuning models
+
+<tidymodels.github.io/tune/>
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/tune/")
+```
+
+---
+class: middle, center
+
+# `tune()`
+
+A placeholder for hyper-parameters to be "tuned"
+
+```{r results='hide'}
+nearest_neighbor(neighbors = tune())
+```
+
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+```{r tune-grid, eval = FALSE}
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+  grid = 10, 
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+```{r eval = FALSE}
+tune_grid(
+  object, #<<
+  resamples, 
+  ..., 
+  grid = 10, 
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+--
+
+.pull-right[
+One of:
+
++ A parsnip `model` object
+
++ A `workflow`
+
+]
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+```{r eval = FALSE}
+tune_grid(
+  object, #<<
+  preprocessor, #<<
+  resamples, 
+  ..., 
+  grid = 10, 
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+A `model` + `recipe`
+]
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+]
+
+.pull-left[
+
+```{r eval = FALSE}
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+  grid = 10, #<<
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+One of:
+
++ A positive integer. 
+
++ A data frame of tuning combinations.
+
+]
+
+---
+
+.center[
+
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+
+]
+
+.pull-left[
+
+```{r eval = FALSE}
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+  grid = 10, #<<
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+Number of candidate parameter sets to be created automatically; `10` is the default.
+]
+
+---
+```{r}
+library(modeldata)
+data(stackoverflow)
+
+# split the data
+set.seed(100) # Important!
+so_split <- initial_split(stackoverflow, strata = Remote)
+so_train <- training(so_split)
+so_test  <- testing(so_split)
+
+# resample training data
+set.seed(100) # Important!
+so_folds <- vfold_cv(so_train, v = 10, strata = Remote)
+```
+
+
+---
+class: inverse, middle, center
+
+
+# Aside:
+
+--
+
+## Sub-class sampling
+
+```{r include=FALSE}
+uni_train <- iris %>% 
+  janitor::clean_names() %>% 
+  mutate(unicorn = as.factor(if_else(species == "versicolor", 1, 0))) %>% 
+  mutate_at(vars(starts_with("sepal")), .funs = ~(.*10)) %>% 
+  select(n_butterflies = sepal_width, n_kittens = sepal_length, unicorn)
+```
+
+---
+class: middle, center
+
+# Downsampling
+
+.pull-left[
+
+
+```{r uni-biscatter, echo=FALSE}
+ggplot(uni_train, aes(x = n_kittens, y = n_butterflies, color = unicorn)) +
+  geom_point(alpha = .8, size = 4) +
+  scale_colour_manual(values = c(train_color, test_color), guide = FALSE) +
+  theme(text = element_text(family = "Lato")) +
+  labs(x = NULL, y = NULL)
+```
+
+]
+
+--
+
+.pull-right[
+```{r echo=FALSE}
+uni_down_rec <- recipe(unicorn ~ ., data = uni_train) %>% 
+  step_downsample(all_outcomes())
+
+uni_down <- uni_down_rec %>% 
+  prep(training = uni_train, 
+       retain = TRUE) %>% 
+  juice()
+
+ggplot(uni_down, aes(x = n_kittens, y = n_butterflies, color = unicorn)) +
+  geom_point(data = filter(uni_down, unicorn == 1), alpha = .8, size = 4) +
+  geom_count(data = filter(uni_down, unicorn == 0), alpha = .8) +
+  scale_colour_manual(values = c(train_color, test_color), guide = FALSE) +
+  theme(text = element_text(family = "Lato")) +
+  labs(x = NULL, y = NULL) +
+  scale_size_area(max_size = 8, guide = FALSE)
+```
+
+]
+
+---
+class: middle, center
+
+# Upsampling
+
+.pull-left[
+
+
+```{r ref.label='uni-biscatter', echo=FALSE}
+```
+
+]
+
+--
+
+.pull-right[
+```{r echo=FALSE}
+uni_up_rec <- recipe(unicorn ~ ., data = uni_train) %>% 
+  step_upsample(all_outcomes())
+
+uni_up <- uni_up_rec %>% 
+  prep(training = uni_train, 
+       retain = TRUE) %>% 
+  juice()
+
+ggplot(uni_down, aes(x = n_kittens, y = n_butterflies, color = unicorn)) +
+  geom_point(data = filter(uni_up, unicorn == 0), alpha = .8, size = 4) +
+  geom_count(data = filter(uni_up, unicorn == 1), alpha = .8) +
+  scale_colour_manual(values = c(train_color, test_color), guide = FALSE) +
+  theme(text = element_text(family = "Lato")) +
+  labs(x = NULL, y = NULL) +
+  scale_size_area(max_size = 8, guide = FALSE)
+```
+
+]
+
+---
+
+# .center[`step_downsample()`]
+
+```{r so-rec, include=FALSE}
+so_rec <- recipe(Remote ~ ., 
+                 data = so_train) %>% 
+  step_zv(all_predictors()) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_lincomb(all_predictors()) %>% 
+  step_downsample(Remote)
+```
+
+Down-sampling is performed on the training set *only*. Default is `skip = TRUE`. 
+
+.pull-left[
+
+## Training Set
+```{r echo=FALSE}
+so_train %>% 
+  count(Remote)
+```
+]
+
+--
+
+.pull-right[
+
+## "Prepped" Training Set
+```{r echo=FALSE}
+so_rec %>% 
+  prep(training = so_train, 
+       retain = TRUE) %>% 
+  juice() %>% #<<
+  count(Remote)
+```
+
+]
+
+---
+
+# .center[`step_downsample()`]
+
+Down-sampling is performed on the training set *only*. Default is `skip = TRUE`. 
+
+.pull-left[
+
+## Test Set
+```{r echo=FALSE}
+so_test %>% 
+  count(Remote)
+```
+]
+
+--
+
+.pull-right[
+
+## "Prepped" Test Set
+```{r echo=FALSE}
+so_rec %>% 
+  prep(training = so_train) %>% 
+  bake(new_data = so_test) %>% 
+  count(Remote)
+```
+
+]
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Here's a new recipe (also in your .Rmd)…
+
+```{r ref.label='so-rec'}
+
+```
+
+
+---
+class: your-turn
+
+# Your Turn `r yt_counter`
+
+…and a new model plus workflow. Can you tell what type of model this is?…
+
+```{r}
+rf_spec <- 
+  rand_forest() %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+rf_workflow <-
+  workflow() %>% 
+  add_recipe(so_rec) %>% 
+  add_model(rf_spec)
+```
+
+---
+class: your-turn
+
+# Your Turn `r yt_counter`
+
+Here is the output from `fit_resamples()`...
+
+```{r}
+set.seed(100) # Important!
+rf_results <-
+  rf_workflow %>% 
+  fit_resamples(resamples = so_folds,
+                metrics = metric_set(roc_auc))
+
+rf_results %>% 
+  collect_metrics()
+```
+
+
+---
+class: your-turn
+
+# Your Turn `r yt_counter`
+
+Edit the random forest model to tune the `mtry` and `min_n` hyperparameters. 
+
+Update your workflow to use the tuned model.
+
+Then use `tune_grid()` to find the best combination of hyper-parameters to maximize `roc_auc`; let tune set up the grid for you.
+
+How does it compare to the average ROC AUC across folds from `fit_resamples()`?
+
+```{r echo=FALSE}
+countdown(minutes = 5)
+```
+
+---
+
+```{r results='hide', messages = FALSE, warning = FALSE}
+rf_tuner <- 
+  rand_forest(mtry = tune(),
+              min_n = tune()) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+rf_workflow <-
+  rf_workflow %>% 
+  update_model(rf_tuner)
+
+set.seed(100) # Important!
+rf_results <-
+  rf_workflow %>% 
+  tune_grid(resamples = so_folds,
+            metrics = metric_set(roc_auc))
+```
+
+---
+
+```{r}
+rf_results %>% 
+  collect_metrics() 
+```
+
+---
+```{r}
+rf_results %>% 
+  collect_metrics(summarize = FALSE) 
+```
+
+
+---
+
+.center[
+# `tune_grid()`
+
+A version of `fit_resamples()` that performs a grid search for the best combination of tuned hyper-parameters.
+
+]
+
+.pull-left[
+
+```{r eval = FALSE}
+tune_grid(
+  object, 
+  resamples, 
+  ..., 
+  grid = df, #<<
+  metrics = NULL, 
+  control = control_grid()
+)
+```
+
+]
+
+.pull-right[
+A data frame of tuning combinations.
+]
+
+---
+class: middle, center
+
+# `expand_grid()`
+
+Takes one or more vectors, and returns a data frame holding all combinations of their values.
+
+```{r}
+expand_grid(mtry = c(1, 5), min_n = 1:3)
+```
+
+--
+
+.footnote[tidyr package; see also base `expand.grid()`]
+
+
+---
+class: middle
+name: show-best
+
+.center[
+# `show_best()`
+
+Shows the .display[n] most optimum combinations of hyper-parameters
+]
+
+```{r show-best, results='hide'}
+rf_results %>% 
+  show_best(metric = "roc_auc", n = 5)
+```
+
+---
+template: show-best
+
+```{r ref.label='show-best', echo=FALSE}
+```
+
+
+---
+class: middle, center
+
+# `autoplot()`
+
+Quickly visualize tuning results
+
+
+```{r rf-plot}
+rf_results %>% autoplot()
+```
+
+---
+class: middle, center
+
+```{r ref.label='rf-plot', echo=FALSE}
+
+```
+
+---
+class: middle
+name: select-best
+
+.center[
+# `select_best()`
+
+Shows the .display[top] combination of hyper-parameters.
+]
+
+```{r select-best, results='hide'}
+so_best <-
+  rf_results %>% 
+  select_best(metric = "roc_auc")
+
+so_best
+```
+
+---
+template: select-best
+
+```{r ref.label='select-best', echo=FALSE}
+```
+
+---
+class: middle
+
+.center[
+# `finalize_workflow()`
+
+Replaces `tune()` placeholders in a model/recipe/workflow with a set of hyper-parameter values.
+]
+
+```{r}
+last_rf_workflow <- 
+  rf_workflow %>%
+  finalize_workflow(so_best) 
+```
+
+---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
+class: middle, center
+background-color: #f5f5f5
+
+.pull-right[
+## We are ready to touch the jewels...
+
+## The .display[testing set]!
+
+]
+
+
+---
+class: middle
+
+.center[
+
+# `last_fit()`
+
+]
+
+```{r}
+last_rf_fit <-
+  last_rf_workflow %>% 
+  last_fit(split = so_split)
+```
+
+---
+
+```{r}
+last_rf_fit
+```
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Use `select_best()`, `finalize_workflow()`, and `last_fit()` to take the best combination of hyper-parameters from `rf_results` and use them to predict the test set.
+
+How does our actual test ROC AUC compare to our cross-validated estimate?
+
+```{r echo=FALSE}
+countdown(minutes = 5)
+```
+
+---
+
+```{r results='hide'}
+so_best <-
+  rf_results %>% 
+  select_best(metric = "roc_auc")
+
+last_rf_workflow <- 
+  rf_workflow %>%
+  finalize_workflow(so_best) 
+
+last_rf_fit <-
+  last_rf_workflow %>% 
+  last_fit(split = so_split)
+
+last_rf_fit %>% 
+  collect_metrics()
+```
+
+---
+class: middle, frame
+
+.center[
+# Final metrics
+]
+
+```{r}
+last_rf_fit %>% 
+  collect_metrics()
+```
+
+
+---
+class: middle
+
+.center[
+# Final test predictions
+]
+
+```{r}
+last_rf_fit %>% 
+  collect_predictions()
+```
+
+---
+
+```{r}
+roc_values <- 
+  last_rf_fit %>% 
+  collect_predictions() %>% 
+  roc_curve(truth = Remote, estimate = .pred_Remote)
+autoplot(roc_values)
+```
+

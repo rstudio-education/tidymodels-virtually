@@ -1,0 +1,1504 @@
+---
+title: "Ensemble Models"
+subtitle: "Tidymodels, Virtually"
+session: 04
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(comment = "#",
+                      message = FALSE,
+                      warning = FALSE, 
+                      collapse = TRUE,
+                      fig.retina = 3,
+                      fig.align = 'center',
+                      fig.path = "figs/04-ensemble/",
+                      R.options = list(tibble.max_extra_cols=5, 
+                                       tibble.print_max=5, 
+                                       tibble.width=60))
+options("scipen" = 16)
+library(tidymodels)
+yt_counter <- 0
+```
+
+```{r packages, include=FALSE}
+library(countdown)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(scico)
+library(gganimate)
+library(AmesHousing)
+library(tune)
+library(viridis)
+ames <- make_ames()
+theme_set(theme_minimal())
+
+set.seed(100) # Important!
+ames_split  <- initial_split(ames)
+ames_train  <- training(ames_split)
+ames_test   <- testing(ames_split)
+
+# for figures
+train_color <- viridis(1, option="magma", begin = .4)
+test_color  <- viridis(1, option="magma", begin = .7)
+data_color  <- viridis(1, option="magma", begin = .1)
+assess_color <- viridis(1, option="magma", begin = 0)
+splits_pal <- c(data_color, train_color, test_color)
+
+lm_spec <- 
+  linear_reg() %>% 
+  set_engine("lm") %>% 
+  set_mode("regression")
+```
+
+```{r depends-on, include =FALSE}
+# smaller for plotting
+set.seed(0)
+small_ames <- ames %>% 
+  sample_n(80) %>% 
+  mutate(.row = dplyr::row_number())
+
+# split
+set.seed(100) # Important!
+small_split  <- initial_split(small_ames)
+small_train  <- training(small_split)
+small_test   <- testing(small_split)
+
+lm_spec <- 
+   linear_reg() %>% # Pick linear regression
+   set_engine(engine = "lm") # set engine
+
+lm_fit <- 
+  lm_spec %>% 
+  fit(Sale_Price ~ Gr_Liv_Area, 
+      data = ames_train)
+
+sales_resid  <- lm_fit %>% 
+  predict(new_data = ames_train) %>% 
+  mutate(truth = ames_train$Sale_Price)
+
+sales_pred <- lm_fit %>% 
+  predict(new_data = ames_test) %>% 
+  mutate(truth = ames_test$Sale_Price)
+
+rmse_train <- rmse(sales_resid, truth = truth, estimate = .pred) %>% pull(.estimate)
+rmse_test  <- rmse(sales_pred, truth = truth, estimate = .pred) %>% pull(.estimate)
+```
+
+```{r so-load, include=FALSE}
+# read in the data
+stackoverflow <- read_rds(here::here("slides/data/stackoverflow.rds")) %>% 
+  select(-country)
+
+set.seed(100) # Important!
+so_split <- initial_split(stackoverflow, strata = remote)
+so_train <- training(so_split)
+so_test  <- testing(so_split)
+
+tree_spec <- 
+  decision_tree() %>%         
+  set_engine("rpart") %>%      
+  set_mode("classification")
+
+set.seed(100) # Important!
+tree_fit <- tree_spec %>% 
+            fit(remote ~ years_coded_job + salary, 
+                data = so_train)
+
+get_tree_fit <- function(results = big_tree) {
+  results %>% 
+    pluck(".workflow", 1) %>% 
+    pull_workflow_fit() 
+}
+```
+
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
+
+### `r rmarkdown::metadata$author` 
+
+
+---
+class: middle, frame, center
+
+# Decision Trees
+
+To predict the outcome of a new data point:
+
+Uses rules learned from splits
+
+Each split maximizes information gain
+
+---
+class: middle, center
+
+![](https://media.giphy.com/media/gj4ZruUQUnpug/source.gif)
+
+---
+```{r include=FALSE}
+rt_spec <- 
+  decision_tree() %>%          
+  set_engine(engine = "rpart") %>% 
+  set_mode("regression")
+
+set.seed(1)
+rt_fitwf <- 
+  rt_spec %>% 
+  last_fit(Sale_Price ~ Gr_Liv_Area, 
+           split = small_split)
+
+rt_fit <- rt_fitwf %>% 
+  pluck(".workflow", 1) %>% 
+  pull_workflow_fit() %>% 
+  .$fit
+
+splt <- rt_fit$splits %>% 
+  as_tibble(.) %>% 
+  mutate(order = dplyr::row_number()) 
+```
+
+
+
+```{r echo = FALSE, fig.align='center'}
+ggplot(small_train, aes(x = Gr_Liv_Area, y = Sale_Price)) + 
+  geom_point(size = 3) +
+  geom_vline(data=splt, 
+             aes(xintercept = index, 
+                 colour=factor(order)), 
+             lwd = 5, 
+             alpha = .7) + 
+  geom_text(data=splt, aes(x=index, 
+                           y=max(small_train$Sale_Price), 
+                           label=order), nudge_x=0.02) +
+  scale_x_continuous(breaks=seq(-0.5, 0.5, 0.1)) +
+  scale_colour_scico_d(palette = "buda", end = .8) +
+  theme(legend.position="none", 
+        text = element_text(family = "Lato")) +
+  coord_cartesian(y = c(50000, 500000), x = c(700, 2750))
+```
+
+---
+
+```{r echo = FALSE, fig.align='center', message = FALSE, warning = FALSE}
+rt_preds <- rt_fitwf %>% 
+  collect_predictions() %>% 
+  left_join(select(small_test, .row, Gr_Liv_Area)) 
+
+rt_pred_plot <-
+  ggplot(rt_preds) + 
+  geom_point(aes(x=Gr_Liv_Area, y=Sale_Price), size = 3) +
+  geom_line(aes(x=Gr_Liv_Area, y=.pred), colour="#4D8DC9", size=2) +
+  geom_vline(data=splt, aes(xintercept = index, colour=factor(order)), 
+             lwd = 5, 
+             alpha = .7) + 
+  scale_colour_scico_d(palette = "buda", end = .8) +
+  theme(legend.position="none", 
+        text = element_text(family = "Lato")) +
+  coord_cartesian(y = c(50000, 500000), x = c(700, 2750))
+
+rt_pred_plot
+```
+
+
+---
+class: middle, center
+
+# Quiz
+
+How do assess predictions here?
+
+--
+
+RMSE
+
+---
+
+```{r rt-test-resid, echo = FALSE, fig.align='center'}
+rt_pred_plot +
+  geom_segment(aes(x = Gr_Liv_Area, 
+                   xend = Gr_Liv_Area, 
+                   y = Sale_Price, 
+                   yend = .pred), 
+               colour = "#E7553C") 
+```
+
+
+
+---
+class: middle, center
+
+.pull-left[
+### LM RMSE = `r round(rmse_test, 2)`
+```{r lm-test-resid, echo=FALSE, message = FALSE, warning = FALSE}
+train_lm <- lm(Sale_Price ~ Gr_Liv_Area, data = small_train)
+
+lm_test_pred <- train_lm %>% 
+  broom::augment(newdata = small_test) %>% 
+  select(Sale_Price, Gr_Liv_Area, .fitted, .row)
+
+ggplot(data = NULL, aes(Gr_Liv_Area, Sale_Price)) +
+  geom_segment(data = lm_test_pred,
+               aes(x = Gr_Liv_Area, 
+                   xend = Gr_Liv_Area, 
+                   y = Sale_Price, 
+                   yend = .fitted), 
+               colour = "#E7553C") +
+  geom_smooth(data = small_train, method = "lm", se = FALSE, colour = "#4D8DC9",
+              fullrange = TRUE) +
+  #geom_smooth(data = small_test, method = "lm", se = FALSE, colour = "#2aa198", lty = 4, fullrange = TRUE) +
+  geom_point(data = small_test, size = 3) +
+  coord_cartesian(y = c(50000, 500000)) +
+  theme(text = element_text(family = "Lato"))
+```
+]
+
+--
+
+.pull-right[
+
+```{r include = FALSE}
+rmse_tree <- rt_fitwf %>% 
+  collect_predictions() %>% 
+  rmse(., truth = Sale_Price, estimate = .pred) %>% 
+  pull(.estimate)
+```
+
+### Tree RMSE = `r round(rmse_tree, 2)`
+```{r ref.label='rt-test-resid', echo=FALSE}
+```
+
+]
+
+
+
+---
+class: inverse, middle, center
+
+.pull-left[
+```{r lm-fig, dev = 'svg', dev.args = list(bg = "transparent"), echo=FALSE, fig.align='center'}
+ggplot(small_train, aes(Gr_Liv_Area, Sale_Price)) +
+  geom_smooth(method = "lm", se = FALSE, colour = "#4D8DC9", lwd=3) +
+  geom_point(size = 3, colour = "white") +  
+  coord_cartesian(y = c(50000, 500000))+
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "transparent", colour = NA), 
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    legend.background = element_rect(fill = "transparent", colour = NA),
+    legend.key = element_rect(fill = "transparent", colour = NA)
+  )
+```
+]
+
+.pull-right[
+```{r dt-fig, dev = 'svg', dev.args = list(bg = "transparent"), echo=FALSE, fig.align='center'}
+ggplot(rt_preds) + 
+  geom_point(data = small_train, aes(x=Gr_Liv_Area, y=Sale_Price), colour = "white", size = 3) +
+  geom_line(aes(x=Gr_Liv_Area, y=.pred), colour="#4D8DC9", size=2) + 
+  scale_colour_scico_d(palette = "buda", end = .8) +
+  coord_cartesian(y = c(50000, 500000), x = c(700, 2750)) +  
+  theme_void() +
+  theme(
+    legend.position="none",
+    panel.background = element_rect(fill = "transparent", colour = NA), 
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    legend.background = element_rect(fill = "transparent", colour = NA),
+    legend.key = element_rect(fill = "transparent", colour = NA)
+  )
+```
+]
+
+---
+class: middle, center
+```{r echo=FALSE, out.width = "70%"}
+knitr::include_graphics("https://raw.githubusercontent.com/EmilHvitfeldt/blog/master/static/blog/2019-08-09-authorship-classification-with-tidymodels-and-textrecipes_files/figure-html/unnamed-chunk-18-1.png")
+```
+
+https://www.hvitfeldt.me/blog/authorship-classification-with-tidymodels-and-textrecipes/
+
+---
+class: middle, center
+```{r echo=FALSE, out.width = "50%"}
+knitr::include_graphics("https://www.kaylinpavlik.com/content/images/2019/12/dt-1.png")
+```
+
+https://www.kaylinpavlik.com/classifying-songs-genres/
+
+---
+class: middle, center
+
+```{r echo=FALSE, out.width='40%'}
+knitr::include_graphics("https://a3.typepad.com/6a0105360ba1c6970c01b7c95c61fb970b-pi")
+```
+
+.footnote[[tweetbotornot2](https://github.com/mkearney/tweetbotornot2)]
+
+
+---
+name: guess-the-animal
+class: middle, center, inverse
+
+
+```{r echo=FALSE, out.width = '100%'}
+knitr::include_graphics("http://www.atarimania.com/8bit/screens/guess_the_animal.gif")
+```
+
+
+---
+class: middle, center
+
+# What makes a good guesser?
+
+--
+
+High information gain per question (can it fly?)
+
+--
+
+Clear features (feathers vs. is it "small"?)
+
+--
+
+Order matters
+
+
+---
+background-image: url(images/aus-standard-animals.png)
+background-size: cover
+
+.footnote[[Australian Computing Academy](https://aca.edu.au/resources/decision-trees-classifying-animals/)]
+
+---
+background-image: url(images/aus-standard-tree.png)
+background-size: cover
+
+.footnote[[Australian Computing Academy](https://aca.edu.au/resources/decision-trees-classifying-animals/)]
+
+---
+background-image: url(images/annotated-tree/annotated-tree.001.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.002.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.003.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.004.png)
+background-size: cover
+
+---
+background-image: url(images/annotated-tree/annotated-tree.005.png)
+background-size: cover
+
+---
+background-image: url(images/copyingandpasting-big.png)
+background-size: contain
+background-position: center
+class: middle, center
+
+---
+background-image: url(images/so-dev-survey.png)
+background-size: contain
+background-position: center
+class: middle, center
+
+---
+
+```{r echo = FALSE, out.width = '80%'}
+knitr::include_graphics("https://github.com/juliasilge/supervised-ML-case-studies-course/blob/master/img/remote_size.png?raw=true")
+```
+
+.footnote[[Julia Silge](https://supervised-ml-course.netlify.com/)]
+
+???
+
+Notes: The specific question we are going to address is what makes a developer more likely to work remotely. Developers can work in their company offices or they can work remotely, and it turns out that there are specific characteristics of developers, such as the size of the company that they work for, how much experience they have, or where in the world they live, that affect how likely they are to be a remote developer.
+
+---
+
+# StackOverflow Data
+
+```{r}
+# read in the data
+stackoverflow <- read_rds(here::here("materials/data/stackoverflow.rds"))
+
+glimpse(stackoverflow)
+```
+
+
+---
+
+# Data Splitting & Resampling
+
+```{r}
+set.seed(100) # Important!
+so_split <- initial_split(stackoverflow, strata = remote)
+so_train <- training(so_split)
+so_test  <- testing(so_split)
+
+# use 10-fold CV
+so_folds <- vfold_cv(so_train, strata = remote)
+```
+
+
+---
+class: middle, frame
+
+
+# .center[To specify a model with parsnip]
+
+.right-column[
+
+1\. Pick a .display[model]
+
+2\. Set the .display[engine]
+
+3\. Set the .display[mode] (if needed)
+
+]
+
+---
+class: middle, frame
+
+
+# .center[To specify a classification tree with parsnip]
+
+```{r results='hide'}
+decision_tree() %>% 
+  set_engine("rpart") %>% 
+  set_mode("classification")
+```
+
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Here is our very-vanilla parsnip model specification for a decision tree (also in your Rmd)...
+
+```{r}
+vanilla_tree_spec <-
+  decision_tree() %>% 
+  set_engine("rpart") %>% 
+  set_mode("classification")
+```
+
+---
+class: your-turn
+
+# Your turn `r yt_counter`
+
+Fill in the blanks to return the accuracy and ROC AUC for this model using 10-fold cross-validation.
+
+```{r echo=FALSE}
+countdown(minutes = 2)
+```
+
+---
+
+```{r}
+set.seed(100)
+vanilla_tree_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+```{r vt-metrics, include=FALSE}
+set.seed(100)
+vt_metrics <- 
+  vanilla_tree_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+---
+class: middle, center
+
+# `args()`
+
+Print the arguments for a **parsnip** model specification.
+
+```{r eval=FALSE}
+args(decision_tree)
+```
+
+---
+class: middle, center
+
+# `decision_tree()`
+
+Specifies a decision tree model
+
+```{r results='hide'}
+decision_tree(tree_depth = 30, min_n = 20, cost_complexity = .01)
+```
+
+--
+
+*either* mode works!
+
+---
+class: middle
+
+.center[
+
+# `decision_tree()`
+
+Specifies a decision tree model
+
+]
+
+
+```{r results='hide'}
+decision_tree(
+  tree_depth = 30,       # max tree depth
+  min_n = 20,            # smallest node allowed
+  cost_complexity = .01  # 0 > cp > 0.1
+  )
+```
+
+
+---
+class: middle, center
+
+# `set_args()`
+
+Change the arguments for a **parsnip** model specification.
+
+```{r eval=FALSE}
+_spec %>% set_args(tree_depth = 3)
+```
+
+---
+class: middle
+
+```{r}
+decision_tree() %>% 
+  set_engine("rpart") %>% 
+  set_mode("classification") %>% 
+  set_args(tree_depth = 3) #<<
+```
+
+---
+class: middle
+
+```{r}
+decision_tree(tree_depth = 3) %>% #<<
+  set_engine("rpart") %>% 
+  set_mode("classification")
+```
+
+---
+class: middle, center
+
+# `tree_depth`
+
+Cap the maximum tree depth.
+
+A method to stop the tree early. Used to prevent overfitting.
+
+```{r eval=FALSE}
+vanilla_tree_spec %>% set_args(tree_depth = 30)
+```
+
+---
+class: middle, center
+exclude: true
+
+```{r include=FALSE}
+big_tree_spec <- 
+  decision_tree(min_n = 1, cost_complexity = 0) %>% #<<
+  set_engine("rpart") %>% 
+  set_mode("classification")
+
+big_tree <-
+  big_tree_spec %>% 
+  last_fit(remote ~ ., 
+           split = so_split) 
+
+big_tree_cp <- get_tree_fit(big_tree)$fit$cptable %>% 
+  as_tibble() %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(contains("error"), names_to = "error_type", values_to = "error_val") %>% 
+  mutate(cp_round = round(cp, 4),
+    cp_fct = as_factor(cp_round))
+```
+
+---
+class: middle, center
+
+```{r echo=FALSE, fig.width=12}
+big_tree_cp %>% 
+  filter(error_type == "rel_error") %>% 
+  ggplot(aes(x = as.factor(nsplit), y = error_val, group = error_type, color =error_type)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "number of splits", y = "error", color = NULL) +
+  scale_color_manual(values = splits_pal[3], 
+                     labels = "Training") +
+  theme(text = element_text(family = "Lato")) +
+  coord_cartesian(ylim = c(0, 1.05), expand = TRUE)
+```
+
+---
+class: middle, center
+
+```{r echo=FALSE, fig.width=12}
+ggplot(big_tree_cp, aes(x = as.factor(nsplit), y = error_val, 
+                        group = error_type, color = fct_rev(error_type))) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "number of splits", y = "error", color = NULL) +
+  scale_color_manual(values = splits_pal[c(1, 3)], 
+                     labels = c("Testing", "Training")) +
+  theme(text = element_text(family = "Lato")) +
+  scale_x_discrete() +
+  coord_cartesian(ylim = c(0, 1.08), expand = TRUE)
+```
+
+
+
+---
+class: middle, center
+
+# `min_n`
+
+Set minimum `n` to split at any node.
+
+Another early stopping method. Used to prevent overfitting.
+
+```{r eval=FALSE}
+vanilla_tree_spec %>% set_args(min_n = 20)
+```
+
+---
+class: middle, center
+
+# Quiz
+
+What value of `min_n` would lead to the *most overfit* tree?
+
+--
+
+`min_n` = 1
+
+---
+class: middle, center, frame
+
+# Recap: early stopping
+
+| `parsnip` arg | `rpart` arg | default | overfit? |
+|---------------|-------------|:-------:|:--------:|
+| `tree_depth`  | `maxdepth`  |    30   |`r emo::ji("up_arrow")`|
+| `min_n`       | `minsplit`  |    20   |`r emo::ji("down_arrow")`|
+
+
+---
+class: middle, center
+
+# `cost_complexity`
+
+Adds a cost or penalty to error rates of more complex trees.
+
+A way to prune a tree. Used to prevent overfitting.
+
+```{r eval=FALSE}
+vanilla_tree_spec %>% set_args(cost_complexity = .01)
+```
+
+--
+
+Closer to zero `r emo::ji("right_arrow")` larger trees. 
+
+Higher penalty `r emo::ji("right_arrow")` smaller trees. 
+
+---
+class: middle, center
+
+```{r echo=FALSE, fig.width=10}
+ggplot(big_tree_cp, aes(x = rev(as.factor(cp)), y = error_val, group = error_type, color =fct_rev(error_type))) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "cost complexity", y = "error", color = NULL) +
+  scale_color_manual(values = splits_pal[c(1, 3)], 
+                     labels = c("Testing", "Training")) +
+  theme(text = element_text(family = "Lato")) +
+  scale_x_discrete(breaks=pretty_breaks())
+```
+
+---
+class: middle, center
+
+```{r echo=FALSE, fig.width=12}
+big_tree_cp %>% 
+  filter(error_type == "rel_error") %>% 
+  ggplot(aes(x = fct_rev(cp_fct), y = error_val, 
+                        group = error_type, color = fct_rev(error_type))) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "cost complexity", y = "error", color = NULL) +
+  scale_color_manual(values = splits_pal[3], 
+                     labels = "Training") +
+  theme(text = element_text(family = "Lato")) +
+  scale_x_discrete() +
+  coord_cartesian(ylim = c(0, 1.05), expand = TRUE)
+```
+
+
+
+---
+class: middle, center
+
+```{r echo=FALSE, fig.width=12}
+ggplot(big_tree_cp, aes(x = fct_rev(cp_fct), y = error_val, 
+                        group = error_type, color = fct_rev(error_type))) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(x = "cost complexity", y = "error", color = NULL) +
+  scale_color_manual(values = splits_pal[c(1, 3)], 
+                     labels = c("Testing", "Training")) +
+  theme(text = element_text(family = "Lato")) +
+  scale_x_discrete() +
+  coord_cartesian(ylim = c(0, 1.08), expand = TRUE)
+```
+
+---
+name: bonsai
+background-image: url(images/kari-shea-AVqh83jStMA-unsplash.jpg)
+background-position: left
+background-size: contain
+class: middle
+
+---
+template: bonsai
+
+.pull-right[
+
+# Consider the bonsai
+
+1. Small pot
+
+1. Strong shears
+
+]
+
+---
+template: bonsai
+
+.pull-right[
+
+# Consider the bonsai
+
+1. ~~Small pot~~ .display[Early stopping]
+
+1. ~~Strong shears~~ .display[Pruning]
+
+]
+
+---
+class: middle, center, frame
+
+# Recap: early stopping & pruning
+
+| `parsnip` arg | `rpart` arg | default | overfit? |
+|---------------|-------------|:-------:|:--------:|
+| `tree_depth`  | `maxdepth`  |    30   |`r emo::ji("up_arrow")`|
+| `min_n`       | `minsplit`  |    20   |`r emo::ji("down_arrow")`|
+| `cost_complexity`  | `cp`  |    .01  |`r emo::ji("down_arrow")`|
+
+---
+class: middle, center
+
+```{r echo=FALSE}
+parsnip::get_model_env() %>% 
+  pluck("decision_tree_args") %>% 
+  filter(engine == "rpart") %>% 
+  select(engine, parsnip, original) %>% 
+  knitr::kable('html')
+```
+
+
+<https://rdrr.io/cran/rpart/man/rpart.control.html>
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Create a new classification tree model spec; call it `big_tree_spec`. 
+Set the cost complexity to `0`, and the minimum number of data points in a node to split to be `1`. 
+
+Compare the metrics of the big tree to the vanilla tree- which one predicts the test set better?
+
+*Hint: you'll need https://tidymodels.github.io/parsnip/reference/decision_tree.html*
+
+```{r echo=FALSE}
+countdown(minutes = 3)
+```
+
+---
+```{r}
+big_tree_spec <- 
+  decision_tree(min_n = 1, cost_complexity = 0) %>% #<<
+  set_engine("rpart") %>% 
+  set_mode("classification")
+
+set.seed(100) # Important!
+big_tree_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+--
+
+Compare to `vanilla`: accuracy = `r round(vt_metrics$mean[[1]], 2)`; ROC AUC = `r round(vt_metrics$mean[[2]], 2)`
+
+
+---
+exclude: true
+class: middle
+
+.center[ 
+# Where is the fit?
+]
+```{r comment = "##"}
+big_tree
+```
+
+
+---
+exclude: true
+class: middle
+
+.center[ 
+# Where is the fit?
+]
+
+
+
+```{r}
+get_tree_fit(big_tree)
+```
+
+.footnote[* see your `04-helpers.R` script]
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Let's combine bootstrapping with decision trees.
+
+Do **Round 1** on your handouts.
+
+```{r echo=FALSE}
+countdown(minutes = 5)
+```
+
+---
+exclude: true
+
+```{r bootstrap-tree, include=FALSE}
+get_boot_trees <- function(seed = 1, tree_depth = 4) {
+  # Make recipe
+  so_rec <- 
+    recipe(remote ~ ., 
+           data = stackoverflow) 
+  
+  # Make learner
+  tmp_tree_lnr <-
+    decision_tree(tree_depth = tree_depth) %>%         
+    set_engine("rpart", model = TRUE) %>%      
+    set_mode("classification")
+  
+  # Make workflow
+  temp_flow <- 
+    workflow() %>% 
+    add_model(tmp_tree_lnr) %>% 
+    add_recipe(so_rec) 
+  
+  # Begin resampling
+  set.seed(seed)
+  so_boots <- so_train %>% 
+    bootstraps(times = 1) %>% 
+    pluck("splits", 1)
+  
+  boot_fit <- temp_flow %>% 
+    fit(data = analysis(so_boots)) %>% 
+    pull_workflow_fit() %>% 
+    pluck("fit")
+  
+  boot_fit
+}
+```
+
+```{r bootstrap-predict, include=FALSE}
+get_boot_votes <- function(seed = 1, team = 1) {
+  tree <- get_boot_trees(seed)
+  mini_test <- so_test %>% 
+    ungroup() %>% 
+    mutate(obs = row_number()) %>% 
+    group_by(remote) %>% 
+    slice(team)
+  preds <- 
+    tree %>% 
+    predict(mini_test, type = "class") %>% 
+    enframe(name = "row_num", value = "guess") %>% 
+    bind_cols(select(mini_test, remote, obs))
+  preds
+}
+```
+
+---
+class: middle
+
+# The trouble with trees?
+
+```{r echo=FALSE, fig.show="hold", out.width="33%", warning=FALSE, message=FALSE}
+library(rattle)
+fancyRpartPlot(get_boot_trees(1), 
+               sub = NULL, 
+               palettes = "RdPu")
+fancyRpartPlot(get_boot_trees(2), 
+               sub = NULL, 
+               palettes = "RdPu")
+fancyRpartPlot(get_boot_trees(3), 
+               sub = NULL, 
+               palettes = "RdPu")
+```
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Now, let's add the aggregating part.
+
+Do **Round 2** on your handouts.
+
+
+```{r echo=FALSE}
+countdown(minutes = 5)
+```
+
+
+---
+class: middle, center
+
+# Your first ensemble!
+
+```{r echo=FALSE, out.width='25%'}
+knitr::include_graphics("images/orchestra.jpg")
+```
+
+
+
+---
+class: middle, frame, center
+
+# Axiom
+
+There is an inverse relationship between  
+model *accuracy* and model *interpretability*.
+
+
+---
+class: middle, center
+
+
+# `rand_forest()`
+
+Specifies a random forest model
+
+
+```{r results='hide'}
+rand_forest(mtry = 4, trees = 500, min_n = 1)
+```
+
+--
+
+*either* mode works!
+
+---
+class: middle
+
+.center[
+
+# `rand_forest()`
+
+Specifies a random forest model
+
+]
+
+
+```{r results='hide'}
+rand_forest(
+  mtry = 4,    # predictors seen at each node
+  trees = 500, # trees per forest
+  min_n = 1    # smallest node allowed
+  )
+```
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Create a new model spec called `rf_spec`, which will learn an ensemble of classification trees from our training data using the **ranger** package. 
+
+Compare the metrics of the random forest to your two single tree models (vanilla and big)- which predicts the test set better?
+
+*Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
+
+```{r echo=FALSE}
+countdown(minutes = 5)
+```
+
+---
+```{r}
+rf_spec <-
+  rand_forest() %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+set.seed(100)
+rf_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+---
+
+.pull-left[
+### Vanilla Decision Tree
+```{r echo=FALSE}
+vt_metrics
+```
+
+
+### Big Decision Tree
+```{r echo=FALSE}
+big_tree %>% 
+  collect_metrics()
+```
+]
+
+.pull-right[
+### Random Forest
+```{r echo=FALSE}
+rf_metrics <-
+  rf_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+rf_metrics
+```
+]
+
+---
+class: middle, center
+
+`mtry` 
+
+The number of predictors that will be randomly sampled at each split when creating the tree models.
+
+```{r results = 'hide'}
+rand_forest(mtry = 4)
+```
+
+**ranger** default = `floor(sqrt(num_predictors))`
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 19 variables at each split. Which value maximizes the area under the ROC curve?
+
+*Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
+
+```{r echo=FALSE}
+countdown(minutes = 4)
+```
+
+
+---
+```{r}
+rf4_spec <- rf_spec %>% 
+  set_args(mtry = 4) #<<
+
+set.seed(100)
+rf4_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+---
+```{r}
+rf8_spec <- rf_spec %>% 
+  set_args(mtry = 8) #<<
+
+set.seed(100)
+rf8_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+---
+```{r}
+rf12_spec <- rf_spec %>% 
+  set_args(mtry = 12) #<<
+
+set.seed(100)
+rf12_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+---
+```{r}
+rf19_spec <- rf_spec %>% 
+  set_args(mtry = 19) #<<
+
+set.seed(100)
+rf19_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+---
+class: middle, center
+
+```{r include=FALSE}
+rf_rec <- recipe(remote ~ ., data = so_train)
+rf_tune <-
+  rand_forest(mtry = tune()) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+so_cv <- mc_cv(stackoverflow, times = 1)
+
+all_rfs <- 
+  rf_tune %>% 
+  tune_grid(preprocessor = rf_rec,
+            resamples = so_cv,
+            grid = expand_grid(mtry = c(4, 8, 12, 19))
+)
+```
+
+```{r echo=FALSE, out.width = '100%', fig.width = 10, fig.height = 5}
+all_rfs %>% 
+  autoplot() + 
+  geom_line(color = assess_color, lty = 3) +
+  theme(text = element_text(family = "Lato"))
+```
+
+
+
+---
+```{r}
+treebag_spec <-
+  rand_forest(mtry = .preds()) %>% #<<
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+set.seed(100)
+treebag_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+```
+
+
+---
+class: center, middle
+
+# `.preds()`
+
+The number of columns in the data set that are associated with the predictors prior to dummy variable creation.
+
+```{r results='hide'}
+rand_forest(mtry = .preds())
+```
+
+--
+
+<https://tidymodels.github.io/parsnip/reference/descriptors.html>
+
+---
+
+.pull-left[
+### Vanilla Decision Tree
+
+```{r echo=FALSE}
+vt_metrics
+```
+
+
+### Big Decision Tree
+```{r echo=FALSE}
+big_tree %>% 
+  collect_metrics()
+```
+]
+
+.pull-right[
+### Random Forest
+```{r echo=FALSE}
+rf_metrics <-
+  rf_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+rf_metrics
+```
+
+### Bagging
+```{r echo=FALSE}
+treebag_metrics <-
+  treebag_spec %>% 
+  fit_resamples(remote ~ ., 
+                resamples = so_folds) %>% 
+  collect_metrics()
+treebag_metrics
+```
+]
+
+---
+class: middle, frame
+
+# .center[To specify a model with parsnip]
+
+.right-column[
+
+.fade[
+
+1\. Pick a .display[model]
+
+]
+
+2\. Set the .display[engine]
+
+.fade[
+
+3\. Set the .display[mode] (if needed)
+]
+]
+
+---
+class: middle, center
+
+
+# `set_engine()`
+
+Adds to a model an R package to train the model.
+
+```{r eval=FALSE}
+spec %>% set_engine(engine = "ranger", ...)
+```
+
+
+---
+class: middle
+
+.center[
+
+# `set_engine()`
+
+Adds to a model an R package to train the model.
+
+]
+
+
+```{r eval=FALSE}
+spec %>% 
+  set_engine(
+    engine = "ranger", # package name in quotes
+    ...                # optional arguments to pass to function
+    )
+```
+
+---
+class: middle
+
+.center[
+.fade[
+
+# `set_engine()`
+
+Adds to a model an R package to train the model.
+]
+]
+
+```{r eval=FALSE}
+rf_imp_spec <-
+  rand_forest(mtry = 4) %>% 
+  set_engine("ranger", importance = 'impurity') %>% 
+  set_mode("classification")
+```
+
+---
+
+
+```{r}
+rf_imp_spec <-
+  rand_forest(mtry = 4) %>% 
+  set_engine("ranger", importance = 'impurity') %>% 
+  set_mode("classification")
+
+imp_fit <- 
+  rf_imp_spec %>% 
+  last_fit(remote ~ .,
+           split = so_split) 
+
+imp_fit
+```
+
+---
+class: middle
+
+.center[
+
+# `get_tree_fit()`
+
+Gets the parsnip model object from the output of `fit_split()`
+
+]
+
+```{r results='hide'}
+get_tree_fit(imp_fit)
+```
+
+
+.footnote[in your helpers.R script]
+
+---
+```{r}
+get_tree_fit(imp_fit)
+```
+
+---
+class: middle, center
+
+# `vip`
+
+Plot variable importance.
+
+```{r echo=FALSE}
+knitr::include_url("https://koalaverse.github.io/vip/index.html")
+```
+
+---
+class: middle, center
+
+# `vip()`
+
+Plot variable importance scores for the predictors in a model. 
+
+```{r eval=FALSE}
+vip(object, geom = "point", ...)
+```
+
+---
+class: middle
+
+.center[
+
+# `vip()`
+
+Plot variable importance scores for the predictors in a model. 
+
+]
+
+```{r eval=FALSE}
+vip(
+  object,       # fitted model object
+  geom = "col", # one of "col", "point", "boxplot", "violin"
+  ...
+  )
+```
+
+---
+
+```{r}
+imp_plot <- get_tree_fit(imp_fit)
+vip::vip(imp_plot, geom = "point")
+```
+
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Make a new model spec called `treebag_imp_spec` to fit a bagged classification tree model. Set the variable `importance` mode to "permutation". Plot the variable importance- which variable was the most important?
+
+```{r echo=FALSE}
+countdown(minutes = 3)
+```
+
+
+---
+class: middle
+```{r treebag-vip, results='hide'}
+treebag_imp_spec <-
+  rand_forest(mtry = .preds()) %>% 
+  set_engine("ranger", importance = 'permutation') %>% 
+  set_mode("classification")
+
+treebag_wf <-
+  workflow() %>% 
+  add_formula(remote ~ .) %>% 
+  add_model(treebag_imp_spec)
+
+imp_fit <- 
+  treebag_wf %>% 
+  last_fit(split = so_split)
+
+imp_plot <- get_tree_fit(imp_fit)
+imp_plot
+```
+
+---
+```{r ref.label='treebag-vip', echo=FALSE}
+
+```
+
+
+
+

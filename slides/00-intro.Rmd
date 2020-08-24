@@ -163,6 +163,20 @@ Unsupervised
 Reinforcement
 
 ---
+class: top, center
+background-image: url(images/all-of-ml.jpg)
+background-size: contain
+
+.footnote[Credit: <https://vas3k.com/blog/machine_learning/>]
+
+---
+
+Why do we want machines to learn?
+
+What are they learning?
+
+What does a machine need to learn?
+---
 class: middle, center, frame
 
 # Examples of Supervised Learning

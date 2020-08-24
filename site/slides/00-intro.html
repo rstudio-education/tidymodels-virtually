@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Tidymodels, Virtually</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alison Hill" />
+    <meta name="date" content="2020-08-12" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <meta name="description" content="Tidymodels, Virtually"/>
+    <meta name="generator" content="xaringan and remark.js"/>
+    <meta name="github-repo" content="rstudio-education/virtual-tidymodels"/>
+    <meta name="twitter:title" content="Tidymodels, Virtually"/>
+    <meta name="twitter:description" content="Tidymodels, Virtually"/>
+    <meta name="twitter:url" content="TBD"/>
+    <meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/248553842/408a8d80-7363-11ea-96ae-d04b664002df"/>
+    <meta name="twitter:image:alt" content="The first slide features a flying machine"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="og:title" content="Tidymodels, Virtually"/>
+    <meta name="og:description" content="Tidymodels, Virtually"/>
+    <meta name="og:url" content="TBD"/>
+    <meta name="og:image" content="https://repository-images.githubusercontent.com/248553842/408a8d80-7363-11ea-96ae-d04b664002df"/>
+    <meta name="og:image:alt" content="The first slide features a flying machine"/>
+    <meta name="og:type" content="website"/>
+    <meta name="og:locale" content="en_US"/>
+    <link href="libs/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+    <!---import JQuery-->
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous">
+    </script>
+
+    <!--add parent selector-->
+
+    <script>
+
+    $( document ).ready( function(){
+
+      $( "pre")
+          .parents( ".remark-slide-content" )
+          .addClass( "code-slide-background" );
+      
+    });
+      
+    </script>
+    <link rel="stylesheet" href="assets/css/my-theme.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/my-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+class: title-slide, center, bottom
+
+# Tidymodels, Virtually
+
+## A Virtual Workshop for BD
+
+### Alison Hill 
+
+
+
+
+
+
+
+
+---
+name: clouds2
+background-image: url(images/Clouds2.jpg)
+background-size: cover
+
+---
+template: clouds2
+class: middle, center
+
+
+
+# &lt;i class="fab fa-google"&gt;&lt;/i&gt;
+
+https://bit.ly/tmv-bd
+
+
+---
+name: clouds
+class: center, middle
+background-image: url(images/Clouds.jpg)
+background-size: cover
+
+---
+template: clouds
+
+## .big-text[Hello.]
+
+???
+
+Hello- I'm so happy you could join us today. 
+
+---
+template: clouds
+class: middle, center
+
+
+### Alison Hill 
+
+&lt;img style="border-radius: 50%;" src="https://github.com/apreshill.png" width="150px"/&gt;
+
+[<i class="fab  fa-github "></i> @apreshill](https://github.com/apreshill)  
+[<i class="fab  fa-twitter "></i> @apreshill](https://twitter.com/apreshill)  
+[<i class="fas  fa-link "></i> alison.rbind.io](https://alison.rbind.io)
+
+
+
+???
+
+My name is Alison Hill, and I'm a data scientist and professional educator at RStudio.
+
+---
+class: middle, center, inverse
+
+# What is machine learning?
+
+---
+background-image: url(https://rejoiner.com/resources/wp-content/uploads/2016/06/recommended-thomas.png)
+background-size: contain
+
+
+---
+background-image: url(https://miro.medium.com/max/1400/1*j5aWfH9t1_EZPJC92CJ7oQ.png)
+background-size: contain
+
+.footnote[https://medium.com/tmobile-tech/small-data-big-value-f783ceca4fdb]
+
+---
+background-image: url(https://techcrunch.com/wp-content/uploads/2017/12/facebook-facial-recognition-photo-review.png?w=730&amp;crop=1)
+background-size: contain
+
+
+---
+class: middle, center
+
+# What is machine learning?
+
+--
+
+![](https://imgs.xkcd.com/comics/machine_learning.png )&lt;!-- --&gt;
+
+---
+class: top, center
+background-image: url(images/intro.002.jpeg)
+background-size: cover
+
+---
+class: top, center
+background-image: url(images/intro.003.jpeg)
+background-size: cover
+
+
+---
+class: middle, center, frame
+
+# Types of Machine Learning
+
+Supervised
+
+Unsupervised
+
+Reinforcement
+
+---
+class: top, center
+background-image: url(images/all-of-ml.jpg)
+background-size: contain
+
+.footnote[Credit: &lt;https://vas3k.com/blog/machine_learning/&gt;]
+---
+class: middle, center, frame
+
+# Examples of Supervised Learning
+
+Spam detection
+
+Medical diagnosis
+
+Ad click prediction
+
+---
+class: middle, center, frame
+
+# Two modes
+
+--
+
+.pull-left[
+
+## Classification
+
+Are you under a stay-at-home order?
+
+]
+
+--
+
+.pull-left[
+
+## Regression
+
+How long has your state had stay-at-home orders in place?
+]
+
+---
+class: middle, center, frame
+
+# Two cultures
+
+.pull-left[
+
+### Statistics
+]
+
+.pull-right[
+
+
+### Machine Learning
+]
+
+---
+class: middle, center, frame
+
+# Quiz
+
+## Which is which?
+
+.pull-left[
+
+model first
+
+inference emphasis
+]
+
+.pull-right[
+
+data first
+
+prediction emphasis
+]
+
+---
+class: middle, center, frame
+
+# Quiz
+
+## Which is which?
+
+.pull-left[
+
+model first
+
+inference emphasis
+
+### Statistics
+]
+
+.pull-right[
+
+data first
+
+prediction emphasis
+
+### Machine Learning
+]
+
+
+
+---
+name: train-love
+background-image: url(images/train.jpg)
+background-size: contain
+background-color: #f6f6f6
+
+---
+template: train-love
+class: center, top
+
+# Statistics
+
+---
+template: train-love
+class: bottom
+
+
+&gt; *"Statisticians, like artists, have the bad habit of falling in love with their models."*
+&gt;
+&gt; &amp;mdash; George Box
+
+---
+class: freight-slide, center, inverse
+
+# Predictive modeling
+
+---
+class: middle, inverse, center
+
+# Schedule for Today
+
+--
+
+Build a model
+
+--
+
+Resample a model
+
+--
+
+Build A Better Training Set
+
+
+
+---
+class: frame, middle, center
+
+## Session 01
+
+EDT: 1:00-1:50
+
+PDT: 10:00-10:50
+
+--
+
+## Session 02
+
+
+EDT: 02-02:50
+
+PDT: 11-11:50
+
+
+--
+
+## Session 03
+
+
+EDT: 03-03:50
+
+PDT: 12-12:50
+
+--
+
+## Session 04
+
+
+EDT: 03-03:50
+
+PDT: 01-01:50
+
+
+---
+class: inverse, middle, center
+
+# tidymodels
+
+---
+background-image: url(images/tm-org.png)
+background-size: contain
+
+---
+
+
+```r
+library(tidymodels)
+## ── Attaching packages ──────────────────────────────────── tidymodels 0.1.0 ──
+## ✓ broom     0.5.5          ✓ recipes   0.1.13    
+## ✓ dials     0.0.4          ✓ rsample   0.0.6     
+## ✓ dplyr     1.0.0          ✓ tibble    3.0.3     
+## ✓ ggplot2   3.3.1.9000     ✓ tune      0.1.0     
+## ✓ infer     0.5.1          ✓ workflows 0.1.1     
+## ✓ parsnip   0.1.0          ✓ yardstick 0.0.5     
+## ✓ purrr     0.3.4
+## Warning: package 'scales' was built under R version 3.6.2
+## Warning: package 'dplyr' was built under R version 3.6.2
+## Warning: package 'parsnip' was built under R version 3.6.2
+## Warning: package 'purrr' was built under R version 3.6.2
+## Warning: package 'recipes' was built under R version 3.6.2
+## Warning: package 'rsample' was built under R version 3.6.2
+## Warning: package 'tibble' was built under R version 3.6.2
+## Warning: package 'tune' was built under R version 3.6.2
+## ── Conflicts ─────────────────────────────────────── tidymodels_conflicts() ──
+## x purrr::discard()  masks scales::discard()
+## x dplyr::filter()   masks stats::filter()
+## x dplyr::lag()      masks stats::lag()
+## x ggplot2::margin() masks dials::margin()
+## x recipes::step()   masks stats::step()
+```
+
+
+
+---
+class: inverse, middle, center
+
+# Logistics
+
+---
+class: frame, middle, center
+
+# Reactions?
+
+![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
+
+---
+class: frame, middle, center
+
+# Mute/unmute?
+
+![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
+
+---
+class: frame, middle, center
+
+# Our classroom
+
+Google Doc: https://bit.ly/tmv-bd
+
+
+---
+class: inverse, middle, center
+
+# To the workshop!
+
+---
+class: inverse, middle, center
+
+# Day Two
+
+## Ensembles 
+
+## Tuning
+
+## Case Study
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightLanguage": "r",
+"highlightStyle": "xcode",
+"slideNumberFormat": "",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

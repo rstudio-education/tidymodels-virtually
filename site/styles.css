@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif+JP:300, 300i&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=Lato:400,400i,700&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono&display=swap');
+
+body {
+  font-family: "Lato";
+  /*color: #1f1f1f;*/
+  color: #404040;
+  font-size: 16px;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Noto Serif JP";
+  letter-spacing: 2px;
+  line-height: 2rem; /* increases, so wrapping headers don't overlap */ 
+  color: #ca225e;
+  font-weight: 300;
+}
+
+d-title {
+  padding-top: 13rem; /*so that navbar doesn't overlap fixed title */
+}
+
+d-title h1,
+d-article h2 {
+	font-weight: 300;
+}
+
+
+/* --------------Navbar-------------------- */
+
+
+/* background-image for fade-to-white color of navbar */
+.distill-site-header{ 
+  padding: 40px 0px;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 1), rgba(255,255,255,0.5));   
+  background-color: transparent;
+  font-size: 15px;
+  font-family: "Noto Serif JP";
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.distill-site-header .logo img{
+  max-height: 40px; /* Makes logo bigger, default was 20px */
+}
+
+/* dropdown navbar color on mobile */
+
+@media screen and (max-width: 768px){
+  .distill-site-header.responsive {
+      background: rgba(255,255,255,0.99);
+  }
+}
+
+
+/* Navbar Links with Animated Hover */ 
+
+
+.distill-site-header a { /* A normal link in navbar */
+  color: #1f1f1f;
+  display: inline-block; /* This line and line below is so pseudo-element will work later */
+  position: relative; 
+  text-decoration: none;
+  padding-left: 0px; /* overrides default so animation looks Ok */
+  padding-right: 0px; /* overrides default so animation looks Ok */
+  margin: 10px 14px; /* replaces default padding values for margin values */
+}
+
+
+.distill-site-header a:hover { /* (unanimated) hover behavior for navbar links */
+  color: #787878;
+  padding-left: 0px; /* overrides default so animation looks Ok */
+  padding-right: 0px; /* overrides default so animation looks Ok */
+  margin: 10px 14px; /* replaces default padding values for margin values */
+}
+
+.distill-site-header a:before { /*Creates pseudoelement line under link */
+  background-color: #787878;
+  content: '';
+  height: 1px; 
+  position: absolute;
+  bottom: -1px;
+  transition: width 0.3s ease-in-out; /* animate the width */
+  width: 100%;
+}
+
+.distill-site-header a:hover:before {
+  width: 0; /* Shrinks width of pseudoelement to 0 when hovered */
+}
+
+/* Makes sure animation does NOT apply to Title or Logo links (or toggle on mobile) */
+
+.distill-site-header a.title:before, .distill-site-nav a.logo:before, a.nav-toggle:before {
+  display: none;
+}
+
+.distill-site-header a.title, .distill-site-nav a.logo {
+  padding: 10px 0px;
+  margin: 10px 14px;
+}
+
+
+/* No navbar links on mobile except title and nav-toggle */
+
+@media screen and (max-width: 768px) {
+  .distill-site-header a, .distill-site-header .nav-dropdown {
+    display: none;
+  }
+  
+  .distill-site-header a.title, .distill-site-header a.nav-toggle {
+    display: inline-block;
+    padding: 10px 0px;
+    margin: 10px 14px; 
+  }
+}
+
+/* -------------Appendix---------------- */
+
+d-appendix {
+  background-color: #fdf7f9;
+  border-top: none !important;
+  color: #1a162d !important;
+}
+
+/* -------------Footer------------------*/
+
+.distill-site-footer {
+  color: #7e7b88;
+  background-color: #ca225e3d;
+  margin-top: 0px;
+  padding: 50px 20px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  line-height: 12px;
+  
+}
+
+d-byline div.byline.grid div p,
+d-byline,
+d-byline p,
+p.author,
+p.affiliation,
+d-byline h3,
+.d-toc,
+.d-toc-header,
+.d-toc ul,
+d-appendix p {
+	font-size: 0.9rem;
+}
+
+d-appendix h3 + * {
+	margin-top: 1.5em !important;
+}
+
+
+/*----- COLORED LIST BULLET----*/
+
+d-article ul {
+  list-style: none; /* Remove default bullets */
+}
+
+d-article ul li::before {
+  content: "\2022";  /* Add content: \2022 is the CSS Code/unicode for a bullet */
+  color: #CA225E; /* Change the color */
+  font-weight: normal; /* If you want it to be bold */
+  display: inline-block; /* Needed to add space between the bullet and the text */
+  width: 1.5em; /* Also needed for space (tweak if needed) */
+  margin-left: -1.5em; /* Also needed for space (tweak if needed) */
+}
+
+d-article ul > li > p {
+  display: inline; /* to have content show up next to bullet */
+  line-height: 1.6em;
+}
+
+d-article ul > li { /*to add back in space between bullet items that I took away by making p display inline */
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.d-toc ul li::before {
+  content: " ";  /* Remove toc bullets */
+}
