@@ -1,0 +1,217 @@
+---
+title: "03-tune"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(scipen = 999)
+library(tidyverse)
+library(modeldata)
+library(tidymodels)
+
+data("ad_data")
+alz <- ad_data
+
+# data splitting
+set.seed(100) # Important!
+alz_split  <- initial_split(alz, prop = .9)
+alz_train  <- training(alz_split)
+alz_test   <- testing(alz_split)
+
+# data resampling
+set.seed(100)
+alz_folds <- 
+    vfold_cv(alz_train, v = 10, strata = Class, breaks = 4)
+
+# feature engineering
+alz_rec <- 
+  recipe(Class ~ ., data = alz) %>%
+    step_other(Genotype, threshold = .05) %>%
+    themis::step_downsample(Class, under_ratio = 2, seed = 100) 
+
+print("Hey there, R/Medicine 2020 all-star!")
+```
+
+# Your Turn 1
+
+Create a new model spec called `rf_mod`, which will learn an ensemble of classification trees from our training data using the **ranger** package. 
+
+Compare the metrics of the random forest to your two single tree models (vanilla and big)- which predicts the test set better?
+
+*Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
+
+```{r}
+# model
+rf_mod <-
+  rand_forest() %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+# workflow
+rf_wf <-
+  workflow() %>% 
+    add_recipe(alz_rec) %>% 
+    add_model(rf_mod)
+
+set.seed(100)
+rf_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+# Your Turn 2
+
+Challenge: Make 3 more random forest model specs, each using 1, 20, and 100 variables at each split. Which value maximizes the area under the ROC curve?
+
+*Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
+
+```{r}
+# model
+rf1_mod <-
+  rand_forest(mtry = 1) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+# workflow
+rf1_wf <-
+  rf_wf %>% 
+    update_model(rf1_mod)
+
+set.seed(100)
+rf1_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+
+```{r}
+# model
+rf20_mod <-
+  rand_forest(mtry = 20) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+# workflow
+rf20_wf <-
+  rf_wf %>% 
+    update_model(rf20_mod)
+
+set.seed(100)
+rf20_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+```{r}
+# model
+rf100_mod <-
+  rand_forest(mtry = 100) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+# workflow
+rf100_wf <-
+  rf_wf %>% 
+    update_model(rf100_mod)
+
+set.seed(100)
+rf100_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+
+# Your Turn 3
+
+Edit the random forest model to tune the `mtry` and `min_n` hyper-parameters; call the new model spec `rf_tuner`.
+
+Update your workflow to use the tuned model.
+
+Then use `tune_grid()` to find the best combination of hyper-parameters to maximize `roc_auc`; let tune set up the grid for you.
+
+How does it compare to the average ROC AUC across folds from `fit_resamples()`?
+
+```{r}
+rf_mod <-
+  rand_forest() %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+rf_wf <-
+  workflow() %>% 
+  add_recipe(alz_rec) %>% 
+  add_model(rf_mod)
+
+set.seed(100) # Important!
+rf_results <-
+  rf_wf %>% 
+  fit_resamples(resamples = alz_folds,
+                metrics = metric_set(roc_auc),
+                control = control_resamples(verbose = TRUE))
+
+rf_results %>% 
+  collect_metrics()
+```
+
+```{r}
+rf_tuner <- 
+  rand_forest(mtry = tune(),
+              min_n = tune()) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+rf_wf <-
+  alzrec_wf %>% 
+    update_model(rf_tuner)
+
+set.seed(100) # Important!
+rf_results <-
+  rf_wf %>% 
+  tune_grid(resamples = alz_folds,
+            metrics = metric_set(roc_auc),
+            control = control_grid(verbose = TRUE))
+
+rf_results %>% 
+  collect_metrics()
+```
+
+
+# Your Turn 4
+
+Make a new model spec called `treebag_imp_spec` to fit a bagged classification tree model. Set the variable `importance` mode to "permutation". Plot the variable importance- which variable was the most important?
+
+```{r}
+rf_best <-
+  rf_results %>% 
+  select_best(metric = "roc_auc")
+
+rf_best
+
+final_mod <-
+  rand_forest(mtry = 43, min_n = 20) %>% 
+  set_engine("ranger", importance = 'permutation') %>% 
+  set_mode("classification")
+
+final_wf <-
+  rf_wf %>% 
+  update_model(final_mod)
+```
+
+# Your Turn 5
+
+```{r}
+imp_fit <- 
+  final_wf %>% 
+  last_fit(split = alz_split)
+
+imp_fit %>% 
+  collect_metrics()
+
+imp_fit %>% 
+  pluck(".workflow", 1) %>% 
+  pull_workflow_fit() %>% 
+  vip::vip(num_features = 15, geom = "point")
+```
+
+
+
