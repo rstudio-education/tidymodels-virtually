@@ -26,8 +26,8 @@
   <link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"/>
 
   <!--  https://schema.org/Article -->
-  <meta property="article:published" itemprop="datePublished" content="2020-08-24"/>
-  <meta property="article:created" itemprop="dateCreated" content="2020-08-24"/>
+  <meta property="article:published" itemprop="datePublished" content="2020-08-25"/>
+  <meta property="article:created" itemprop="dateCreated" content="2020-08-25"/>
   <meta name="article:author" content="Alison Hill, Ph.D."/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
@@ -46,7 +46,7 @@
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","description","site"]}},"value":[{"type":"character","attributes":{},"value":["Tidymodels, Virtually"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url"]}},"value":[{"type":"character","attributes":{},"value":["Alison Hill, Ph.D."]},{"type":"character","attributes":{},"value":["https://alison.rbind.io"]},{"type":"character","attributes":{},"value":["RStudio, PBC"]},{"type":"character","attributes":{},"value":["https://rstudio.com"]}]}]},{"type":"character","attributes":{},"value":["2020-08-24"]},{"type":"character","attributes":{},"value":["An Introduction to Machine Learning with Tidymodels\n"]},{"type":"character","attributes":{},"value":["distill::distill_website"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","date","description","site"]}},"value":[{"type":"character","attributes":{},"value":["Tidymodels, Virtually"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","affiliation","affiliation_url"]}},"value":[{"type":"character","attributes":{},"value":["Alison Hill, Ph.D."]},{"type":"character","attributes":{},"value":["https://alison.rbind.io"]},{"type":"character","attributes":{},"value":["RStudio, PBC"]},{"type":"character","attributes":{},"value":["https://rstudio.com"]}]}]},{"type":"character","attributes":{},"value":["2020-08-25"]},{"type":"character","attributes":{},"value":["An Introduction to Machine Learning with Tidymodels\n"]},{"type":"character","attributes":{},"value":["distill::distill_website"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -1486,7 +1486,7 @@
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Tidymodels, Virtually","description":"An Introduction to Machine Learning with Tidymodels","authors":[{"author":"Alison Hill, Ph.D.","authorURL":"https://alison.rbind.io","affiliation":"RStudio, PBC","affiliationURL":"https://rstudio.com"}],"publishedDate":"2020-08-24T00:00:00.000-07:00","citationText":"Ph.D., 2020"}
+{"title":"Tidymodels, Virtually","description":"An Introduction to Machine Learning with Tidymodels","authors":[{"author":"Alison Hill, Ph.D.","authorURL":"https://alison.rbind.io","affiliation":"RStudio, PBC","affiliationURL":"https://rstudio.com"}],"publishedDate":"2020-08-25T00:00:00.000-07:00","citationText":"Ph.D., 2020"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1519,7 +1519,7 @@
 <div class="d-byline">
   Alison Hill, Ph.D. <a href="https://alison.rbind.io" class="uri">https://alison.rbind.io</a> (RStudio, PBC)<a href="https://rstudio.com" class="uri">https://rstudio.com</a>
   
-<br/>2020-08-24
+<br/>2020-08-25
 </div>
 
 <div class="d-article">
@@ -1527,7 +1527,11 @@
 <nav class="d-toc" id="TOC">
 <ul>
 <li><a href="#welcome">Welcome</a></li>
-<li><a href="#prework">Prework</a></li>
+<li><a href="#prework">Prework</a>
+<ul>
+<li><a href="#essential">Essential</a></li>
+<li><a href="#optional">Optional</a></li>
+</ul></li>
 <li><a href="#links">Links</a></li>
 <li><a href="#workshops">Workshops</a></li>
 <li><a href="#acknowledgments">Acknowledgments</a></li>
@@ -1538,14 +1542,23 @@
 
 </div>
 <h2 id="welcome">Welcome</h2>
-<p>Thank you for enrolling in our workshop! These are the materials for an introductory machine learning workshop with tidymodels by Dr. Alison Presmanes Hill.</p>
-<p>This four-hour workshop will provide a gentle introduction to machine learning with R using the modern suite of predictive modeling packages called <a href="https://tidymodels.org">tidymodels</a>. We will build, evaluate, compare, and tune predictive models. Along the way, we’ll learn about key concepts in machine learning including overfitting, the holdout method, the bias-variance trade-off, ensembling, cross-validation, and feature engineering. Learners will gain knowledge about good predictive modeling practices, as well as hands-on experience using tidymodels packages like <a href="https://tidymodels.github.io/parsnip">parsnip</a>, <a href="https://tidymodels.github.io/rsample">rsample</a>, <a href="https://tidymodels.github.io/recipes/">recipes</a>, <a href="https://tidymodels.github.io/yardstick/">yardstick</a>, <a href="https://tidymodels.github.io/tune/">tune</a>, and <a href="https://tidymodels.github.io/workflows/">workflows</a>.</p>
+<p>Thank you for enrolling in this course! These are the materials for an introductory machine learning short course with tidymodels by Dr. Alison Presmanes Hill.</p>
+<p>This four-hour pre-conference short course will provide a gentle introduction to machine learning with R using the modern suite of predictive modeling packages called <a href="https://tidymodels.org">tidymodels</a>. We will build, evaluate, compare, and tune predictive models. Along the way, we’ll learn about key concepts in machine learning including overfitting, the holdout method, the bias-variance trade-off, ensembling, cross-validation, and feature engineering. Learners will gain knowledge about good predictive modeling practices, as well as hands-on experience using tidymodels packages like <a href="https://tidymodels.github.io/parsnip">parsnip</a>, <a href="https://tidymodels.github.io/rsample">rsample</a>, <a href="https://tidymodels.github.io/recipes/">recipes</a>, <a href="https://tidymodels.github.io/yardstick/">yardstick</a>, <a href="https://tidymodels.github.io/tune/">tune</a>, and <a href="https://tidymodels.github.io/workflows/">workflows</a>.</p>
+<p>The entire course will be recorded and made available to registered R/Medicine 2020 conference participants for replay. To protect the privacy of participants, no breakouts, video feeds, or chats will be recorded. We also request that you refrain from recording or screen-grabbing any part of the course.</p>
 <p><br />
 </p>
 <h2 id="prework">Prework</h2>
+<h3 id="essential">Essential</h3>
+<ul>
+<li>Please sign up for a free RStudio Cloud account here: <a href="https://rstudio.cloud" class="uri">https://rstudio.cloud</a>.</li>
+<li>Install the latest version of <a href="https://zoom.us/download">Zoom</a>.</li>
+<li>Join a pre-course technology check session - details are in the pre-course email.</li>
+<li>We want to provide a welcoming and supportive learning environment for everyone. To help us do so, please take a look at our <a href="https://events.linuxfoundation.org/r-medicine/attend/code-of-conduct/">code of conduct</a>.</li>
+</ul>
+<h3 id="optional">Optional</h3>
 <p>Please tune into class with a laptop that has the following installed:</p>
 <aside>
-On the day of the class, we’ll provide you with an RStudio Cloud project that contains all of the course materials.
+On the day of the class, we’ll provide you with a link to an RStudio Cloud project that contains all of the course materials.
 </aside>
 <ul>
 <li><p>A recent version of R (&gt;=3.9.0), which is available for free at <a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a></p></li>
@@ -1554,13 +1567,9 @@ On the day of the class, we’ll provide you with an RStudio Cloud project that 
 <div class="layout-chunk" data-layout="l-body">
 <pre class="r"><code>
 install.packages(c(&quot;tidyverse&quot;, &quot;tidymodels&quot;, 
-                   &quot;remotes&quot;, &quot;rpart.plot&quot;, &quot;rattle&quot;, 
-                   &quot;vip&quot;, &quot;AmesHousing&quot;, &quot;kknn&quot;, 
-                   &quot;rpart&quot;, &quot;ranger&quot;, &quot;partykit&quot;))
-
-# and
-
-remotes::install_github(&quot;tidymodels/modeldata&quot;)</code></pre>
+                   &quot;modeldata&quot;, &quot;kknn&quot;, &quot;rpart&quot;,
+                   &quot;rpart.plot&quot;, &quot;rattle&quot;, 
+                   &quot;vip&quot;, &quot;ranger&quot;, &quot;partykit&quot;))</code></pre>
 </div></li>
 </ul>
 <aside>

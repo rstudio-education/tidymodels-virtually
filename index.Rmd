@@ -35,24 +35,35 @@ meta() %>%
 
 ## Welcome  
 
-Thank you for enrolling in our workshop! These are the materials for an introductory machine learning workshop with tidymodels by Dr. Alison Presmanes Hill.
+Thank you for enrolling in this course! These are the materials for an introductory machine learning short course with tidymodels by Dr. Alison Presmanes Hill.
 
 ```{r, include=FALSE, fig.cap="[Slides](slides/index.html)"}
 knitr::include_url("slides/index.html")
 ```
 
 
-This four-hour workshop will provide a gentle introduction to machine learning with R using the modern suite of predictive modeling packages called [tidymodels](https://tidymodels.org). We will build, evaluate, compare, and tune predictive models. Along the way, we’ll learn about key concepts in machine learning including overfitting, the holdout method, the bias-variance trade-off, ensembling, cross-validation, and feature engineering. Learners will gain knowledge about good predictive modeling practices, as well as hands-on experience using tidymodels packages like [parsnip](https://tidymodels.github.io/parsnip), [rsample](https://tidymodels.github.io/rsample), [recipes](https://tidymodels.github.io/recipes/), [yardstick](https://tidymodels.github.io/yardstick/), [tune](https://tidymodels.github.io/tune/), and [workflows](https://tidymodels.github.io/workflows/).
+This four-hour pre-conference short course will provide a gentle introduction to machine learning with R using the modern suite of predictive modeling packages called [tidymodels](https://tidymodels.org). We will build, evaluate, compare, and tune predictive models. Along the way, we’ll learn about key concepts in machine learning including overfitting, the holdout method, the bias-variance trade-off, ensembling, cross-validation, and feature engineering. Learners will gain knowledge about good predictive modeling practices, as well as hands-on experience using tidymodels packages like [parsnip](https://tidymodels.github.io/parsnip), [rsample](https://tidymodels.github.io/rsample), [recipes](https://tidymodels.github.io/recipes/), [yardstick](https://tidymodels.github.io/yardstick/), [tune](https://tidymodels.github.io/tune/), and [workflows](https://tidymodels.github.io/workflows/).
+
+The entire course will be recorded and made available to registered R/Medicine 2020 conference participants for replay. To protect the privacy of participants, no breakouts, video feeds, or chats will be recorded. We also request that you refrain from recording or screen-grabbing any part of the course. 
 
 \
 
 ## Prework
 
+### Essential
+
++ Please sign up for a free RStudio Cloud account here: <https://rstudio.cloud>.
++ Install the latest version of [Zoom](https://zoom.us/download).
++ Join a pre-course technology check session - details are in the pre-course email.
++ We want to provide a welcoming and supportive learning environment for everyone. To help us do so, please take a look at our [code of conduct](https://events.linuxfoundation.org/r-medicine/attend/code-of-conduct/). 
+
+### Optional
+
 Please tune into class with a laptop that has the following installed:
 
 
 <aside>
-On the day of the class, we'll provide you with an RStudio Cloud project that contains all of the course materials. 
+On the day of the class, we'll provide you with a link to an RStudio Cloud project that contains all of the course materials. 
 </aside>
 
 * A recent version of R (>=3.9.0), which is available for free at <https://cran.r-project.org/>
@@ -63,13 +74,9 @@ On the day of the class, we'll provide you with an RStudio Cloud project that co
 
     ```{r echo=TRUE, eval = FALSE}
     install.packages(c("tidyverse", "tidymodels", 
-                       "remotes", "rpart.plot", "rattle", 
-                       "vip", "AmesHousing", "kknn", 
-                       "rpart", "ranger", "partykit"))
-    
-    # and
-    
-    remotes::install_github("tidymodels/modeldata")
+                       "modeldata", "kknn", "rpart",
+                       "rpart.plot", "rattle", 
+                       "vip", "ranger", "partykit"))
     ```
 
 <aside>

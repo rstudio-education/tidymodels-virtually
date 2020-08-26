@@ -1,0 +1,138 @@
+---
+title: "01-resample"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(scipen = 999)
+library(tidyverse)
+library(modeldata)
+library(tidymodels)
+
+data("ad_data")
+alz <- ad_data
+print("Hello R/Medicine 2020!")
+```
+
+# Your Turn 1
+
+plot it
+
+```{r}
+ggplot(alz, aes(x = tau, 
+                y = VEGF,
+                colour = Class)) +
+  geom_point(alpha = .5) 
+```
+
+# Your Turn 2
+
+Run the chunk below and look at the output. Then, edit the code below to create a K-nearest neighbor classification model that uses the `kknn` engine. Save it as `nn_mod` and look at the object. What is different about the output?
+
+```{r}
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine(engine = "glm") %>% 
+  set_mode("classification")
+lr_mod
+```
+
+```{r}
+nn_mod <- 
+  nearest_neighbor() %>% 
+  set_engine(engine = "kknn") %>% 
+  set_mode("classification")
+nn_mod
+```
+
+
+# Your Turn 3
+
+Fill in the blanks. 
+
+Use `initial_split()`, `training()`, and `testing()` to:
+
+1. Split **alz** into training and test sets. Save the rsplit!
+
+2. Extract the training data. Fit a linear model to it. 
+
+3. Predict the testing data, and save the true values too.
+
+4. Measure the accuracy of your model with your test set.  
+
+Keep `set.seed(100)` at the start of your code.
+
+*Hint: Be sure to remove every `_` before running the code!*
+
+```{r}
+set.seed(100) # Important!
+
+alz_split  <- ________
+alz_train  <- ________
+alz_test   <- ________
+
+nn_mod %>% 
+  fit(Class ~ tau*VEGF, 
+      data = ________) %>% 
+  predict(new_data = ________) %>% 
+  mutate(true_class = ________) %>% 
+  accuracy(truth = ________, estimate = .pred_class)
+```
+
+```{r}
+set.seed(100) # Important!
+
+alz_split  <- initial_split(alz, prop = .9)
+alz_train  <- training(alz_split)
+alz_test   <- testing(alz_split)
+
+nn_mod %>% 
+  fit(Class ~ tau*VEGF, 
+      data = alz_train) %>% 
+  predict(new_data = alz_test) %>% 
+  mutate(true_class = alz_test$Class) %>% 
+  accuracy(truth = true_class, estimate = .pred_class)
+```
+
+## Your Turn 4
+
+What would happen if you repeated this process? Would you get the same answers?
+
+Note your accuracy from above. Then change your seed number and rerun just the last code chunk above. Do you get the same answer? 
+
+Try it a few times with a few different seeds.
+
+## Your Turn 5
+
+Run the code below. What does it return?
+
+```{r}
+set.seed(100)
+alz_folds <- 
+    vfold_cv(alz_train, v = 10, strata = Class, breaks = 4)
+alz_folds
+```
+
+
+## Your Turn 6
+
+Modify the code below to use `fit_resamples` and `alz_folds` to cross-validate the regression tree model. What is the ROC AUC that you collect at the end?
+
+```{r}
+set.seed(100)
+nn_mod %>% 
+  fit(Class ~ tau*VEGF, 
+      data = alz_train) %>% 
+  predict(new_data = alz_test) %>% 
+  mutate(true_class = alz_test$Class) %>% 
+  accuracy(truth = true_class, estimate = .pred_class)
+```
+
+Answer:
+```{r}
+set.seed(100)
+nn_mod %>% 
+  fit_resamples(Class ~ tau*VEGF, 
+                resamples = alz_folds) %>% 
+  collect_metrics()
+```

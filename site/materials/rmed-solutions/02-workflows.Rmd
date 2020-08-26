@@ -1,0 +1,134 @@
+---
+title: "02-workflows"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(scipen = 999)
+library(tidyverse)
+library(modeldata)
+library(tidymodels)
+
+data("ad_data")
+alz <- ad_data
+
+# data splitting
+set.seed(100) # Important!
+alz_split  <- initial_split(alz, prop = .9)
+alz_train  <- training(alz_split)
+alz_test   <- testing(alz_split)
+
+# data resampling
+set.seed(100)
+alz_folds <- 
+    vfold_cv(alz_train, v = 10, strata = Class, breaks = 4)
+
+print("Welcome back, R/Medicine 2020!")
+```
+
+# Your Turn 1
+
+workflow with formula
+
+```{r}
+tree_mod <- 
+  decision_tree() %>% 
+  set_engine(engine = "rpart") %>% 
+  set_mode("classification")
+
+tree_wf <-
+  _____ %>% 
+  add______(Class ~ .) %>% 
+  add______(tree_mod)
+
+tree_wf
+```
+
+```{r}
+tree_mod <- 
+  decision_tree() %>% 
+  set_engine(engine = "rpart") %>% 
+  set_mode("classification")
+
+tree_wf <-
+  workflow() %>% 
+  add_formula(Class ~ .) %>% 
+  add_model(tree_mod)
+
+tree_wf
+```
+
+
+# Your Turn 2
+
+Edit to fit the workflow instead.
+
+```{r}
+set.seed(100)
+tree_mod %>% 
+  fit_resamples(Class ~ ., 
+                resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+```{r}
+set.seed(100)
+tree_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+# Your Turn 3
+
+Write a recipe for predicting Class. 
+
+Save the result as `alz_rec`  
+
+```{r}
+alz_rec <- 
+  recipe(Class ~ ., data = alz) %>%
+    step_other(Genotype, threshold = .05) %>%
+    themis::step_downsample(Class, under_ratio = 2, seed = 100) 
+```
+
+
+# Your Turn 4
+
+Make a workflow and fit it again.
+
+```{r}
+alzrec_wf <-
+  workflow() %>% 
+    add_recipe(alz_rec) %>% 
+    add_model(tree_mod)
+
+alzrec_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics() 
+```
+
+# Your Turn 5
+
+Create a new classification tree model spec; call it `big_tree_mod`. 
+Set the cost complexity to `0`, and the minimum number of data points in a node to split to be `1`. 
+
+Compare the metrics of the big tree to your previous results- which one predicts the test set better?
+
+*Hint: you'll need https://parsnip.tidymodels.org/reference/decision_tree.html*
+
+
+```{r}
+big_tree_mod <-
+  decision_tree(min_n = 1, cost_complexity = 0) %>% 
+  set_engine("rpart") %>% 
+  set_mode("classification")
+
+big_tree_wf <- 
+  alzrec_wf %>% 
+  update_model(big_tree_mod)
+
+set.seed(100)
+big_tree_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
