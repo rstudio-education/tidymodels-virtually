@@ -48,5 +48,7 @@ set.seed(345)
 tree_results <- 
   tree_workflow %>% 
   fit_resamples(resamples = val_set,
-                control = control_resamples(save_pred = TRUE),
+                # change me to control_grid with tune_grid
+                control = control_resamples(save_pred = TRUE,
+                                            verbose = TRUE),
                 metrics = metric_set(roc_auc))

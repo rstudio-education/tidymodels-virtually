@@ -51,5 +51,7 @@ rf_results <-
   rf_workflow %>% 
   tune_grid(resamples = val_set,
             grid = rf_grid,
-            control = control_grid(save_pred = TRUE),
+            # change me to control_grid with tune_grid
+            control = control_resamples(save_pred = TRUE,
+                                        verbose = TRUE),
             metrics = metric_set(roc_auc))

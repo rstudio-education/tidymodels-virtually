@@ -54,5 +54,7 @@ lasso_workflow <-
 lasso_results <- 
   lasso_workflow %>% 
   fit_resamples(resamples = val_set,
-                control = control_resamples(save_pred = TRUE),
+                # change me to control_grid with tune_grid
+                control = control_resamples(save_pred = TRUE,
+                                            verbose = TRUE),
                 metrics = metric_set(roc_auc))
