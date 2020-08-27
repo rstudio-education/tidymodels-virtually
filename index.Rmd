@@ -100,6 +100,7 @@ Alison
 
 ### Slides
 
++ [00: Brief intro](slides/00-intro.html)
 + [01: Build a model](slides/rmed01-model.html)
 + [02: Build better workflows](slides/rmed02-workflows.html)
 + [03: Tune better models](slides/rmed03-tune.html)

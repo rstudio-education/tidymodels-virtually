@@ -69,9 +69,9 @@ class: middle, center
 
 
 
-# <i class="fab fa-google"></i>
+# <i class="fas fa-crow"></i>
 
-https://bit.ly/tmv-bd
+https://tmv.netlify.app/site/
 
 
 ---
@@ -169,13 +169,6 @@ background-size: contain
 
 .footnote[Credit: <https://vas3k.com/blog/machine_learning/>]
 
----
-
-Why do we want machines to learn?
-
-What are they learning?
-
-What does a machine need to learn?
 ---
 class: middle, center, frame
 
@@ -312,7 +305,7 @@ Build a model
 
 --
 
-Build better modeling workflows
+Build better workflows
 
 --
 
