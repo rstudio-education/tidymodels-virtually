@@ -101,8 +101,8 @@ Alison
 ### Slides
 
 + [01: Build a model](slides/rmed01-model.html)
-+ [02: Build better models](slides/rmed02-workflows.html)
-+ [03: Tune tree-based models](slides/rmed03-tune-trees.html)
++ [02: Build better modeling workflows](slides/rmed02-workflows.html)
++ [03: Tune better models](slides/rmed03-tune.html)
 
 ## Workshops
 

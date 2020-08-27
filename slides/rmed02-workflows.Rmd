@@ -1,5 +1,5 @@
 ---
-title: "Build a better training set"
+title: "Build better modeling workflows"
 subtitle: "Tidymodels, virtually"
 session: 02
 author: Alison Hill
