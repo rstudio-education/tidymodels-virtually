@@ -57,9 +57,6 @@ test_color  <- "#84cae1"
 data_color  <- "#CA225E"
 assess_color <- data_color
 splits_pal <- c(data_color, train_color, test_color)
-
-lm_spec <- linear_reg() %>% 
-  set_engine("lm")
 ```
 
 
@@ -372,7 +369,7 @@ Adds an engine to power or implement the model.
 
 
 ```{r eval=FALSE}
-lm_spec %>% set_engine(engine = "lm", ...)
+logistic_reg() %>% set_engine(engine = "glm")
 ```
 
 ---
@@ -405,7 +402,7 @@ Sets the class of problem the model will solve, which influences which output is
 
 
 ```{r eval=FALSE}
-lm_spec %>% set_mode(mode = "regression")
+logistic_reg() %>% set_mode(mode = "classification")
 ```
 
 ---
@@ -1474,15 +1471,15 @@ class: middle
 ]
 
 ```{r eval=FALSE}
-split1       <- cv_folds %>% pluck("splits", 1)
+split1       <- alz_folds %>% pluck("splits", 1)
 split1_train <- training(split1)
 split1_test  <- testing(split1)
 
-rt_spec %>% 
-  fit(Sale_Price ~ ., data = split1_train) %>% 
+lr_mod %>% 
+  fit(Class ~ ., data = split1_train) %>% 
   predict(split1_test) %>% 
-  mutate(truth = split1_test$Sale_Price) %>% 
-  rmse(truth, .pred)
+  mutate(truth = split1_test$Class) %>% 
+  rmse(truth, .pred_class)
 
 # rinse and repeat
 split2 <- ...
