@@ -462,7 +462,7 @@ class: inverse, middle, center
 
 --
 
-## First---what does it mean to use a model?
+## First - what does it mean to use a model?
 
 ---
 class: inverse, middle, center
@@ -506,9 +506,8 @@ ggplot(alz, aes(x = tau,
 ]
 
 ---
-class: inverse, middle, center
 
-# "All models are wrong, but some are useful"
+## "All models are wrong, but some are useful"
 
 ```{r include=FALSE}
 lr_preds <- lr_mod %>% 
@@ -536,9 +535,8 @@ ggplot(lr_preds,
 
 
 ---
-class: inverse, middle, center
 
-# "All models are wrong, but some are useful"
+## "All models are wrong, but some are useful"
 
 ```{r include=FALSE}
 tree_preds <- tree_mod %>% 
@@ -565,7 +563,7 @@ ggplot(tree_preds,
 ]
 ---
 
-# Fitted models can also be used to predict new data
+## Predict new data
 
 ```{r}
 alz_new <- 
@@ -589,7 +587,6 @@ How many people have used a model to generate .display[predictions] with R?
 
 # Predict old data
 
-.pull-right[
 
 ```{r predict-old}
 tree_mod %>% 
@@ -597,11 +594,10 @@ tree_mod %>%
       data = alz) %>% 
   predict(new_data = alz) %>% 
   mutate(true_class = alz$Class) %>% 
-  accuracy(truth = true_class, estimate = .pred_class)
+  accuracy(truth = true_class, 
+           estimate = .pred_class)
 ```
 
-
-]
 
 ---
 
@@ -625,7 +621,8 @@ tree_mod %>%
       data = alz) %>% 
   predict(new_data = alz_new) %>% #<<
   mutate(true_class = alz_new$Class) %>% #<<
-  accuracy(truth = true_class, estimate = .pred_class)
+  accuracy(truth = true_class, 
+           estimate = .pred_class)
 ```
 
 ]
@@ -876,13 +873,15 @@ class: your-turn
 
 Fill in the blanks. 
 
-Use `initial_split()`, `training()`, `testing()`, `lm()` and `rmse()` to:
+Use `initial_split()`, `training()`, and `testing()` to:
 
 1. Split **alz** into training and test sets. Save the rsplit!
 
-1. Extract the training data. Fit a linear model to it. Save the model!
+2. Extract the training data and fit your classification tree model.
 
-1. Measure the accuracy of your classification tree model with your test set.  
+3. Predict the testing data, and save the true `Class` values.
+
+4. Measure the accuracy of your model with your test set.  
 
 Keep `set.seed(100)` at the start of your code.
 
