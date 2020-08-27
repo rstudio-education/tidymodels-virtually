@@ -160,8 +160,7 @@ tree_mod <-
 ---
 class: middle, center
 
-.pull-left[
-```{r alz-tree-01, echo=FALSE}
+```{r alz-tree-01, echo=FALSE, out.width='40%'}
 library(parttree)
 ## Build our tree using parsnip (but with rpart as the model engine)
 alz_tree_01 <-
@@ -180,11 +179,8 @@ alz_train %>%
   scale_fill_manual("predicted", values = c("#fdf7f9", "#84cae1")) +
   guides(fill = guide_legend(reverse = TRUE))
 ```
-]
 
---
 
-.pull-right[
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(rpart.plot)
@@ -192,9 +188,9 @@ rpart.rules(alz_tree_01$fit,
             extra = 4, 
             cover = TRUE, 
             nn = TRUE,
-            roundint = FALSE)
+            roundint = FALSE) 
 ```
-]
+
 
 ---
 
@@ -226,6 +222,17 @@ Here is our very-vanilla parsnip model specification for a decision tree (also i
 
 ```
 
+And a workflow:
+```{r tree-wf}
+tree_wf <-
+  workflow() %>% 
+  add_formula(Class ~ .) %>% 
+  add_model(tree_mod)
+```
+
+
+For decision trees, no recipe really required `r emo::ji("tada")`
+
 ---
 class: your-turn
 
@@ -241,18 +248,16 @@ countdown(minutes = 2)
 
 ```{r}
 set.seed(100)
-tree_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
+tree_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
 
 ```{r vt-metrics, include=FALSE}
 set.seed(100)
 vt_metrics <- 
-  tree_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
+  tree_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
 
@@ -577,21 +582,84 @@ class: middle, center
 
 ```{r echo=FALSE}
 ## Build our tree using parsnip (but with rpart as the model engine)
-alz_tree_05 <-
+alz_tree_01 <-
   tree_mod %>% 
-  set_args(min_n = 1, cost_complexity = 0, tree_depth = 5) %>%
+  set_args(min_n = 1, cost_complexity = 0, tree_depth = 1) %>%
   fit(Class ~ tau + VEGF, data = alz_train)
 
 ## Plot the data and model partitions
 alz_train %>%
   ggplot(aes(x=tau, y=VEGF)) +
-  geom_parttree(data = alz_tree_05, aes(fill=Class), alpha = 0.5) +
+  geom_parttree(data = alz_tree_01, aes(fill=Class), alpha = 0.5) +
   geom_jitter(aes(col=Class), alpha=0.7) +
   theme_minimal() +
   scale_color_manual("true", values = c("#1a162d", "#CA225E")) +
   scale_fill_manual("predicted", values = c("#fdf7f9", "#84cae1")) +
   guides(fill = guide_legend(reverse = TRUE)) +
-  ggtitle("tree_depth = 5")
+  ggtitle("tree_depth = 1")
+```
+
+---
+
+```{r echo=FALSE}
+## Build our tree using parsnip (but with rpart as the model engine)
+alz_tree_02 <-
+  tree_mod %>% 
+  set_args(min_n = 1, cost_complexity = 0, tree_depth = 2) %>%
+  fit(Class ~ tau + VEGF, data = alz_train)
+
+## Plot the data and model partitions
+alz_train %>%
+  ggplot(aes(x=tau, y=VEGF)) +
+  geom_parttree(data = alz_tree_02, aes(fill=Class), alpha = 0.5) +
+  geom_jitter(aes(col=Class), alpha=0.7) +
+  theme_minimal() +
+  scale_color_manual("true", values = c("#1a162d", "#CA225E")) +
+  scale_fill_manual("predicted", values = c("#fdf7f9", "#84cae1")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  ggtitle("tree_depth = 2")
+```
+
+---
+
+```{r echo=FALSE}
+## Build our tree using parsnip (but with rpart as the model engine)
+alz_tree_03 <-
+  tree_mod %>% 
+  set_args(min_n = 1, cost_complexity = 0, tree_depth = 3) %>%
+  fit(Class ~ tau + VEGF, data = alz_train)
+
+## Plot the data and model partitions
+alz_train %>%
+  ggplot(aes(x=tau, y=VEGF)) +
+  geom_parttree(data = alz_tree_03, aes(fill=Class), alpha = 0.5) +
+  geom_jitter(aes(col=Class), alpha=0.7) +
+  theme_minimal() +
+  scale_color_manual("true", values = c("#1a162d", "#CA225E")) +
+  scale_fill_manual("predicted", values = c("#fdf7f9", "#84cae1")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  ggtitle("tree_depth = 3")
+```
+
+---
+
+```{r echo=FALSE}
+## Build our tree using parsnip (but with rpart as the model engine)
+alz_tree_04 <-
+  tree_mod %>% 
+  set_args(min_n = 1, cost_complexity = 0, tree_depth = 4) %>%
+  fit(Class ~ tau + VEGF, data = alz_train)
+
+## Plot the data and model partitions
+alz_train %>%
+  ggplot(aes(x=tau, y=VEGF)) +
+  geom_parttree(data = alz_tree_04, aes(fill=Class), alpha = 0.5) +
+  geom_jitter(aes(col=Class), alpha=0.7) +
+  theme_minimal() +
+  scale_color_manual("true", values = c("#1a162d", "#CA225E")) +
+  scale_fill_manual("predicted", values = c("#fdf7f9", "#84cae1")) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  ggtitle("tree_depth = 4")
 ```
 
 ---
@@ -621,21 +689,21 @@ class: middle, center
 
 ```{r echo=FALSE}
 ## Build our tree using parsnip (but with rpart as the model engine)
-alz_tree_30 <-
+alz_tree_15 <-
   tree_mod %>% 
-  set_args(min_n = 1, cost_complexity = 0, tree_depth = 30) %>%
+  set_args(min_n = 1, cost_complexity = 0, tree_depth = 15) %>%
   fit(Class ~ tau + VEGF, data = alz_train)
 
 ## Plot the data and model partitions
 alz_train %>%
   ggplot(aes(x=tau, y=VEGF)) +
-  geom_parttree(data = alz_tree_30, aes(fill=Class), alpha = 0.5) +
+  geom_parttree(data = alz_tree_15, aes(fill=Class), alpha = 0.5) +
   geom_jitter(aes(col=Class), alpha=0.7) +
   theme_minimal() +
   scale_color_manual("true", values = c("#1a162d", "#CA225E")) +
   scale_fill_manual("predicted", values = c("#fdf7f9", "#84cae1")) +
   guides(fill = guide_legend(reverse = TRUE)) +
-  ggtitle("tree_depth = 30")
+  ggtitle("tree_depth = 15")
 ```
 
 ---
@@ -703,14 +771,14 @@ class: your-turn
 
 # Your turn `r (yt_counter <- yt_counter + 1)`
 
-Create a new model spec called `rf_mod`, which will learn an ensemble of classification trees from our training data using the **ranger** package. 
+Create a new parsnip model called `rf_mod`, which will learn an ensemble of classification trees from our training data using the **ranger** package. Update your `tree_wf` with this new model.
 
-Compare the metrics of the random forest to your two single tree models (vanilla and big)- which predicts the test set better?
+Fit your workflow with 10-fold cross-validation and compare the ROC AUC of the random forest to your single decision tree model --- which predicts the test set better?
 
-*Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
+*Hint: you'll need https://www.tidymodels.org/find/parsnip/*
 
 ```{r echo=FALSE}
-countdown(minutes = 5)
+countdown(minutes = 4)
 ```
 
 ---
@@ -720,22 +788,25 @@ rf_mod <-
   set_engine("ranger") %>% 
   set_mode("classification")
 
+rf_wf <-
+  tree_wf %>% 
+  update_model(rf_mod)
+
 set.seed(100)
-rf_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
+rf_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
 
 ---
 class: middle, center
 
-`mtry` 
+# `mtry` 
 
 The number of predictors that will be randomly sampled at each split when creating the tree models.
 
 ```{r results = 'hide'}
-rand_forest(mtry = 4)
+rand_forest(mtry = 11)
 ```
 
 **ranger** default = `floor(sqrt(num_predictors))`
@@ -745,60 +816,55 @@ class: your-turn
 
 # Your turn `r (yt_counter <- yt_counter + 1)`
 
-Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 19 variables at each split. Which value maximizes the area under the ROC curve?
-
-*Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
+Challenge: Fit 3 more random forest models, each using 3, 8, and 30 variables at each split. Update your `rf_wf` with each new model. Which value maximizes the area under the ROC curve?
 
 ```{r echo=FALSE}
-countdown(minutes = 4)
+countdown(minutes = 3)
 ```
 
 
 ---
 ```{r}
-rf4_mod <- rf_mod %>% 
-  set_args(mtry = 4) #<<
+rf3_mod <- rf_mod %>% 
+  set_args(mtry = 3) #<<
 
-set.seed(100)
-rf4_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
-  collect_metrics()
-```
-
----
-```{r}
 rf8_mod <- rf_mod %>% 
   set_args(mtry = 8) #<<
 
+rf30_mod <- rf_mod %>% 
+  set_args(mtry = 30) #<<
+```
+
+---
+```{r}
+rf3_wf <- rf_wf %>% 
+  update_model(rf3_mod)
+
 set.seed(100)
-rf8_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
+rf3_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
 
 ---
 ```{r}
-rf12_mod <- rf_mod %>% 
-  set_args(mtry = 12) #<<
+rf8_wf <- rf_wf %>% 
+  update_model(rf8_mod)
 
 set.seed(100)
-rf12_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
+rf8_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
 
 ---
 ```{r}
-rf19_mod <- rf_mod %>% 
-  set_args(mtry = 19) #<<
+rf30_wf <- rf_wf %>% 
+  update_model(rf30_mod)
 
 set.seed(100)
-rf19_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
+rf30_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
 
@@ -998,7 +1064,7 @@ class: your-turn
 
 # Your Turn `r (yt_counter <- yt_counter + 1)`
 
-Here's a new model plus workflow to work with.
+Here's our random forest model plus workflow to work with.
 
 ```{r}
 rf_mod <- 
@@ -1006,7 +1072,7 @@ rf_mod <-
   set_engine("ranger") %>% 
   set_mode("classification")
 
-rf_workflow <-
+rf_wf <-
   workflow() %>% 
   add_formula(Class ~ .) %>% 
   add_model(rf_mod)
@@ -1022,10 +1088,9 @@ Here is the output from `fit_resamples()`...
 ```{r}
 set.seed(100) # Important!
 rf_results <-
-  rf_workflow %>% 
+  rf_wf %>% 
   fit_resamples(resamples = alz_folds,
-                metrics = metric_set(roc_auc),
-                control = control_resamples(verbose = TRUE))
+                metrics = metric_set(roc_auc))
 
 rf_results %>% 
   collect_metrics()
@@ -1058,16 +1123,15 @@ rf_tuner <-
   set_engine("ranger") %>% 
   set_mode("classification")
 
-rf_workflow <-
-  rf_workflow %>% 
+rf_wf <-
+  rf_wf %>% 
   update_model(rf_tuner)
 
 set.seed(100) # Important!
 rf_results <-
-  rf_workflow %>% 
+  rf_wf %>% 
   tune_grid(resamples = alz_folds,
-            metrics = metric_set(roc_auc),
-            control = control_grid(verbose = TRUE))
+            metrics = metric_set(roc_auc))
 ```
 
 ---
@@ -1169,6 +1233,8 @@ class: middle, center
 
 ```
 
+
+
 ---
 class: middle
 name: select-best
@@ -1204,7 +1270,7 @@ Replaces `tune()` placeholders in a model/recipe/workflow with a set of hyper-pa
 
 ```{r}
 last_rf_workflow <- 
-  rf_workflow %>%
+  rf_wf %>%
   finalize_workflow(alz_best) 
 ```
 
@@ -1265,7 +1331,7 @@ alz_best <-
   select_best(metric = "roc_auc")
 
 last_rf_workflow <- 
-  rf_workflow %>%
+  rf_wf%>%
   finalize_workflow(alz_best) 
 
 last_rf_fit <-
@@ -1303,7 +1369,7 @@ last_rf_fit %>%
 
 ---
 
-```{r}
+```{r out.width='50%'}
 roc_values <- 
   last_rf_fit %>% 
   collect_predictions() %>% 

@@ -4,7 +4,7 @@
     <title>Tune models</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-08-26" />
+    <meta name="date" content="2020-08-27" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/countdown/countdown.css" rel="stylesheet" />
@@ -131,13 +131,9 @@ tree_mod &lt;-
 ---
 class: middle, center
 
-.pull-left[
-&lt;img src="figs/rmed03-tune-trees/alz-tree-01-1.png" width="504" style="display: block; margin: auto;" /&gt;
-]
+&lt;img src="figs/rmed03-tune-trees/alz-tree-01-1.png" width="40%" style="display: block; margin: auto;" /&gt;
 
---
 
-.pull-right[
 
 
 ```
@@ -147,7 +143,7 @@ class: middle, center
 #  11  Control [.16 .84] when tau is 5.9 to 6.7 &amp; VEGF &gt;= 17     19%
 #   3  Control [.10 .90] when tau &lt;  5.9                         58%
 ```
-]
+
 
 ---
 
@@ -176,6 +172,18 @@ tree_mod &lt;-
   set_mode("classification")
 ```
 
+And a workflow:
+
+```r
+tree_wf &lt;-
+  workflow() %&gt;% 
+  add_formula(Class ~ .) %&gt;% 
+  add_model(tree_mod)
+```
+
+
+For decision trees, no recipe really required 🎉
+
 ---
 class: your-turn
 
@@ -183,7 +191,7 @@ class: your-turn
 
 Fill in the blanks to return the accuracy and ROC AUC for this model using 10-fold cross-validation.
 
-<div class="countdown" id="timer_5f474e07" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f47dec0" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -192,9 +200,8 @@ Fill in the blanks to return the accuracy and ROC AUC for this model using 10-fo
 
 ```r
 set.seed(100)
-tree_mod %&gt;% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %&gt;% 
+tree_wf %&gt;% 
+  fit_resamples(resamples = alz_folds) %&gt;% 
   collect_metrics()
 # # A tibble: 2 x 5
 #   .metric  .estimator  mean     n std_err
@@ -489,14 +496,26 @@ class: middle, center
 &lt;img src="figs/rmed03-tune-trees/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
-class: middle, center
 
 &lt;img src="figs/rmed03-tune-trees/unnamed-chunk-24-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
-class: middle, center
 
 &lt;img src="figs/rmed03-tune-trees/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="figs/rmed03-tune-trees/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle, center
+
+&lt;img src="figs/rmed03-tune-trees/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle, center
+
+&lt;img src="figs/rmed03-tune-trees/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -505,6 +524,14 @@ class: middle, center
 
 
 
+
+---
+class: middle, frame, center
+
+# Axiom
+
+There is an inverse relationship between  
+model *accuracy* and model *interpretability*.
 
 ---
 class: middle, center
@@ -550,14 +577,14 @@ class: your-turn
 
 # Your turn 2
 
-Create a new model spec called `rf_mod`, which will learn an ensemble of classification trees from our training data using the **ranger** package. 
+Create a new parsnip model called `rf_mod`, which will learn an ensemble of classification trees from our training data using the **ranger** package. Update your `tree_wf` with this new model.
 
-Compare the metrics of the random forest to your two single tree models (vanilla and big)- which predicts the test set better?
+Fit your workflow with 10-fold cross-validation and compare the ROC AUC of the random forest to your single decision tree model --- which predicts the test set better?
 
-*Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
+*Hint: you'll need https://www.tidymodels.org/find/parsnip/*
 
-<div class="countdown" id="timer_5f474eee" style="right:0;bottom:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+<div class="countdown" id="timer_5f47deb7" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
 ---
@@ -568,10 +595,13 @@ rf_mod &lt;-
   set_engine("ranger") %&gt;% 
   set_mode("classification")
 
+rf_wf &lt;-
+  tree_wf %&gt;% 
+  update_model(rf_mod)
+
 set.seed(100)
-rf_mod %&gt;% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %&gt;% 
+rf_wf %&gt;% 
+  fit_resamples(resamples = alz_folds) %&gt;% 
   collect_metrics()
 # # A tibble: 2 x 5
 #   .metric  .estimator  mean     n std_err
@@ -583,13 +613,13 @@ rf_mod %&gt;%
 ---
 class: middle, center
 
-`mtry` 
+# `mtry` 
 
 The number of predictors that will be randomly sampled at each split when creating the tree models.
 
 
 ```r
-rand_forest(mtry = 4)
+rand_forest(mtry = 11)
 ```
 
 **ranger** default = `floor(sqrt(num_predictors))`
@@ -599,43 +629,52 @@ class: your-turn
 
 # Your turn 3
 
-Challenge: Make 4 more random forest model specs, each using 4, 8, 12, and 19 variables at each split. Which value maximizes the area under the ROC curve?
+Challenge: Fit 3 more random forest models, each using 3, 8, and 30 variables at each split. Update your `rf_wf` with each new model. Which value maximizes the area under the ROC curve?
 
-*Hint: you'll need https://tidymodels.github.io/parsnip/reference/rand_forest.html*
-
-<div class="countdown" id="timer_5f474e83" style="right:0;bottom:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+<div class="countdown" id="timer_5f47de9c" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
 
 ---
 
 ```r
-rf4_mod &lt;- rf_mod %&gt;% 
-* set_args(mtry = 4)
+rf3_mod &lt;- rf_mod %&gt;% 
+* set_args(mtry = 3)
 
-set.seed(100)
-rf4_mod %&gt;% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %&gt;% 
-  collect_metrics()
-# # A tibble: 2 x 5
-#   .metric  .estimator  mean     n std_err
-#   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-# 1 accuracy binary     0.803    10  0.0117
-# 2 roc_auc  binary     0.873    10  0.0186
+rf8_mod &lt;- rf_mod %&gt;% 
+* set_args(mtry = 8)
+
+rf30_mod &lt;- rf_mod %&gt;% 
+* set_args(mtry = 30)
 ```
 
 ---
 
 ```r
-rf8_mod &lt;- rf_mod %&gt;% 
-* set_args(mtry = 8)
+rf3_wf &lt;- rf_wf %&gt;% 
+  update_model(rf3_mod)
 
 set.seed(100)
-rf8_mod %&gt;% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %&gt;% 
+rf3_wf %&gt;% 
+  fit_resamples(resamples = alz_folds) %&gt;% 
+  collect_metrics()
+# # A tibble: 2 x 5
+#   .metric  .estimator  mean     n std_err
+#   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+# 1 accuracy binary     0.780    10  0.0115
+# 2 roc_auc  binary     0.862    10  0.0173
+```
+
+---
+
+```r
+rf8_wf &lt;- rf_wf %&gt;% 
+  update_model(rf8_mod)
+
+set.seed(100)
+rf8_wf %&gt;% 
+  fit_resamples(resamples = alz_folds) %&gt;% 
   collect_metrics()
 # # A tibble: 2 x 5
 #   .metric  .estimator  mean     n std_err
@@ -647,37 +686,18 @@ rf8_mod %&gt;%
 ---
 
 ```r
-rf12_mod &lt;- rf_mod %&gt;% 
-* set_args(mtry = 12)
+rf30_wf &lt;- rf_wf %&gt;% 
+  update_model(rf30_mod)
 
 set.seed(100)
-rf12_mod %&gt;% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %&gt;% 
+rf30_wf %&gt;% 
+  fit_resamples(resamples = alz_folds) %&gt;% 
   collect_metrics()
 # # A tibble: 2 x 5
 #   .metric  .estimator  mean     n std_err
 #   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-# 1 accuracy binary     0.830    10  0.0156
-# 2 roc_auc  binary     0.893    10  0.0152
-```
-
----
-
-```r
-rf19_mod &lt;- rf_mod %&gt;% 
-* set_args(mtry = 19)
-
-set.seed(100)
-rf19_mod %&gt;% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %&gt;% 
-  collect_metrics()
-# # A tibble: 2 x 5
-#   .metric  .estimator  mean     n std_err
-#   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-# 1 accuracy binary     0.837    10  0.0101
-# 2 roc_auc  binary     0.888    10  0.0142
+# 1 accuracy binary     0.837    10  0.0181
+# 2 roc_auc  binary     0.897    10  0.0137
 ```
 
 
@@ -881,7 +901,7 @@ class: your-turn
 
 # Your Turn 4
 
-Here's a new model plus workflow to work with.
+Here's our random forest model plus workflow to work with.
 
 
 ```r
@@ -890,7 +910,7 @@ rf_mod &lt;-
   set_engine("ranger") %&gt;% 
   set_mode("classification")
 
-rf_workflow &lt;-
+rf_wf &lt;-
   workflow() %&gt;% 
   add_formula(Class ~ .) %&gt;% 
   add_model(rf_mod)
@@ -907,10 +927,9 @@ Here is the output from `fit_resamples()`...
 ```r
 set.seed(100) # Important!
 rf_results &lt;-
-  rf_workflow %&gt;% 
+  rf_wf %&gt;% 
   fit_resamples(resamples = alz_folds,
-                metrics = metric_set(roc_auc),
-                control = control_resamples(verbose = TRUE))
+                metrics = metric_set(roc_auc))
 
 rf_results %&gt;% 
   collect_metrics()
@@ -934,7 +953,7 @@ Then use `tune_grid()` to find the best combination of hyper-parameters to maxim
 
 How does it compare to the average ROC AUC across folds from `fit_resamples()`?
 
-<div class="countdown" id="timer_5f474e15" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f47dd51" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -948,16 +967,15 @@ rf_tuner &lt;-
   set_engine("ranger") %&gt;% 
   set_mode("classification")
 
-rf_workflow &lt;-
-  rf_workflow %&gt;% 
+rf_wf &lt;-
+  rf_wf %&gt;% 
   update_model(rf_tuner)
 
 set.seed(100) # Important!
 rf_results &lt;-
-  rf_workflow %&gt;% 
+  rf_wf %&gt;% 
   tune_grid(resamples = alz_folds,
-            metrics = metric_set(roc_auc),
-            control = control_grid(verbose = TRUE))
+            metrics = metric_set(roc_auc))
 ```
 
 ---
@@ -1109,7 +1127,9 @@ rf_results %&gt;% autoplot()
 ---
 class: middle, center
 
-&lt;img src="figs/rmed03-tune-trees/unnamed-chunk-53-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/rmed03-tune-trees/unnamed-chunk-56-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
 
 ---
 class: middle
@@ -1153,7 +1173,7 @@ Replaces `tune()` placeholders in a model/recipe/workflow with a set of hyper-pa
 
 ```r
 last_rf_workflow &lt;- 
-  rf_workflow %&gt;%
+  rf_wf %&gt;%
   finalize_workflow(alz_best) 
 ```
 
@@ -1210,7 +1230,7 @@ Use `select_best()`, `finalize_workflow()`, and `last_fit()` to take the best co
 
 How does our actual test ROC AUC compare to our cross-validated estimate?
 
-<div class="countdown" id="timer_5f474f03" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f47dd7b" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1223,7 +1243,7 @@ alz_best &lt;-
   select_best(metric = "roc_auc")
 
 last_rf_workflow &lt;- 
-  rf_workflow %&gt;%
+  rf_wf%&gt;%
   finalize_workflow(alz_best) 
 
 last_rf_fit &lt;-
@@ -1291,7 +1311,7 @@ roc_values &lt;-
 autoplot(roc_values)
 ```
 
-&lt;img src="figs/rmed03-tune-trees/unnamed-chunk-62-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="figs/rmed03-tune-trees/unnamed-chunk-65-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
