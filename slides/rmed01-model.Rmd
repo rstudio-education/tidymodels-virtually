@@ -531,7 +531,7 @@ ggplot(lr_preds,
   scale_color_manual(values = c("#1a162d", "#cd4173"), guide = FALSE)+
   ggtitle("Logistic regression model")
 ```
-]
+
 
 
 ---
@@ -560,7 +560,7 @@ ggplot(tree_preds,
   scale_color_manual(values = c("#1a162d", "#cd4173"), guide = FALSE) +
   ggtitle("C5.0 classification tree model")
 ```
-]
+
 ---
 
 ## Predict new data
@@ -1469,7 +1469,7 @@ split1       <- alz_folds %>% pluck("splits", 1)
 split1_train <- training(split1)
 split1_test  <- testing(split1)
 
-lr_mod %>% 
+tree_mod %>% 
   fit(Class ~ ., data = split1_train) %>% 
   predict(split1_test) %>% 
   mutate(truth = split1_test$Class) %>% 
@@ -1490,7 +1490,7 @@ Trains and tests a resampled model.
 ]
 
 ```{r fit-ames-cv, results='hide'}
-lr_mod %>% 
+tree_mod %>% 
   fit_resamples(
     Class ~ tau + VEGF, 
     resamples = alz_folds
@@ -1521,7 +1521,7 @@ _results %>% collect_metrics(summarize = TRUE)
 
 ---
 ```{r}
-lr_mod %>% 
+tree_mod %>% 
   fit_resamples(
     Class ~ tau + VEGF, 
     resamples = alz_folds
@@ -1547,11 +1547,11 @@ class: your-turn
 
 # Your Turn `r (yt_counter <- yt_counter + 1)`
 
-Modify the code below to use `fit_resamples` and `alz_folds` to cross-validate the KNN model. What is the ROC AUC that you collect at the end?
+Modify the code below to use `fit_resamples` and `alz_folds` to cross-validate the classification tree model. What is the ROC AUC that you collect at the end?
 
 ```{r eval=FALSE}
 set.seed(100)
-lr_mod %>% 
+tree_mod %>% 
   fit(Class ~ tau + VEGF, 
       data = alz_train) %>% 
   predict(new_data = alz_test) %>% 
@@ -1578,7 +1578,7 @@ lr_mod %>%
 # How did we do?
 
 ```{r}
-lr_mod %>% 
+tree_mod %>% 
   fit(Class ~ tau + VEGF, data = alz_train) %>% 
   predict(alz_test) %>% 
   mutate(truth = alz_test$Class) %>% 

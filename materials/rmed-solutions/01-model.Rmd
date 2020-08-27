@@ -1,5 +1,5 @@
 ---
-title: "01-resample"
+title: "01-model"
 output: html_document
 ---
 
@@ -16,7 +16,7 @@ print("Hello R/Medicine 2020!")
 
 # Your Turn 1
 
-Run the chunk in your .Rmd and look at the output. Then, copy/paste the code and edit to create:
+Run the chunk below and look at the output. Then, copy/paste the code and edit to create:
 
 + a decision tree model for classification 
 
@@ -73,7 +73,8 @@ ________ %>%
       data = ________) %>% 
   predict(new_data = ________) %>% 
   mutate(true_class = ________) %>% 
-  accuracy(truth = ________, estimate = .pred_class)
+  accuracy(truth = ________, 
+           estimate = .pred_class)
 ```
 
 ```{r}
@@ -88,7 +89,8 @@ tree_mod %>%
       data = alz_train) %>% 
   predict(new_data = alz_test) %>% 
   mutate(true_class = alz_test$Class) %>% 
-  accuracy(truth = true_class, estimate = .pred_class)
+  accuracy(truth = true_class, 
+           estimate = .pred_class)
 ```
 
 ## Your Turn 3
