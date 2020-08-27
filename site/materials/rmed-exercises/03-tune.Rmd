@@ -1,0 +1,160 @@
+---
+title: "03-tune"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(scipen = 999)
+library(tidyverse)
+library(modeldata)
+library(tidymodels)
+
+data("ad_data")
+alz <- ad_data
+
+# data splitting
+set.seed(100) # Important!
+alz_split  <- initial_split(alz, strata = Class, prop = .9)
+alz_train  <- training(alz_split)
+alz_test   <- testing(alz_split)
+
+# data resampling
+set.seed(100)
+alz_folds <- 
+    vfold_cv(alz_train, v = 10, strata = Class)
+
+print("Hey there, R/Medicine 2020 all-star!")
+```
+
+# Your Turn 1
+
+Fill in the blanks to return the accuracy and ROC AUC for this model using 10-fold cross-validation.
+
+```{r}
+tree_mod <- 
+  decision_tree() %>% 
+  set_engine(engine = "rpart") %>% 
+  set_mode("classification")
+
+tree_wf <-
+  workflows() %>% 
+  add_formula(Class ~ .) %>% 
+  add_model(tree_mod)
+
+set.seed(100)
+______ %>% 
+  ______(resamples = alz_folds) %>% 
+  ______
+```
+
+# Your Turn 2
+
+Create a new parsnip model called `rf_mod`, which will learn an ensemble of classification trees from our training data using the **ranger** package. Update your `tree_wf` with this new model.
+
+Fit your workflow with 10-fold cross-validation and compare the ROC AUC of the random forest to your single decision tree model --- which predicts the test set better?
+
+*Hint: you'll need https://www.tidymodels.org/find/parsnip/*
+
+```{r}
+# model
+rf_mod <-
+  _____ %>% 
+  _____("ranger") %>% 
+  _____("classification")
+
+# workflow
+rf_wf <-
+  tree_wf %>% 
+  update_model(_____)
+
+# fit with cross-validation
+set.seed(100)
+_____ %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+
+# Your Turn 3
+
+Challenge: Fit 3 more random forest models, each using 3, 8, and 30 variables at each split. Update your `rf_wf` with each new model. Which value maximizes the area under the ROC curve?
+
+```{r}
+rf3_mod <- rf_mod %>% 
+  set_args(mtry = 3) 
+
+rf8_mod <- rf_mod %>% 
+  set_args(mtry = 8) 
+
+rf30_mod <- rf_mod %>% 
+  set_args(mtry = 30) 
+```
+
+Do this for each model above:
+```{r}
+_____ <- rf_wf %>% 
+  update_model(_____)
+
+set.seed(100)
+_____ %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+
+# Your Turn 4
+
+Edit the random forest model to tune the `mtry` and `min_n` hyper-parameters; call the new model spec `rf_tuner`.
+
+Update your workflow to use the tuned model.
+
+Then use `tune_grid()` to find the best combination of hyper-parameters to maximize `roc_auc`; let tune set up the grid for you.
+
+How does it compare to the average ROC AUC across folds from `fit_resamples()`?
+
+```{r}
+rf_mod <-
+  rand_forest() %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+rf_wf <-
+  workflow() %>% 
+  add_formula(Class ~ .) %>% 
+  add_model(rf_mod)
+
+set.seed(100) # Important!
+rf_results <-
+  rf_wf %>% 
+  fit_resamples(resamples = alz_folds,
+                metrics = metric_set(roc_auc),
+                # change me to control_grid(verbose = TRUE) with tune_grid
+                control = control_resamples(verbose = TRUE))
+
+rf_results %>% 
+  collect_metrics()
+```
+
+
+# Your Turn 5
+
+Use `select_best()`, `finalize_workflow()`, and `last_fit()` to take the best combination of hyper-parameters from `rf_results` and use them to predict the test set.
+
+How does our actual test ROC AUC compare to our cross-validated estimate?
+
+```{r results='hide'}
+alz_best <-
+  rf_results %>% 
+  _____(metric = "roc_auc")
+
+last_rf_workflow <- 
+  rf_wf%>%
+  _____(alz_best) 
+
+last_rf_fit <-
+  last_rf_workflow %>% 
+  _____(split = alz_split)
+
+last_rf_fit %>% 
+  collect_metrics()
+```

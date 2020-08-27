@@ -1,0 +1,86 @@
+---
+title: "02-workflows"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(scipen = 999)
+library(tidyverse)
+library(modeldata)
+library(tidymodels)
+
+data("ad_data")
+alz <- ad_data
+
+# data splitting
+set.seed(100) # Important!
+alz_split  <- initial_split(alz, strata = Class, prop = .9)
+alz_train  <- training(alz_split)
+alz_test   <- testing(alz_split)
+
+# data resampling
+set.seed(100)
+alz_folds <- 
+    vfold_cv(alz_train, v = 10, strata = Class)
+
+print("Welcome back, R/Medicine 2020!")
+```
+
+# Your Turn 1
+
+Unscramble! You have all the steps from our `knn_rec`- your challenge is to *unscramble* them into the right order! 
+
+Save the result as `knn_rec`
+
+```{r}
+step_dummy(all_nominal(), -all_outcomes())
+
+step_normalize(all_numeric()) 
+
+recipe(Class ~ ., data = alz)
+
+step_novel(all_nominal(), -all_outcomes()) 
+
+step_zv(all_predictors()) 
+
+step_other(Genotype, threshold = .03) 
+```
+
+# Your Turn 2
+
+Fill in the blanks to make a workflow that combines `knn_rec` and with `knn_mod`.
+
+```{r}
+knn_wf <-
+  ______ %>% 
+  ______(knn_rec) %>% 
+  ______(knn_mod)
+knn_wf
+```
+
+# Your Turn 3
+
+Edit the code chunk below to fit the entire `knn_wflow` instead of just `knn_mod`.
+
+```{r}
+set.seed(100)
+knn_mod %>% 
+  fit_resamples(Class ~ ., 
+                resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+
+# Your Turn 4
+
+Turns out, the same `knn_rec` recipe can also be used to fit a penalized logistic regression model using the lasso. Let's try it out!
+
+```{r}
+plr_mod <- 
+  logistic_reg(penalty = .01, mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_mode("classification")
+
+plr_mod %>% 
+  translate()
+```

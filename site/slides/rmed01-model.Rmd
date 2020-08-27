@@ -1,0 +1,1606 @@
+---
+title: "Build a model"
+subtitle: "Tidymodels, virtually"
+session: 01
+author: Alison Hill
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/my-theme.css", "assets/css/my-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      highlightLanguage: "r"
+      highlightStyle: "xcode"
+      slideNumberFormat: "" 
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes: 
+      in_header:
+        - 'assets/header.html'
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(comment = "#",
+                      message = FALSE,
+                      warning = FALSE, 
+                      collapse = TRUE,
+                      fig.retina = 3,
+                      fig.align = 'center',
+                      fig.path = "figs/rmed01-model/",
+                      R.options = list(tibble.max_extra_cols=5, 
+                                       tibble.print_max=5, 
+                                       tibble.width=60))
+options("scipen" = 16)
+library(tidymodels)
+yt_counter <- 0
+```
+
+```{r packages, include=FALSE}
+library(countdown)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(scico)
+library(gganimate)
+library(AmesHousing)
+library(tune)
+library(viridis)
+ames <- make_ames()
+theme_set(theme_minimal())
+
+# for figures
+train_color <- "#1a162d"
+test_color  <- "#84cae1"
+data_color  <- "#CA225E"
+assess_color <- data_color
+splits_pal <- c(data_color, train_color, test_color)
+```
+
+
+class: title-slide, center, bottom
+
+# `r rmarkdown::metadata$title`
+
+## `r rmarkdown::metadata$subtitle` &mdash; Session `r stringr::str_pad(rmarkdown::metadata$session, 2, pad = "0")`
+
+### `r rmarkdown::metadata$author` 
+
+
+
+---
+class: center, middle, inverse
+
+# What is Machine Learning?
+
+---
+class: middle
+
+# .center[Alzheimer's disease data]
+
+Data from a clinical trial of individuals with well-characterized cognitive impairment, and age-matched control participants.
+
+```{r}
+# install.packages("modeldata")
+library(modeldata)
+data("ad_data")
+alz <- ad_data
+```
+
+
+
+---
+class: middle
+
+```{r}
+glimpse(alz)
+```
+
+---
+background-image: url(images/hands.jpg)
+background-size: contain
+background-position: left
+class: middle
+
+.pull-right[
+
+## Alzheimer's disease data
+
++ N = `r nrow(alz)`
+
++ 1 categorical outcome: `Class`
+
++ `r ncol(alz) - 1` predictors
+
++ 126 protein measurements
+
++ also: `age`, `male`, `Genotype`
+
+]
+
+---
+background-image: url(images/hands.jpg)
+background-size: contain
+background-position: left
+class: middle
+
+.pull-right[
+```{r echo=FALSE}
+ggplot(alz, aes(x = tau, 
+                y = VEGF,
+                colour = Class)) +
+  geom_point(alpha = .5, size = 3) +
+  scale_color_manual(values = c("#1a162d", "#CA225E"))
+```
+]
+---
+class: middle, center, inverse
+
+# What is the goal of machine learning?
+
+---
+class: middle, center, frame
+
+# Goal
+
+--
+
+
+## Build .display[models] that
+
+--
+
+
+## generate .display[accurate predictions]
+
+--
+
+
+## for .display[future, yet-to-be-seen data].
+
+
+
+--
+
+.footnote[Max Kuhn & Kjell Johnston, http://www.feat.engineering/]
+
+
+???
+
+This is our whole game vision for today. This is the main goal for predictive modeling broadly, and for machine learning specifically.
+
+We'll use this goal to drive learning of 3 core tidymodels packages:
+
+- parsnip
+- yardstick
+- and rsample
+
+---
+class: inverse, middle, center
+
+# `r emo::ji("hammer")` Build models 
+
+--
+
+# with parsnip
+
+
+???
+
+Enter the parsnip package
+
+---
+class: middle, center, frame
+
+# parsnip
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://parsnip.tidymodels.org")
+```
+
+
+---
+class: middle
+
+# .center[`glm()`]
+
+
+```{r}
+glm(Class ~ tau, family = binomial, data = alz)
+```
+
+
+???
+
+So let's start with prediction. To predict, we have to have two things: a model to generate predictions, and data to predict
+
+This type of formula interface may look familiar
+
+How would we use parsnip to build this kind of linear regression model?
+
+---
+name: step1
+background-image: url("images/predicting/predicting.001.jpeg")
+background-size: contain
+
+---
+class: middle, frame
+
+
+# .center[To specify a model with parsnip]
+
+.right-column[
+
+1\. Pick a .display[model]
+
+2\. Set the .display[engine]
+
+3\. Set the .display[mode] (if needed)
+
+]
+
+---
+class: middle, frame
+
+# .center[To specify a model with parsnip]
+
+
+```{r}
+logistic_reg() %>%
+  set_engine("glm") %>%
+  set_mode("classification")
+```
+
+---
+class: middle, frame
+
+# .center[To specify a model with parsnip]
+
+
+
+```{r}
+decision_tree() %>%
+  set_engine("C5.0") %>%
+  set_mode("classification")
+```
+
+
+
+
+---
+class: middle, frame
+
+# .center[To specify a model with parsnip]
+
+
+```{r}
+nearest_neighbor() %>%              
+  set_engine("kknn") %>%             
+  set_mode("classification")        
+```
+
+
+
+---
+class: middle, frame
+
+.fade[
+# .center[To specify a model with parsnip]
+]
+
+
+.right-column[
+
+1\. Pick a .display[model]
+.fade[
+2\. Set the .display[engine]
+
+3\. Set the .display[mode] (if needed)
+]
+
+]
+
+---
+class: middle, center
+
+# 1\. Pick a .display[model] 
+
+All available models are listed at
+
+<https://www.tidymodels.org/find/parsnip/>
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://www.tidymodels.org/find/parsnip/")
+```
+
+---
+class: middle
+
+.center[
+# `logistic_reg()`
+
+Specifies a model that uses logistic regression
+]
+
+```{r results='hide'}
+logistic_reg(penalty = NULL, mixture = NULL)
+```
+
+---
+class: middle
+
+.center[
+# `logistic_reg()`
+
+Specifies a model that uses logistic regression
+]
+
+```{r results='hide'}
+logistic_reg(
+  mode = "classification", # "default" mode, if exists
+  penalty = NULL,          # model hyper-parameter
+  mixture = NULL           # model hyper-parameter
+  )
+```
+
+---
+class: middle, frame
+
+.fade[
+# .center[To specify a model with parsnip]
+]
+
+
+.right-column[
+.fade[
+1\. Pick a .display[model]
+]
+
+2\. Set the .display[engine]
+
+.fade[
+3\. Set the .display[mode] (if needed)
+]
+
+]
+
+---
+class: middle, center
+
+
+# `set_engine()`
+
+Adds an engine to power or implement the model.
+
+
+```{r eval=FALSE}
+logistic_reg() %>% set_engine(engine = "glm")
+```
+
+---
+class: middle, frame
+
+.fade[
+# .center[To specify a model with parsnip]
+]
+
+
+.right-column[
+.fade[
+1\. Pick a .display[model]
+
+2\. Set the .display[engine]
+]
+
+3\. Set the .display[mode] (if needed)
+
+
+]
+
+---
+class: middle, center
+
+
+# `set_mode()`
+
+Sets the class of problem the model will solve, which influences which output is collected. Not necessary if mode is set in Step 1.
+
+
+```{r eval=FALSE}
+logistic_reg() %>% set_mode(mode = "classification")
+```
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Run the chunk in your .Rmd and look at the output. Then, copy/paste the code and edit to create:
+
++ a decision tree model for classification 
+
++ that uses the `C5.0` engine. 
+
+Save it as `tree_mod` and look at the object. What is different about the output?
+
+*Hint: you'll need https://www.tidymodels.org/find/parsnip/*
+
+
+```{r echo = FALSE}
+countdown(minutes = 3)
+```
+
+---
+```{r include=FALSE}
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine(engine = "glm") %>% 
+  set_mode("classification")
+lr_mod
+```
+
+```{r}
+lr_mod 
+
+tree_mod <- 
+  decision_tree() %>% 
+  set_engine(engine = "C5.0") %>% 
+  set_mode("classification")
+tree_mod 
+```
+
+---
+class: inverse, middle, center
+
+## Now we've built a model.
+
+--
+
+## But, how do we *use* a model?
+
+--
+
+## First - what does it mean to use a model?
+
+---
+class: inverse, middle, center
+
+![](https://media.giphy.com/media/fhAwk4DnqNgw8/giphy.gif)
+
+Statistical models learn from the data. 
+
+Many learn model parameters, which *can* be useful as values for inference and interpretation.
+
+---
+class: center, middle
+
+# Show of hands
+
+How many people have .display[fitted] a statistical model with R?
+
+---
+
+# A fitted model
+
+.pull-left[
+```{r}
+lr_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz) %>% 
+  broom::tidy()
+```
+]
+
+.pull-right[
+
+```{r echo=FALSE}
+ggplot(alz, aes(x = tau, 
+                y = VEGF,
+                colour = Class)) +
+  geom_point(alpha = .5, size = 3) +
+  scale_color_manual(values = c("#1a162d", "#cd4173")) +
+  theme(legend.position = "top")
+```
+]
+
+---
+
+## "All models are wrong, but some are useful"
+
+```{r include=FALSE}
+lr_preds <- lr_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz) %>% 
+  predict(new_data = alz) %>% 
+  bind_cols(alz) %>% 
+  mutate(.pred_match = if_else(Class == .pred_class, 1, 0))
+```
+
+```{r echo=FALSE}
+ggplot(lr_preds, 
+       aes(x = tau, 
+           y = VEGF,
+           shape = as.factor(.pred_match),
+           colour = Class,
+           alpha = as.factor(.pred_match))) +
+  geom_point(size = 3) +
+  scale_alpha_manual(values = c(1, .2), guide = FALSE) +
+  scale_shape_manual(values = c(4, 19), guide = FALSE) +
+  scale_color_manual(values = c("#1a162d", "#cd4173"), guide = FALSE)+
+  ggtitle("Logistic regression model")
+```
+
+
+
+---
+
+## "All models are wrong, but some are useful"
+
+```{r include=FALSE}
+tree_preds <- tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz) %>% 
+  predict(new_data = alz) %>% 
+  bind_cols(alz) %>% 
+  mutate(.pred_match = if_else(Class == .pred_class, 1, 0))
+```
+
+```{r echo=FALSE}
+ggplot(tree_preds, 
+       aes(x = tau, 
+           y = VEGF,
+           shape = as.factor(.pred_match),
+           colour = Class,
+           alpha = as.factor(.pred_match))) +
+  geom_point(size = 3) +
+  scale_alpha_manual(values = c(1, .2), guide = FALSE) +
+  scale_shape_manual(values = c(4, 19), guide = FALSE) +
+  scale_color_manual(values = c("#1a162d", "#cd4173"), guide = FALSE) +
+  ggtitle("C5.0 classification tree model")
+```
+
+---
+
+## Predict new data
+
+```{r}
+alz_new <- 
+  tibble(tau = c(5, 6, 7), 
+         VEGF = c(15, 15, 15),
+         Class = c("Control", "Control", "Impaired")) %>% 
+  mutate(Class = factor(Class, levels = c("Impaired", "Control")))
+alz_new
+```
+
+
+
+---
+class: center, middle
+
+# Show of hands
+
+How many people have used a model to generate .display[predictions] with R?
+
+---
+
+# Predict old data
+
+
+```{r predict-old}
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz) %>% 
+  predict(new_data = alz) %>% 
+  mutate(true_class = alz$Class) %>% 
+  accuracy(truth = true_class, 
+           estimate = .pred_class)
+```
+
+
+---
+
+# Predict new data
+
+.pull-left[
+## out with the old...
+```{r ref.label='predict-old'}
+
+```
+
+]
+
+.pull-right[
+
+## in with the `r emo::ji("new")`
+
+```{r}
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz) %>% 
+  predict(new_data = alz_new) %>% #<<
+  mutate(true_class = alz_new$Class) %>% #<<
+  accuracy(truth = true_class, 
+           estimate = .pred_class)
+```
+
+]
+---
+class: middle, center
+
+# `fit()`
+
+Train a model by fitting a model. Returns a parsnip model fit.
+
+```{r results='hide'}
+fit(tree_mod, Class ~ tau + VEGF, data = alz)
+```
+
+
+---
+class: middle
+
+.center[
+# `fit()`
+
+Train a model by fitting a model. Returns a parsnip model fit.
+]
+
+```{r results='hide'}
+tree_mod %>%                     # parsnip model
+  fit(Class ~ tau + VEGF,        # a formula
+      data = alz                 # dataframe
+  )
+```
+
+---
+class: middle
+
+.center[
+# `fit()`
+
+Train a model by fitting a model. Returns a parsnip model fit.
+]
+
+```{r results='hide'}
+tree_fit <-
+  tree_mod %>%                   # parsnip model
+  fit(Class ~ tau + VEGF,        # a formula
+      data = alz                 # dataframe
+  )
+```
+
+
+
+---
+template: step1
+
+---
+name: step2
+background-image: url("images/predicting/predicting.003.jpeg")
+background-size: contain
+
+---
+class: middle, center
+
+# `predict()`
+
+Use a fitted model to predict new `y` values from data. Returns a tibble.
+
+```{r eval=FALSE}
+predict(tree_fit, new_data = alz_new) 
+```
+
+---
+
+
+```{r}
+tree_fit %>% 
+  predict(new_data = alz_new)
+```
+
+
+---
+class: middle, center, frame
+
+# Axiom
+
+The best way to measure a model's performance at predicting new data is to .display[predict new data].
+
+---
+class: middle, center, frame
+
+# Data splitting
+
+
+--
+
+
+```{r all-split, echo = FALSE, fig.width = 12, fig.height = 3}
+set.seed(16)
+one_split <- slice(alz, 1:30) %>% 
+  initial_split() %>% 
+  tidy() %>% 
+  add_row(Row = 1:30, Data = "Original") %>% 
+  mutate(Data = case_when(
+    Data == "Analysis" ~ "Training",
+    Data == "Assessment" ~ "Testing",
+    TRUE ~ Data
+  )) %>% 
+  mutate(Data = factor(Data, levels = c("Original", "Training", "Testing")))
+
+all_split <-
+  ggplot(one_split, aes(x = Row, y = fct_rev(Data), fill = Data)) + 
+  geom_tile(color = "white",
+            size = 1) + 
+  scale_fill_manual(values = splits_pal, guide = FALSE) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = rel(2)),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato")) +
+  coord_equal(ratio = 1) +
+  labs(x = NULL, y = NULL)
+
+all_split
+```
+
+???
+
+
+We refer to the group for which we know the outcome, and use to develop the algorithm, as the training set. We refer to the group for which we pretend we don’t know the outcome as the test set.
+
+---
+class: inverse, middle, center
+
+# `r emo::ji("recycle")` Resample models
+
+--
+
+# with rsample
+
+
+???
+
+Enter the rsample package
+
+
+---
+class: middle, center, frame
+
+# rsample
+
+```{r echo=FALSE, out.width="100%"}
+knitr::include_url("https://tidymodels.github.io/rsample/")
+```
+
+---
+class: center, middle
+
+# `initial_split()*`
+
+"Splits" data randomly into a single testing and a single training set.
+
+```{r eval= FALSE}
+initial_split(data, prop = 3/4)
+```
+
+.footnote[`*` from `rsample`]
+---
+
+```{r}
+alz_split <- initial_split(alz, strata = Class, prop = .9)
+alz_split
+```
+
+???
+
+data splitting
+
+---
+class: center, middle
+
+# `training()` and `testing()*`
+
+Extract training and testing sets from an rsplit
+
+```{r results='hide'}
+training(alz_split)
+testing(alz_split)
+```
+
+.footnote[`*` from `rsample`]
+
+---
+```{r R.options = list(tibble.max_extra_cols=5, tibble.print_max=5, tibble.width=60)}
+alz_train <- training(alz_split) 
+alz_train
+```
+
+
+---
+class: middle, center
+
+# Quiz
+
+Now that we have training and testing sets...
+
+--
+
+Which dataset do you think we use for .display[fitting]?
+
+--
+
+Which do we use for .display[predicting]?
+
+---
+template: step1
+
+---
+template: step2
+
+---
+template: step3
+background-image: url("images/predicting/predicting.004.jpeg")
+background-size: contain
+
+---
+name: holdout-step2
+background-image: url("images/predicting/predicting.006.jpeg")
+background-size: contain
+
+---
+name: holdout-step3
+background-image: url("images/predicting/predicting.007.jpeg")
+background-size: contain
+
+---
+name: holdout-step4
+background-image: url("images/predicting/predicting.008.jpeg")
+background-size: contain
+
+---
+name: holdout
+background-image: url("images/predicting/predicting.009.jpeg")
+background-size: contain
+
+---
+class: your-turn
+
+# Your turn `r (yt_counter <- yt_counter + 1)`
+
+Fill in the blanks. 
+
+Use `initial_split()`, `training()`, and `testing()` to:
+
+1. Split **alz** into training and test sets. Save the rsplit!
+
+2. Extract the training data and fit your classification tree model.
+
+3. Predict the testing data, and save the true `Class` values.
+
+4. Measure the accuracy of your model with your test set.  
+
+Keep `set.seed(100)` at the start of your code.
+
+```{r echo=FALSE}
+countdown(minutes = 4)
+```
+
+---
+
+```{r results='hide'}
+set.seed(100) # Important!
+
+alz_split  <- initial_split(alz, strata = Class, prop = .9)
+alz_train  <- training(alz_split)
+alz_test   <- testing(alz_split)
+
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz_train) %>% 
+  predict(new_data = alz_test) %>% 
+  mutate(true_class = alz_test$Class) %>% 
+  accuracy(truth = true_class, estimate = .pred_class)
+```
+
+
+---
+template: predictions
+
+---
+name: accurate-predictions
+class: middle, center, frame
+
+# Goal of Machine Learning
+
+## `r emo::ji("target")` generate .display[accurate predictions]
+
+???
+
+Now we have predictions from our model. What can we do with them? If we already know the truth, that is, the outcome variable that was observed, we can compare them!
+
+---
+class: middle, center, frame
+
+# Axiom
+
+Better Model = Better Predictions (Lower error rate)
+
+---
+class: middle, center
+
+# `accuracy()*`
+
+Calculates the accuracy based on two columns in a dataframe: 
+
+The .display[truth]: ${y}_i$ 
+
+The predicted .display[estimate]: $\hat{y}_i$ 
+
+```{r eval = FALSE}
+accuracy(data, truth, estimate)
+```
+
+
+.footnote[`*` from `yardstick`]
+
+---
+
+```{r}
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz_train) %>% 
+  predict(new_data = alz_test) %>% 
+  mutate(true_class = alz_test$Class) %>% 
+  accuracy(truth = true_class, estimate = .pred_class) #<<
+```
+
+
+---
+template: step1
+
+---
+template: step2
+
+---
+name: step3
+background-image: url("images/predicting/predicting.004.jpeg")
+background-size: contain
+
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+What would happen if you repeated this process? Would you get the same answers?
+
+Note your accuracy from above. Then change your seed number and rerun just the last code chunk above. Do you get the same answer? 
+
+Try it a few times with a few different seeds.
+
+```{r echo=FALSE}
+countdown(minutes = 2)
+```
+
+---
+
+.pull-left[
+
+```{r new-split, echo=FALSE, warnings = FALSE, message = FALSE}
+set.seed(100) # Important!
+
+alz_split  <- initial_split(alz, strata = Class, prop = .9)
+alz_train  <- training(alz_split)
+alz_test   <- testing(alz_split)
+
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz_train) %>% 
+  predict(new_data = alz_test) %>% 
+  mutate(true_class = alz_test$Class) %>% 
+  accuracy(truth = true_class, estimate = .pred_class)
+```
+
+```{r include=FALSE}
+set.seed(500) # Important!
+```
+
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r include=FALSE}
+set.seed(2020) # Important!
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+]
+
+--
+
+.pull-right[
+
+```{r include=FALSE}
+set.seed(13) # Important!
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r include=FALSE}
+set.seed(1000) # Important!
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r include=FALSE}
+set.seed(1980) # Important!
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+]
+
+---
+class: middle, center
+
+# Quiz
+
+Why is the new estimate different?
+
+
+```{r include=FALSE}
+plot_split <- function(seed = 1, arrow = FALSE) {
+  set.seed(seed)
+  one_split <- slice(alz, 1:20) %>% 
+    initial_split() %>% 
+    tidy() %>% 
+    add_row(Row = 1:20, Data = "Original") %>% 
+    mutate(Data = case_when(
+      Data == "Analysis" ~ "Training",
+      Data == "Assessment" ~ "Testing",
+      TRUE ~ Data
+    )) %>% 
+    mutate(Data = factor(Data, levels = c("Original", "Training", "Testing")))
+  
+  both_split <-
+    one_split %>% 
+    filter(!Data == "Original") %>% 
+    ggplot(aes(x = Row, y = 1, fill = Data)) + 
+    geom_tile(color = "white",
+              size = 1) + 
+    scale_fill_manual(values = splits_pal[2:3],
+                       guide = FALSE) +
+    theme_void() +
+    #theme(plot.margin = unit(c(-1, -1, -1, -1), "mm")) +
+    coord_equal() + {
+    # arrow is TRUE
+    if (arrow == TRUE) 
+      annotate("segment", x = 31, xend = 32, y = 1, yend = 1, 
+               colour = assess_color, size=1, arrow=arrow())
+    } + {
+    # arrow is TRUE
+    if (arrow == TRUE)
+        annotate("text", x = 33.5, y = 1, colour = assess_color, size=8, 
+                 label = "Metric", family="Lato")
+    }
+
+  
+  both_split
+}
+```
+
+---
+class: middle, center
+
+# Data Splitting
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 100)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 1)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 10)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 18)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 30)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 31)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 21)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 10, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 321)
+```
+
+---
+
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 100, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 1, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 10, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 18, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 30, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 31, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 21, arrow = TRUE)
+```
+
+--
+
+```{r echo=FALSE, fig.width = 15, fig.height = .5, fig.align = 'center'}
+plot_split(seed = 321, arrow = TRUE)
+```
+
+--
+
+.right[Mean RMSE]
+
+---
+class: frame, center, middle
+
+# Resampling
+
+Let's resample 10 times 
+
+then compute the mean of the results...
+
+---
+
+```{r include = FALSE}
+set.seed(9)
+```
+
+
+```{r cv-for-loop, include = FALSE}
+acc <- vector(length = 10, mode = "double")
+for (i in 1:10) {
+  new_split <- initial_split(alz)
+  new_train <- training(new_split)
+  new_test  <- testing(new_split)
+  acc[i] <-
+    lr_mod %>% 
+      fit(Class ~ tau + VEGF, data = new_train) %>% 
+      predict(new_test) %>% 
+      mutate(truth = new_test$Class) %>% 
+      accuracy(truth, .pred_class) %>% 
+      pull(.estimate)
+}
+```
+
+```{r}
+acc %>% tibble::enframe(name = "accuracy")
+mean(acc)
+```
+
+---
+class: middle, center
+
+# Guess
+
+Which do you think is a better estimate?
+
+The best result or the mean of the results? Why? 
+
+---
+class: middle, center
+
+# But also...
+
+Fit with .display[training set]
+
+Predict with .display[testing set]
+
+--
+
+Rinse and repeat?
+
+---
+
+# There has to be a better way...
+
+```{r ref.label='cv-for-loop', eval = FALSE}
+```
+
+---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
+class: middle, center
+background-color: #f5f5f5
+
+.pull-right[
+## The .display[testing set] is precious...
+
+## we can only use it once!
+
+]
+
+---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
+class: middle, center
+background-color: #f5f5f5
+
+.pull-right[
+## How can we use the training set to compare, evaluate, and tune models?
+
+]
+
+
+
+---
+background-image: url(https://www.tidymodels.org/start/resampling/img/resampling.svg)
+background-size: 60%
+
+---
+class: middle, center, inverse
+
+# Cross-validation
+
+---
+background-image: url(images/cross-validation/Slide2.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide3.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide4.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide5.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide6.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide7.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide8.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide9.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide10.png)
+background-size: contain
+
+---
+background-image: url(images/cross-validation/Slide11.png)
+background-size: contain
+
+---
+class: middle, center
+
+# V-fold cross-validation
+
+```{r eval=FALSE}
+vfold_cv(data, v = 10, ...)
+```
+
+
+---
+exclude: true
+
+```{r cv, fig.height=4, echo=FALSE}
+set.seed(1)
+folds10 <- slice(ames, 1:20) %>% 
+  vfold_cv() %>% 
+  tidy() %>% 
+  mutate(split = str_c("Split", str_pad(parse_number(Fold), width = 2, pad = "0")))
+
+folds <- ggplot(folds10, aes(x = Row, y = fct_rev(split), fill = Data)) + 
+  geom_tile(color = "white",
+            width = 1,
+            size = 1) + 
+  scale_fill_manual(values = c(train_color, assess_color)) +
+  theme(axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato"),
+        legend.key.size = unit(.4, "cm"),
+        legend.text = element_text(size = rel(.4))) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = NULL) 
+```
+
+---
+class: middle, center
+
+# Guess
+
+How many times does in observation/row appear in the assessment set?
+
+```{r vfold-tiles, echo=FALSE, fig.height=6, fig.width = 12, fig.align='center'}
+folds +
+    theme(axis.text.y = element_text(size = rel(2)),
+          legend.key.size = unit(.85, "cm"),
+          legend.text = element_text(size = rel(1)))
+```
+
+---
+
+```{r echo=FALSE, fig.height=6, fig.width = 12, fig.align='center', warning=FALSE, message=FALSE}
+test_folds <- tibble(
+  Row = seq(1, 20, 1),
+  Data = "assessment",
+  Fold = rep(1:10, each = 2)
+) 
+
+# i want all 20 rows, for all 10 folds
+all_rows <- tibble(
+  Row = rep(seq(1, 20, 1), 10),
+  Fold = rep(1:10, each = 20)
+)
+
+train_folds <- all_rows %>% 
+  anti_join(test_folds)
+
+all_folds <- test_folds %>% 
+  full_join(train_folds) %>% 
+  mutate(Fold = as.factor(Fold)) %>% 
+  mutate(Data = replace_na(Data, "analysis"))
+
+ggplot(all_folds, aes(x = Row, y = fct_rev(Fold), fill = Data)) + 
+  geom_tile(color = "white",
+            width = 1,
+            size = 1) + 
+  scale_fill_manual(values = c(train_color, assess_color), guide = FALSE) +
+  theme(axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        panel.grid = element_blank(),
+        text = element_text(family = "Lato"),
+        legend.key.size = unit(.4, "cm"),
+        legend.text = element_text(size = rel(.4))) +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = NULL) 
+```
+
+---
+class: middle, center
+
+# Quiz
+
+If we use 10 folds, which percent of our data will end up in the training set and which percent in the testing set for each fold?
+
+--
+
+90% - training
+
+10% - test
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Run the code below. What does it return?
+
+```{r make-ames-cv, results='hide'}
+set.seed(100)
+alz_folds <- 
+    vfold_cv(alz_train, v = 10, strata = Class)
+alz_folds
+```
+
+```{r echo=FALSE}
+countdown(minutes = 1)
+```
+
+---
+```{r ref.label='make-ames-cv'}
+```
+
+---
+class: middle
+
+.center[
+# We need a new way to fit
+]
+
+```{r eval=FALSE}
+split1       <- alz_folds %>% pluck("splits", 1)
+split1_train <- training(split1)
+split1_test  <- testing(split1)
+
+tree_mod %>% 
+  fit(Class ~ ., data = split1_train) %>% 
+  predict(split1_test) %>% 
+  mutate(truth = split1_test$Class) %>% 
+  rmse(truth, .pred_class)
+
+# rinse and repeat
+split2 <- ...
+```
+
+
+---
+class: middle
+
+.center[
+# `fit_resamples()`
+
+Trains and tests a resampled model.
+]
+
+```{r fit-ames-cv, results='hide'}
+tree_mod %>% 
+  fit_resamples(
+    Class ~ tau + VEGF, 
+    resamples = alz_folds
+    )
+```
+
+---
+
+```{r ref.label='fit-ames-cv', warning=FALSE, messages=FALSE}
+
+```
+
+
+---
+class: middle, center
+
+# `collect_metrics()`
+
+Unnest the metrics column from a tidymodels `fit_resamples()`
+
+```{r eval = FALSE}
+_results %>% collect_metrics(summarize = TRUE)
+```
+
+--
+
+.footnote[`TRUE` is actually the default; averages across folds]
+
+---
+```{r}
+tree_mod %>% 
+  fit_resamples(
+    Class ~ tau + VEGF, 
+    resamples = alz_folds
+    ) %>% 
+  collect_metrics(summarize = FALSE)
+```
+
+---
+class: middle, center, frame
+
+# 10-fold CV
+
+### 10 different analysis/assessment sets
+
+### 10 different models (trained on .display[analysis] sets)
+
+### 10 different sets of performance statistics (on .display[assessment] sets)
+
+
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Modify the code below to use `fit_resamples` and `alz_folds` to cross-validate the classification tree model. What is the ROC AUC that you collect at the end?
+
+```{r eval=FALSE}
+set.seed(100)
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz_train) %>% 
+  predict(new_data = alz_test) %>% 
+  mutate(true_class = alz_test$Class) %>% 
+  accuracy(truth = true_class, estimate = .pred_class)
+```
+
+```{r echo=FALSE}
+countdown(minutes = 3)
+```
+
+
+---
+```{r rt-rs, warning=FALSE, message=FALSE}
+set.seed(100)
+lr_mod %>% 
+  fit_resamples(Class ~ tau + VEGF, 
+                resamples = alz_folds) %>% 
+  collect_metrics()
+```
+
+---
+
+# How did we do?
+
+```{r}
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, data = alz_train) %>% 
+  predict(alz_test) %>% 
+  mutate(truth = alz_test$Class) %>% 
+  accuracy(truth, .pred_class)
+```
+
+
+```{r ref.label='rt-rs', echo=FALSE}
+
+```
+
