@@ -47,24 +47,6 @@ ______ %>%
   ______
 ```
 
-Answer:
-```{r}
-tree_mod <- 
-  decision_tree() %>% 
-  set_engine(engine = "rpart") %>% 
-  set_mode("classification")
-
-tree_wf <-
-  workflow() %>% 
-  add_formula(Class ~ .) %>% 
-  add_model(tree_mod)
-
-set.seed(100)
-tree_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics()
-```
-
 # Your Turn 2
 
 Create a new parsnip model called `rf_mod`, which will learn an ensemble of classification trees from our training data using the **ranger** package. Update your `tree_wf` with this new model.
@@ -92,25 +74,6 @@ _____ %>%
   collect_metrics()
 ```
 
-Answer:
-```{r}
-# model
-rf_mod <-
-  rand_forest() %>% 
-  set_engine("ranger") %>% 
-  set_mode("classification")
-
-# workflow
-rf_wf <-
-  tree_wf %>% 
-  update_model(rf_mod)
-
-# fit with cross-validation
-set.seed(100)
-rf_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics()
-```
 
 # Your Turn 3
 
@@ -138,35 +101,6 @@ _____ %>%
   collect_metrics()
 ```
 
-Answer:
-```{r}
-# first one!
-rf3_wf <- rf_wf %>% 
-  update_model(rf3_mod)
-
-set.seed(100)
-rf3_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics()
-
-# second one!
-rf8_wf <- rf_wf %>% 
-  update_model(rf8_mod)
-
-set.seed(100)
-rf8_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics()
-
-# last one!
-rf30_wf <- rf_wf %>% 
-  update_model(rf30_mod)
-
-set.seed(100)
-rf30_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics()
-```
 
 # Your Turn 4
 
@@ -201,31 +135,6 @@ rf_results %>%
   collect_metrics()
 ```
 
-Answer:
-```{r}
-rf_tuner <- 
-  rand_forest(mtry = tune(),
-              min_n = tune()) %>% 
-  set_engine("ranger") %>% 
-  set_mode("classification")
-
-rf_wf <-
-  workflow() %>% 
-  add_formula(Class ~ .) %>% 
-  add_model(rf_tuner)
-
-set.seed(100) # Important!
-rf_results <-
-  rf_wf %>% 
-  tune_grid(resamples = alz_folds,
-            metrics = metric_set(roc_auc),
-            # change me to control_grid(verbose = TRUE) with tune_grid
-            control = control_grid(verbose = TRUE))
-
-rf_results %>% 
-  collect_metrics()
-```
-
 
 # Your Turn 5
 
@@ -249,24 +158,3 @@ last_rf_fit <-
 last_rf_fit %>% 
   collect_metrics()
 ```
-
-Answer: 
-```{r}
-alz_best <-
-  rf_results %>% 
-  select_best(metric = "roc_auc")
-
-last_rf_workflow <- 
-  rf_wf%>%
-  finalize_workflow(alz_best) 
-
-last_rf_fit <-
-  last_rf_workflow %>% 
-  last_fit(split = alz_split)
-
-last_rf_fit %>% 
-  collect_metrics()
-```
-
-
-

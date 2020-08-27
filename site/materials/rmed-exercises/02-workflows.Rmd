@@ -46,17 +46,6 @@ step_zv(all_predictors())
 step_other(Genotype, threshold = .03) 
 ```
 
-Answer:
-```{r}
-knn_rec <- 
-  recipe(Class ~ ., data = alz) %>%
-  step_other(Genotype, threshold = .03) %>% 
-  step_novel(all_nominal(), -all_outcomes()) %>% 
-  step_dummy(all_nominal(), -all_outcomes()) %>% 
-  step_zv(all_predictors()) %>% 
-  step_normalize(all_numeric()) 
-```
-
 # Your Turn 2
 
 Fill in the blanks to make a workflow that combines `knn_rec` and with `knn_mod`.
@@ -66,14 +55,6 @@ knn_wf <-
   ______ %>% 
   ______(knn_rec) %>% 
   ______(knn_mod)
-knn_wf
-```
-
-```{r}
-knn_wf <-
-  workflow() %>% 
-  add_recipe(knn_rec) %>% 
-  add_model(knn_mod)
 knn_wf
 ```
 
@@ -89,13 +70,6 @@ knn_mod %>%
   collect_metrics()
 ```
 
-Answer:
-```{r}
-set.seed(100)
-knn_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics()
-```
 
 # Your Turn 4
 
@@ -110,17 +84,3 @@ plr_mod <-
 plr_mod %>% 
   translate()
 ```
-
-
-Answer:
-```{r}
-glmnet_wf <-
-  knn_wf %>% 
-  update_model(plr_mod)
-
-glmnet_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics()
-```
-
-
