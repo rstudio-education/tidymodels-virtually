@@ -1,0 +1,109 @@
+---
+title: "01-model"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(scipen = 999)
+library(tidyverse)
+library(modeldata)
+library(tidymodels)
+
+data("ad_data")
+alz <- ad_data
+print("Hello R/Medicine 2020!")
+```
+
+# Your Turn 1
+
+Run the chunk below and look at the output. Then, copy/paste the code and edit to create:
+
++ a decision tree model for classification 
+
++ that uses the `C5.0` engine. 
+
+Save it as `tree_mod` and look at the object. What is different about the output?
+
+*Hint: you'll need https://www.tidymodels.org/find/parsnip/*
+
+```{r}
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine(engine = "glm") %>% 
+  set_mode("classification")
+lr_mod
+```
+
+```{r}
+
+```
+
+
+# Your Turn 2
+
+Fill in the blanks. 
+
+Use `initial_split()`, `training()`, and `testing()` to:
+
+1. Split **alz** into training and test sets. Save the rsplit!
+
+2. Extract the training data and fit your classification tree model.
+
+3. Predict the testing data, and save the true `Class` values.
+
+4. Measure the accuracy of your model with your test set.  
+
+Keep `set.seed(100)` at the start of your code.
+
+*Hint: Be sure to remove every `_` before running the code!*
+
+```{r}
+set.seed(100) # Important!
+
+alz_split  <- ________(alz, strata = Class, prop = .9)
+alz_train  <- ________(alz_split)
+alz_test   <- ________(alz_split)
+
+________ %>% 
+  fit(Class ~ tau + VEGF, 
+      data = ________) %>% 
+  predict(new_data = ________) %>% 
+  mutate(true_class = ________) %>% 
+  accuracy(truth = ________, 
+           estimate = .pred_class)
+```
+
+
+## Your Turn 3
+
+What would happen if you repeated this process? Would you get the same answers?
+
+Note your accuracy from above. Then change your seed number and rerun just the last code chunk above. Do you get the same answer? 
+
+Try it a few times with a few different seeds.
+
+## Your Turn 4
+
+Run the code below. What does it return?
+
+```{r}
+set.seed(100)
+alz_folds <- 
+    vfold_cv(alz_train, v = 10, strata = Class)
+alz_folds
+```
+
+
+## Your Turn 5
+
+Modify the code below to use `fit_resamples` and `alz_folds` to cross-validate the classification tree model. What is the ROC AUC that you collect at the end?
+
+```{r}
+set.seed(100)
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
+      data = alz_train) %>% 
+  predict(new_data = alz_test) %>% 
+  mutate(true_class = alz_test$Class) %>% 
+  accuracy(truth = true_class, estimate = .pred_class)
+```
