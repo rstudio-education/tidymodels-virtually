@@ -23,6 +23,12 @@ set.seed(100)
 alz_folds <- 
     vfold_cv(alz_train, v = 10, strata = Class)
 
+# KNN model
+knn_mod <-
+  nearest_neighbor() %>%              
+  set_engine("kknn") %>%             
+  set_mode("classification") 
+
 print("Welcome back, R/Medicine 2020!")
 ```
 
