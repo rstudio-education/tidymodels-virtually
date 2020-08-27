@@ -1,6 +1,6 @@
 ---
 title: "Tidymodels, Virtually"
-subtitle: "A Virtual Workshop for BD"
+subtitle: "A Short Course"
 author: Alison Hill
 date: "`r Sys.Date()`"
 output:
@@ -312,50 +312,11 @@ Build a model
 
 --
 
-Resample a model
+Build better modeling workflows
 
 --
 
-Build A Better Training Set
-
-
-
----
-class: frame, middle, center
-
-## Session 01
-
-EDT: 1:00-1:50
-
-PDT: 10:00-10:50
-
---
-
-## Session 02
-
-
-EDT: 02-02:50
-
-PDT: 11-11:50
-
-
---
-
-## Session 03
-
-
-EDT: 03-03:50
-
-PDT: 12-12:50
-
---
-
-## Session 04
-
-
-EDT: 03-03:50
-
-PDT: 01-01:50
+Tune better models
 
 
 ---
@@ -374,47 +335,9 @@ library(tidymodels)
 ```
 
 
-
----
-class: inverse, middle, center
-
-# Logistics
-
----
-class: frame, middle, center
-
-# Reactions?
-
-![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
-
----
-class: frame, middle, center
-
-# Mute/unmute?
-
-![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
-
----
-class: frame, middle, center
-
-# Our classroom
-
-Google Doc: https://bit.ly/tmv-bd
-
-
 ---
 class: inverse, middle, center
 
 # To the workshop!
 
----
-class: inverse, middle, center
-
-# Day Two
-
-## Ensembles 
-
-## Tuning
-
-## Case Study
 

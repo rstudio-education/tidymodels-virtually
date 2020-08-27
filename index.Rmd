@@ -25,9 +25,9 @@ meta() %>%
   meta_name("github-repo" = "rstudio-education/tidymodels-virtually") %>% 
   meta_social(
     title = "Tidymodels, Virtually",
-    url = "https://rstd.io/tip",
-    image = "https://repository-images.githubusercontent.com/288797104/d13f1700-e2cc-11ea-9ed7-0bf3a41af1e4",
-    image_alt = "",
+    url = "https://tmv.netlify.app/site/",
+    image = "https://repository-images.githubusercontent.com/257969031/8d10c100-e84e-11ea-8200-6a1aa6d8a356",
+    image_alt = "Birds perched",
     og_type = "website",
     twitter_card_type = "summary_large_image"
   )
@@ -101,7 +101,7 @@ Alison
 ### Slides
 
 + [01: Build a model](slides/rmed01-model.html)
-+ [02: Build better modeling workflows](slides/rmed02-workflows.html)
++ [02: Build better workflows](slides/rmed02-workflows.html)
 + [03: Tune better models](slides/rmed03-tune.html)
 
 ## Workshops

@@ -4,7 +4,7 @@
     <title>Tidymodels, Virtually</title>
     <meta charset="utf-8" />
     <meta name="author" content="Alison Hill" />
-    <meta name="date" content="2020-08-12" />
+    <meta name="date" content="2020-08-27" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <meta name="description" content="Tidymodels, Virtually"/>
@@ -59,7 +59,7 @@ class: title-slide, center, bottom
 
 # Tidymodels, Virtually
 
-## A Virtual Workshop for BD
+## A Short Course
 
 ### Alison Hill 
 
@@ -178,6 +178,14 @@ background-image: url(images/all-of-ml.jpg)
 background-size: contain
 
 .footnote[Credit: &lt;https://vas3k.com/blog/machine_learning/&gt;]
+
+---
+
+Why do we want machines to learn?
+
+What are they learning?
+
+What does a machine need to learn?
 ---
 class: middle, center, frame
 
@@ -314,50 +322,11 @@ Build a model
 
 --
 
-Resample a model
+Build better modeling workflows
 
 --
 
-Build A Better Training Set
-
-
-
----
-class: frame, middle, center
-
-## Session 01
-
-EDT: 1:00-1:50
-
-PDT: 10:00-10:50
-
---
-
-## Session 02
-
-
-EDT: 02-02:50
-
-PDT: 11-11:50
-
-
---
-
-## Session 03
-
-
-EDT: 03-03:50
-
-PDT: 12-12:50
-
---
-
-## Session 04
-
-
-EDT: 03-03:50
-
-PDT: 01-01:50
+Tune better models
 
 
 ---
@@ -374,57 +343,38 @@ background-size: contain
 
 ```r
 library(tidymodels)
-## ── Attaching packages ──────────────────────────────────── tidymodels 0.1.0 ──
-## ✓ broom     0.5.5          ✓ recipes   0.1.13    
-## ✓ dials     0.0.4          ✓ rsample   0.0.6     
-## ✓ dplyr     1.0.0          ✓ tibble    3.0.3     
-## ✓ ggplot2   3.3.1.9000     ✓ tune      0.1.0     
-## ✓ infer     0.5.1          ✓ workflows 0.1.1     
-## ✓ parsnip   0.1.0          ✓ yardstick 0.0.5     
+## Warning: package 'tidymodels' was built under R version 3.6.2
+## ── Attaching packages ────────────────────────────────────────── tidymodels 0.1.1 ──
+## ✓ broom     0.7.0      ✓ recipes   0.1.13
+## ✓ dials     0.0.8      ✓ rsample   0.0.7 
+## ✓ dplyr     1.0.2      ✓ tibble    3.0.3 
+## ✓ ggplot2   3.3.2      ✓ tidyr     1.1.1 
+## ✓ infer     0.5.3      ✓ tune      0.1.1 
+## ✓ modeldata 0.0.2      ✓ workflows 0.1.3 
+## ✓ parsnip   0.1.3      ✓ yardstick 0.0.7 
 ## ✓ purrr     0.3.4
+## Warning: package 'broom' was built under R version 3.6.2
+## Warning: package 'dials' was built under R version 3.6.2
 ## Warning: package 'scales' was built under R version 3.6.2
 ## Warning: package 'dplyr' was built under R version 3.6.2
+## Warning: package 'ggplot2' was built under R version 3.6.2
+## Warning: package 'infer' was built under R version 3.6.2
+## Warning: package 'modeldata' was built under R version 3.6.2
 ## Warning: package 'parsnip' was built under R version 3.6.2
 ## Warning: package 'purrr' was built under R version 3.6.2
 ## Warning: package 'recipes' was built under R version 3.6.2
 ## Warning: package 'rsample' was built under R version 3.6.2
 ## Warning: package 'tibble' was built under R version 3.6.2
+## Warning: package 'tidyr' was built under R version 3.6.2
 ## Warning: package 'tune' was built under R version 3.6.2
-## ── Conflicts ─────────────────────────────────────── tidymodels_conflicts() ──
-## x purrr::discard()  masks scales::discard()
-## x dplyr::filter()   masks stats::filter()
-## x dplyr::lag()      masks stats::lag()
-## x ggplot2::margin() masks dials::margin()
-## x recipes::step()   masks stats::step()
+## Warning: package 'workflows' was built under R version 3.6.2
+## Warning: package 'yardstick' was built under R version 3.6.2
+## ── Conflicts ───────────────────────────────────────────── tidymodels_conflicts() ──
+## x purrr::discard() masks scales::discard()
+## x dplyr::filter()  masks stats::filter()
+## x dplyr::lag()     masks stats::lag()
+## x recipes::step()  masks stats::step()
 ```
-
-
-
----
-class: inverse, middle, center
-
-# Logistics
-
----
-class: frame, middle, center
-
-# Reactions?
-
-![](https://blog.zoom.us/wordpress/wp-content/uploads/2019/12/meeting-reactions.png)
-
----
-class: frame, middle, center
-
-# Mute/unmute?
-
-![](https://support.zoom.us/hc/article_attachments/360001181546/windows-pushtotalk.gif)
-
----
-class: frame, middle, center
-
-# Our classroom
-
-Google Doc: https://bit.ly/tmv-bd
 
 
 ---
@@ -432,16 +382,6 @@ class: inverse, middle, center
 
 # To the workshop!
 
----
-class: inverse, middle, center
-
-# Day Two
-
-## Ensembles 
-
-## Tuning
-
-## Case Study
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
