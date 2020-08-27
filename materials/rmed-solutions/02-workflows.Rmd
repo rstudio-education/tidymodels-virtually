@@ -28,107 +28,99 @@ print("Welcome back, R/Medicine 2020!")
 
 # Your Turn 1
 
-workflow with formula
+Unscramble! You have all the steps from our `knn_rec`- your challenge is to *unscramble* them into the right order! 
+
+Save the result as `knn_rec`
 
 ```{r}
-tree_mod <- 
-  decision_tree() %>% 
-  set_engine(engine = "rpart") %>% 
-  set_mode("classification")
+step_dummy(all_nominal(), -all_outcomes())
 
-tree_wf <-
-  _____ %>% 
-  add______(Class ~ .) %>% 
-  add______(tree_mod)
+step_normalize(all_numeric()) 
 
-tree_wf
+recipe(Class ~ ., data = alz)
+
+step_novel(all_nominal(), -all_outcomes()) 
+
+step_zv(all_predictors()) 
+
+step_other(Genotype, threshold = .03) 
 ```
 
+Answer:
 ```{r}
-tree_mod <- 
-  decision_tree() %>% 
-  set_engine(engine = "rpart") %>% 
-  set_mode("classification")
-
-tree_wf <-
-  workflow() %>% 
-  add_formula(Class ~ .) %>% 
-  add_model(tree_mod)
-
-tree_wf
+knn_rec <- 
+  recipe(Class ~ ., data = alz) %>%
+  step_other(Genotype, threshold = .03) %>% 
+  step_novel(all_nominal(), -all_outcomes()) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_numeric()) 
 ```
-
 
 # Your Turn 2
 
-Edit to fit the workflow instead.
+Fill in the blanks to make a workflow that combines `knn_rec` and with `knn_mod`.
+
+```{r}
+knn_wf <-
+  ______ %>% 
+  ______(knn_rec) %>% 
+  ______(knn_mod)
+knn_wf
+```
+
+```{r}
+knn_wf <-
+  workflow() %>% 
+  add_recipe(knn_rec) %>% 
+  add_model(knn_mod)
+knn_wf
+```
+
+# Your Turn 3
+
+Edit the code chunk below to fit the entire `knn_wflow` instead of just `knn_mod`.
 
 ```{r}
 set.seed(100)
-tree_mod %>% 
+knn_mod %>% 
   fit_resamples(Class ~ ., 
                 resamples = alz_folds) %>% 
   collect_metrics()
 ```
 
+Answer:
 ```{r}
 set.seed(100)
-tree_wf %>% 
+knn_wf %>% 
   fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
-
-# Your Turn 3
-
-Write a recipe for predicting Class. 
-
-Save the result as `alz_rec`  
-
-```{r}
-alz_rec <- 
-  recipe(Class ~ ., data = alz) %>%
-    step_other(Genotype, threshold = .05) %>%
-    themis::step_downsample(Class, under_ratio = 2, seed = 100) 
-```
-
 
 # Your Turn 4
 
-Make a workflow and fit it again.
+Turns out, the same `knn_rec` recipe can also be used to fit a penalized logistic regression model using the lasso. Let's try it out!
 
 ```{r}
-alzrec_wf <-
-  workflow() %>% 
-    add_recipe(alz_rec) %>% 
-    add_model(tree_mod)
-
-alzrec_wf %>% 
-  fit_resamples(resamples = alz_folds) %>% 
-  collect_metrics() 
-```
-
-# Your Turn 5
-
-Create a new classification tree model spec; call it `big_tree_mod`. 
-Set the cost complexity to `0`, and the minimum number of data points in a node to split to be `1`. 
-
-Compare the metrics of the big tree to your previous results- which one predicts the test set better?
-
-*Hint: you'll need https://parsnip.tidymodels.org/reference/decision_tree.html*
-
-
-```{r}
-big_tree_mod <-
-  decision_tree(min_n = 1, cost_complexity = 0) %>% 
-  set_engine("rpart") %>% 
+plr_mod <- 
+  logistic_reg(penalty = .01, mixture = 1) %>% 
+  set_engine("glmnet") %>% 
   set_mode("classification")
 
-big_tree_wf <- 
-  alzrec_wf %>% 
-  update_model(big_tree_mod)
+plr_mod %>% 
+  translate()
+```
 
-set.seed(100)
-big_tree_wf %>% 
+
+Answer:
+```{r}
+glmnet_wf <-
+  knn_wf %>% 
+  update_model(plr_mod)
+
+glmnet_wf %>% 
   fit_resamples(resamples = alz_folds) %>% 
   collect_metrics()
 ```
+
+

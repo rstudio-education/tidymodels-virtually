@@ -1285,6 +1285,20 @@ background-color: #f5f5f5
 ]
 
 ---
+background-image: url(images/diamonds.jpg)
+background-size: contain
+background-position: left
+class: middle, center
+background-color: #f5f5f5
+
+.pull-right[
+## How can we use the training set to compare, evaluate, and tune models?
+
+]
+
+
+
+---
 background-image: url(https://www.tidymodels.org/start/resampling/img/resampling.svg)
 background-size: 60%
 

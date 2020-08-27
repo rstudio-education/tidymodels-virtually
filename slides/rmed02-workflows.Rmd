@@ -113,6 +113,29 @@ knitr::include_url("https://recipes.tidymodels.org")
 ```
 
 ---
+background-image: url(images/cranes.jpg)
+background-position: left
+background-size: contain
+class: middle
+
+.right-column[
+
+# Preprocessing options
+
++ Encode categorical predictors
+
++ Center and scale variables
+
++ Handle class imbalance
+
++ Impute missing data
+
++ Perform dimensionality reduction 
+
++ *A lot more!*
+]
+
+---
 background-image: url(images/workflows/workflows.013.jpeg)
 background-size: contain
 background-position: center
@@ -180,10 +203,11 @@ alz %>%
 ```
 
 ---
+class: middle
 
 .pull-left[
 ## Before recipe
-```{r}
+```{r echo=FALSE}
 alz_train %>% 
   count(Genotype, sort = TRUE)
 ```
@@ -194,7 +218,7 @@ alz_train %>%
 .pull-right[
 
 ## After recipe
-```{r}
+```{r echo=FALSE}
 rec %>% 
   prep() %>% 
   bake(new_data = alz_train) %>% 
@@ -266,27 +290,6 @@ What does that mean?
 
 
 
-
----
-class: middle
-
-.center[
-# Quiz
-
-How does recipes know which variables are **numeric** and what is **nominal**?
-]
-
---
-
-```{r eval=FALSE}
-rec <- 
-  recipe(Class ~ ., 
-         data = alz) #<<
-```
-
-
-
-
 ---
 class: middle, center
 
@@ -310,23 +313,6 @@ background-size: contain
 ---
 background-image: url(images/pca.004.jpeg)
 background-size: contain
-
----
-
-```{r include=FALSE}
-rec <- 
-  recipe(Class ~ ., 
-         data = alz) %>% 
-  step_normalize(all_numeric()) 
-```
-
-```{r echo=FALSE}
-rec %>% 
-  prep(alz_train) %>%
-  bake(alz_test) 
-```
-
-
 
 ---
 
@@ -381,8 +367,10 @@ needed as predictors for models like KNN.
 
 ]
 
-```{r results='hide'}
-rec %>% 
+```{r dummy, results='hide'}
+rec <- 
+  recipe(Class ~ ., data = alz) %>%
+  step_other(Genotype, threshold = .03) %>% 
   step_dummy(all_nominal(), -all_outcomes()) #<<
 ```
 
@@ -395,12 +383,27 @@ class: middle
 
 Use commas to separate
 
-```{r eval=FALSE}
-rec %>% 
-  step_novel(all_nominal(), -all_outcomes()) %>% #<<
-  step_zv(all_predictors())
+```{r ref.label='dummy', eval=FALSE}
 ```
 
+
+
+---
+class: middle
+
+.center[
+# Quiz
+
+How does recipes know which variables are **numeric** and what is **nominal**?
+]
+
+--
+
+```{r eval=FALSE}
+rec <- 
+  recipe(Class ~ ., 
+         data = alz) #<<
+```
 
 
 ---
@@ -471,9 +474,7 @@ gt(all)  %>%
 ---
 class: middle, center
 
-# Quiz
-
-Let's think about the modeling. 
+# Let's think about the modeling. 
 
 What if there were no individuals with `Genotype` E2E2 in the training data?
 
@@ -487,7 +488,7 @@ Will the model have a coefficient for `Genotype` E2E2?
 
 --
 
-What will happen if the test data has a home with a shed roof?
+What will happen if the test data includes a person with `Genotype` E2E2?
 
 --
 
@@ -505,7 +506,9 @@ which lets R intelligently predict new levels in the test set.
 ]
 
 ```{r results='hide'}
-rec %>% 
+rec <- 
+  recipe(Class ~ ., data = alz) %>%
+  step_other(Genotype, threshold = .03) %>% 
   step_novel(all_nominal(), -all_outcomes()) %>% #<<
   step_dummy(all_nominal(), -all_outcomes()) 
 ```
@@ -536,9 +539,11 @@ Intelligently handles zero variance variables
 
 
 ```{r results='hide'}
-rec %>% 
+rec <- 
+  recipe(Class ~ ., data = alz) %>%
+  step_other(Genotype, threshold = .03) %>% 
   step_novel(all_nominal(), -all_outcomes()) %>% 
-  step_dummy(all_nominal(), -all_outcomes()) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
   step_zv(all_predictors()) #<<
 ```
 
@@ -554,8 +559,11 @@ Centers then scales numeric variable (mean = 0, sd = 1)
 
 ```{r results='hide'}
 rec <- 
-  recipe(Class ~ ., 
-         data = alz) %>% 
+  recipe(Class ~ ., data = alz) %>%
+  step_other(Genotype, threshold = .03) %>% 
+  step_novel(all_nominal(), -all_outcomes()) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors()) %>% 
   step_normalize(all_numeric()) #<<
 ```
 ---
@@ -563,14 +571,7 @@ class: your-turn
 
 # Your Turn `r (yt_counter <- yt_counter + 1)`
 
-Put it all together! Make a new recipe for using a K-nearest neighbors model to classify impaired versus control patients; here are the steps:
-
-1. Lumps all `Genotype`s with threshold < 
-1. Adds a novel level to all factors  
-2. Convert all factors to dummy variables  
-3. Catches any zero variance variables  
-4. Normalizes all of the predictors (centers and scales)
-5. Computes the first 5 principal components  
+Unscramble! You have all the steps from our `knn_rec`- your challenge is to *unscramble* them into the right order! 
 
 Save the result as `knn_rec`
 
@@ -580,20 +581,15 @@ countdown(minutes = 5)
 
 ---
 ```{r}
-knn_recipe <- 
+knn_rec <- 
   recipe(formula = Class ~ ., data = alz) %>% 
   step_novel(all_nominal(), -all_outcomes()) %>% 
   step_dummy(all_nominal(), -all_outcomes()) %>% 
   step_zv(all_predictors()) %>% 
   step_normalize(all_predictors(), -all_nominal()) 
-knn_recipe
+knn_rec
 ```
 
----
-
-```{r}
-summary(knn_recipe)
-```
 
 ---
 class: middle, center, frame
@@ -618,6 +614,15 @@ use_kknn(Class ~ ., data = alz, verbose = TRUE, tune = FALSE)
 ```{r}
 use_glmnet(Class ~ ., data = alz, verbose = TRUE, tune = FALSE)
 ```
+
+---
+class: inverse, middle, center
+
+## Now we've built a recipe.
+
+--
+
+## But, how do we *use* a recipe?
 
 ---
 class: center, middle, frame
@@ -719,10 +724,6 @@ Adds a parsnip model spec to a workflow
 workflow() %>% add_model(knn_mod)
 ```
 
----
-background-image: url(images/zestimate.png)
-background-position: center
-background-size: contain
 
 ---
 class: middle, center
@@ -740,7 +741,7 @@ class: your-turn
 
 # Your Turn `r (yt_counter <- yt_counter + 1)`
 
-Make a workflow that combines `pca_rec` and with `rt_spec`.
+Fill in the blanks to make a workflow that combines `knn_rec` and with `knn_mod`.
 
 ```{r echo=FALSE}
 countdown(minutes = 1)
@@ -751,7 +752,7 @@ countdown(minutes = 1)
 ```{r}
 knn_wf <-
   workflow() %>% 
-  add_recipe(knn_recipe) %>% 
+  add_recipe(knn_rec) %>% 
   add_model(knn_mod)
 knn_wf
 ```
@@ -770,7 +771,7 @@ Adds a recipe to a workflow.
 ```{r}
 knn_wf <- 
   workflow() %>%
-  add_recipe(knn_recipe) %>% #<<
+  add_recipe(knn_rec) %>% #<<
   add_model(knn_mod)
 ```
 
@@ -853,8 +854,6 @@ class: your-turn
 
 Run the first chunk. Then try our KNN workflow on `alz_folds`. What is the ROC AUC?
 
-
-
 ```{r echo=FALSE}
 countdown(minutes=3)
 ```
@@ -864,7 +863,7 @@ countdown(minutes=3)
 ```{r}
 set.seed(100)
 alz_folds <- 
-    vfold_cv(alz_train, v = 10, strata = Class)
+  vfold_cv(alz_train, v = 10, strata = Class)
 
 knn_wf %>% 
   fit_resamples(resamples = alz_folds) %>% 
@@ -889,4 +888,70 @@ After
 
 ![](https://media.giphy.com/media/108GZES8iG0myc/giphy.gif)
 ]
+
+---
+
+class: middle
+
+.center[
+# `update_recipe()`
+
+Replace the recipe in a workflow.
+
+]
+
+```{r eval=FALSE}
+_wf %>%
+  update_recipe(glmnet_rec) #<<
+```
+
+---
+
+class: middle
+
+.center[
+# `update_model()`
+
+Replace the model in a workflow.
+
+]
+
+```{r eval=FALSE}
+_wf %>%
+  update_model(tree_mod) #<<
+```
+
+
+---
+class: your-turn
+
+# Your Turn `r (yt_counter <- yt_counter + 1)`
+
+Turns out, the same `knn_rec` recipe can also be used to fit a penalized logistic regression model. Let's try it out!
+
+```{r}
+plr_mod <- 
+  logistic_reg(penalty = .01, mixture = 1) %>% 
+  set_engine("glmnet") %>% 
+  set_mode("classification")
+
+plr_mod %>% 
+  translate()
+```
+
+```{r echo=FALSE}
+countdown(minutes=3)
+```
+
+---
+
+```{r}
+glmnet_wf <-
+  knn_wf %>% 
+  update_model(plr_mod)
+
+glmnet_wf %>% 
+  fit_resamples(resamples = alz_folds) %>% 
+  collect_metrics() 
+```
 
