@@ -14,14 +14,14 @@ alz <- ad_data
 
 # data splitting
 set.seed(100) # Important!
-alz_split  <- initial_split(alz, prop = .9)
+alz_split  <- initial_split(alz, strata = Class, prop = .9)
 alz_train  <- training(alz_split)
 alz_test   <- testing(alz_split)
 
 # data resampling
 set.seed(100)
 alz_folds <- 
-    vfold_cv(alz_train, v = 10, strata = Class, breaks = 4)
+    vfold_cv(alz_train, v = 10, strata = Class)
 
 print("Welcome back, R/Medicine 2020!")
 ```
