@@ -417,24 +417,15 @@ class: your-turn
 
 # Your turn `r (yt_counter <- yt_counter + 1)`
 
-Run the chunk below and look at the output. Then, copy/paste the code chunk and edit to create:
+Run the chunk in your .Rmd and look at the output. Then, copy/paste the code and edit to create:
 
 + a decision tree model for classification 
+
 + that uses the `C5.0` engine. 
 
 Save it as `tree_mod` and look at the object. What is different about the output?
 
-
-```{r results='hide'}
-lr_mod <- 
-  logistic_reg() %>% 
-  set_engine(engine = "glm") %>% 
-  set_mode("classification")
-lr_mod
-```
-
-
-*Hint: you'll need https://tidymodels.github.io/parsnip/articles/articles/Models.html*
+*Hint: you'll need https://www.tidymodels.org/find/parsnip/*
 
 
 ```{r echo = FALSE}
@@ -442,7 +433,13 @@ countdown(minutes = 3)
 ```
 
 ---
-
+```{r include=FALSE}
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine(engine = "glm") %>% 
+  set_mode("classification")
+lr_mod
+```
 
 ```{r}
 lr_mod 

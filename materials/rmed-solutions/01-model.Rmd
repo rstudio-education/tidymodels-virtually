@@ -16,13 +16,15 @@ print("Hello R/Medicine 2020!")
 
 # Your Turn 1
 
-Run the chunk below and look at the output. Then, copy/paste the code chunk and edit to create:
+Run the chunk in your .Rmd and look at the output. Then, copy/paste the code and edit to create:
 
 + a decision tree model for classification 
 
 + that uses the `C5.0` engine. 
 
 Save it as `tree_mod` and look at the object. What is different about the output?
+
+*Hint: you'll need https://www.tidymodels.org/find/parsnip/*
 
 ```{r}
 lr_mod <- 
