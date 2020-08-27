@@ -610,8 +610,13 @@ knitr::include_url("https://tidymodels.github.io/usemodels/")
 
 ```{r}
 library(usemodels)
-use_ranger(Class ~ ., data = alz, tune = FALSE)
 use_kknn(Class ~ ., data = alz, verbose = TRUE, tune = FALSE)
+```
+
+---
+
+```{r}
+use_glmnet(Class ~ ., data = alz, verbose = TRUE, tune = FALSE)
 ```
 
 ---

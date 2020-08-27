@@ -16,18 +16,13 @@ print("Hello R/Medicine 2020!")
 
 # Your Turn 1
 
-plot it
+Run the chunk below and look at the output. Then, copy/paste the code chunk and edit to create:
 
-```{r}
-ggplot(alz, aes(x = tau, 
-                y = VEGF,
-                colour = Class)) +
-  geom_point(alpha = .5) 
-```
++ a decision tree model for classification 
 
-# Your Turn 2
++ that uses the `C5.0` engine. 
 
-Run the chunk below and look at the output. Then, edit the code below to create a K-nearest neighbor classification model that uses the `kknn` engine. Save it as `nn_mod` and look at the object. What is different about the output?
+Save it as `tree_mod` and look at the object. What is different about the output?
 
 ```{r}
 lr_mod <- 
@@ -38,11 +33,11 @@ lr_mod
 ```
 
 ```{r}
-nn_mod <- 
-  nearest_neighbor() %>% 
-  set_engine(engine = "kknn") %>% 
+tree_mod <- 
+  decision_tree() %>% 
+  set_engine(engine = "C5.0") %>% 
   set_mode("classification")
-nn_mod
+tree_mod 
 ```
 
 
@@ -54,9 +49,9 @@ Use `initial_split()`, `training()`, and `testing()` to:
 
 1. Split **alz** into training and test sets. Save the rsplit!
 
-2. Extract the training data. Fit a linear model to it. 
+2. Extract the training data and fit your classification tree model.
 
-3. Predict the testing data, and save the true values too.
+3. Predict the testing data, and save the true `Class` values.
 
 4. Measure the accuracy of your model with your test set.  
 
@@ -67,12 +62,12 @@ Keep `set.seed(100)` at the start of your code.
 ```{r}
 set.seed(100) # Important!
 
-alz_split  <- ________
-alz_train  <- ________
-alz_test   <- ________
+alz_split  <- ________(alz, strata = Class, prop = .9)
+alz_train  <- ________(alz_split)
+alz_test   <- ________(alz_split)
 
-nn_mod %>% 
-  fit(Class ~ tau*VEGF, 
+________ %>% 
+  fit(Class ~ tau + VEGF, 
       data = ________) %>% 
   predict(new_data = ________) %>% 
   mutate(true_class = ________) %>% 
@@ -86,8 +81,8 @@ alz_split  <- initial_split(alz, strata = Class, prop = .9)
 alz_train  <- training(alz_split)
 alz_test   <- testing(alz_split)
 
-nn_mod %>% 
-  fit(Class ~ tau*VEGF, 
+tree_mod %>% 
+  fit(Class ~ tau + VEGF, 
       data = alz_train) %>% 
   predict(new_data = alz_test) %>% 
   mutate(true_class = alz_test$Class) %>% 
@@ -121,7 +116,7 @@ Modify the code below to use `fit_resamples` and `alz_folds` to cross-validate t
 ```{r}
 set.seed(100)
 nn_mod %>% 
-  fit(Class ~ tau*VEGF, 
+  fit(Class ~ tau + VEGF, 
       data = alz_train) %>% 
   predict(new_data = alz_test) %>% 
   mutate(true_class = alz_test$Class) %>% 
@@ -132,7 +127,7 @@ Answer:
 ```{r}
 set.seed(100)
 nn_mod %>% 
-  fit_resamples(Class ~ tau*VEGF, 
+  fit_resamples(Class ~ tau + VEGF, 
                 resamples = alz_folds) %>% 
   collect_metrics()
 ```

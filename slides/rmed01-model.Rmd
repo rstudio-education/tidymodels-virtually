@@ -121,6 +121,21 @@ class: middle
 ]
 
 ---
+background-image: url(images/hands.jpg)
+background-size: contain
+background-position: left
+class: middle
+
+.pull-right[
+```{r echo=FALSE}
+ggplot(alz, aes(x = tau, 
+                y = VEGF,
+                colour = Class)) +
+  geom_point(alpha = .5, size = 3) +
+  scale_color_manual(values = c("#1a162d", "#CA225E"))
+```
+]
+---
 class: middle, center, inverse
 
 # What is the goal of machine learning?
@@ -185,14 +200,6 @@ class: middle, center, frame
 knitr::include_url("https://parsnip.tidymodels.org")
 ```
 
----
-exclude: true
-name: predictions
-class: middle, center, frame
-
-# Goal of Predictive Modeling
-
-## `r emo::ji("crystal_ball")` generate accurate .display[predictions]
 
 ---
 class: middle
@@ -333,8 +340,8 @@ Specifies a model that uses logistic regression
 ```{r results='hide'}
 logistic_reg(
   mode = "classification", # "default" mode, if exists
-  penalty = NULL,      # model hyper-parameter
-  mixture = NULL       # model hyper-parameter
+  penalty = NULL,          # model hyper-parameter
+  mixture = NULL           # model hyper-parameter
   )
 ```
 
@@ -410,7 +417,13 @@ class: your-turn
 
 # Your turn `r (yt_counter <- yt_counter + 1)`
 
-Run the chunk below and look at the output. Then, edit the code below to create a K-nearest neighbor classification model that uses the `kknn` engine. Save it as `nn_mod` and look at the object. What is different about the output?
+Run the chunk below and look at the output. Then, copy/paste the code chunk and edit to create:
+
++ a decision tree model for classification 
++ that uses the `C5.0` engine. 
+
+Save it as `tree_mod` and look at the object. What is different about the output?
+
 
 ```{r results='hide'}
 lr_mod <- 
@@ -432,31 +445,36 @@ countdown(minutes = 3)
 
 
 ```{r}
-lr_mod
+lr_mod 
 
-nn_mod <- 
-  nearest_neighbor() %>% 
-  set_engine(engine = "kknn") %>% 
+tree_mod <- 
+  decision_tree() %>% 
+  set_engine(engine = "C5.0") %>% 
   set_mode("classification")
-nn_mod
+tree_mod 
 ```
 
 ---
 class: inverse, middle, center
 
-Now we've built a model.
+## Now we've built a model.
 
 --
 
-But, how do we *use* a model?
+## But, how do we *use* a model?
 
 --
 
-What does it mean to use a model?
+## First---what does it mean to use a model?
 
 ---
+class: inverse, middle, center
 
-Statistical models learn from the data. They typically learn model parameters, which can be useful as values for interpretation and understanding.
+![](https://media.giphy.com/media/fhAwk4DnqNgw8/giphy.gif)
+
+Statistical models learn from the data. 
+
+Many learn model parameters, which *can* be useful as values for inference and interpretation.
 
 ---
 class: center, middle
@@ -484,7 +502,7 @@ lr_mod %>%
 ggplot(alz, aes(x = tau, 
                 y = VEGF,
                 colour = Class)) +
-  geom_point(alpha = .8) +
+  geom_point(alpha = .5, size = 3) +
   scale_color_manual(values = c("#1a162d", "#cd4173")) +
   theme(legend.position = "top")
 ```
@@ -511,7 +529,7 @@ ggplot(lr_preds,
            shape = as.factor(.pred_match),
            colour = Class,
            alpha = as.factor(.pred_match))) +
-  geom_point() +
+  geom_point(size = 3) +
   scale_alpha_manual(values = c(1, .2), guide = FALSE) +
   scale_shape_manual(values = c(4, 19), guide = FALSE) +
   scale_color_manual(values = c("#1a162d", "#cd4173"), guide = FALSE)+
@@ -526,7 +544,7 @@ class: inverse, middle, center
 # "All models are wrong, but some are useful"
 
 ```{r include=FALSE}
-nn_preds <- nn_mod %>% 
+tree_preds <- tree_mod %>% 
   fit(Class ~ tau + VEGF, 
       data = alz) %>% 
   predict(new_data = alz) %>% 
@@ -535,17 +553,17 @@ nn_preds <- nn_mod %>%
 ```
 
 ```{r echo=FALSE}
-ggplot(nn_preds, 
+ggplot(tree_preds, 
        aes(x = tau, 
            y = VEGF,
            shape = as.factor(.pred_match),
            colour = Class,
            alpha = as.factor(.pred_match))) +
-  geom_point() +
+  geom_point(size = 3) +
   scale_alpha_manual(values = c(1, .2), guide = FALSE) +
   scale_shape_manual(values = c(4, 19), guide = FALSE) +
   scale_color_manual(values = c("#1a162d", "#cd4173"), guide = FALSE) +
-  ggtitle("K-nearest neighbors model")
+  ggtitle("C5.0 classification tree model")
 ```
 ]
 ---
@@ -577,7 +595,7 @@ How many people have used a model to generate .display[predictions] with R?
 .pull-right[
 
 ```{r predict-old}
-lr_mod %>% 
+tree_mod %>% 
   fit(Class ~ tau + VEGF, 
       data = alz) %>% 
   predict(new_data = alz) %>% 
@@ -605,7 +623,7 @@ lr_mod %>%
 ## in with the `r emo::ji("new")`
 
 ```{r}
-lr_mod %>% 
+tree_mod %>% 
   fit(Class ~ tau + VEGF, 
       data = alz) %>% 
   predict(new_data = alz_new) %>% #<<
@@ -622,7 +640,7 @@ class: middle, center
 Train a model by fitting a model. Returns a parsnip model fit.
 
 ```{r results='hide'}
-fit(lr_mod, Class ~ tau + VEGF, data = alz)
+fit(tree_mod, Class ~ tau + VEGF, data = alz)
 ```
 
 
@@ -636,9 +654,9 @@ Train a model by fitting a model. Returns a parsnip model fit.
 ]
 
 ```{r results='hide'}
-lr_mod %>%                     # parsnip model
+tree_mod %>%                     # parsnip model
   fit(Class ~ tau + VEGF,        # a formula
-      data = alz               # dataframe
+      data = alz                 # dataframe
   )
 ```
 
@@ -652,18 +670,13 @@ Train a model by fitting a model. Returns a parsnip model fit.
 ]
 
 ```{r results='hide'}
-lr_fit <-
-  lr_mod %>%                   # parsnip model
+tree_fit <-
+  tree_mod %>%                   # parsnip model
   fit(Class ~ tau + VEGF,        # a formula
-      data = alz               # dataframe
+      data = alz                 # dataframe
   )
 ```
 
----
-name: handout
-class: center, middle
-
-data `(x, y)` + model = fitted model
 
 
 ---
@@ -682,45 +695,15 @@ class: middle, center
 Use a fitted model to predict new `y` values from data. Returns a tibble.
 
 ```{r eval=FALSE}
-predict(lr_fit, new_data = alz_new) 
+predict(tree_fit, new_data = alz_new) 
 ```
 
 ---
 
 
 ```{r}
-lr_fit %>% 
+tree_fit %>% 
   predict(new_data = alz_new)
-```
-
----
-exclude: true
-name: lm-predict
-class: middle, center
-
-# Predictions
-
-```{r lm-predict, echo = FALSE, fig.align='center'}
-# smaller for plotting
-set.seed(0)
-small_ames <- ames %>% 
-  sample_n(80) %>% 
-  mutate(.row = dplyr::row_number())
-
-# split
-set.seed(100) # Important!
-small_split  <- initial_split(small_ames)
-small_train  <- training(small_split)
-small_test   <- testing(small_split)
-
-ggplot(small_train, aes(Gr_Liv_Area, Sale_Price)) +
-  geom_smooth(method = "lm", se = FALSE, colour = "#4D8DC9") +
-  geom_point(size = 3, alpha = .5) +
-  geom_point(aes(Gr_Liv_Area, fitted(lm(Sale_Price ~ Gr_Liv_Area))),
-             color = "#E7553C",
-             size = 3) +
-  coord_cartesian(y = c(50000, 500000)) +
-  theme(text = element_text(family = "Lato"))
 ```
 
 
@@ -742,7 +725,7 @@ class: middle, center, frame
 
 ```{r all-split, echo = FALSE, fig.width = 12, fig.height = 3}
 set.seed(16)
-one_split <- slice(ames, 1:30) %>% 
+one_split <- slice(alz, 1:30) %>% 
   initial_split() %>% 
   tidy() %>% 
   add_row(Row = 1:30, Data = "Original") %>% 
@@ -778,7 +761,7 @@ We refer to the group for which we know the outcome, and use to develop the algo
 ---
 class: inverse, middle, center
 
-# Resample models
+# `r emo::ji("recycle")` Resample models
 
 --
 
@@ -814,8 +797,8 @@ initial_split(data, prop = 3/4)
 ---
 
 ```{r}
-ames_split <- initial_split(ames, prop = 0.75)
-ames_split
+alz_split <- initial_split(alz, strata = Class, prop = .9)
+alz_split
 ```
 
 ???
@@ -830,16 +813,16 @@ class: center, middle
 Extract training and testing sets from an rsplit
 
 ```{r results='hide'}
-training(ames_split)
-testing(ames_split)
+training(alz_split)
+testing(alz_split)
 ```
 
 .footnote[`*` from `rsample`]
 
 ---
 ```{r R.options = list(tibble.max_extra_cols=5, tibble.print_max=5, tibble.width=60)}
-train_set <- training(ames_split) 
-train_set
+alz_train <- training(alz_split) 
+alz_train
 ```
 
 
@@ -898,11 +881,11 @@ Fill in the blanks.
 
 Use `initial_split()`, `training()`, `testing()`, `lm()` and `rmse()` to:
 
-1. Split **ames** into training and test sets. Save the rsplit!
+1. Split **alz** into training and test sets. Save the rsplit!
 
 1. Extract the training data. Fit a linear model to it. Save the model!
 
-1. Measure the RMSE of your linear model with your test set.  
+1. Measure the accuracy of your classification tree model with your test set.  
 
 Keep `set.seed(100)` at the start of your code.
 
@@ -915,11 +898,11 @@ countdown(minutes = 4)
 ```{r results='hide'}
 set.seed(100) # Important!
 
-alz_split  <- initial_split(alz, prop = .9)
+alz_split  <- initial_split(alz, strata = Class, prop = .9)
 alz_train  <- training(alz_split)
 alz_test   <- testing(alz_split)
 
-nn_mod %>% 
+tree_mod %>% 
   fit(Class ~ tau + VEGF, 
       data = alz_train) %>% 
   predict(new_data = alz_test) %>% 
@@ -927,13 +910,6 @@ nn_mod %>%
   accuracy(truth = true_class, estimate = .pred_class)
 ```
 
-
----
-template: handout
-
---
-
-data `(x)` + fitted model = predictions
 
 ---
 template: predictions
@@ -978,7 +954,7 @@ accuracy(data, truth, estimate)
 ---
 
 ```{r}
-lr_mod %>% 
+tree_mod %>% 
   fit(Class ~ tau + VEGF, 
       data = alz_train) %>% 
   predict(new_data = alz_test) %>% 
@@ -1021,11 +997,11 @@ countdown(minutes = 2)
 ```{r new-split, echo=FALSE, warnings = FALSE, message = FALSE}
 set.seed(100) # Important!
 
-alz_split  <- initial_split(alz, prop = .9)
+alz_split  <- initial_split(alz, strata = Class, prop = .9)
 alz_train  <- training(alz_split)
 alz_test   <- testing(alz_split)
 
-nn_mod %>% 
+tree_mod %>% 
   fit(Class ~ tau + VEGF, 
       data = alz_train) %>% 
   predict(new_data = alz_test) %>% 
@@ -1033,7 +1009,16 @@ nn_mod %>%
   accuracy(truth = true_class, estimate = .pred_class)
 ```
 
+```{r include=FALSE}
+set.seed(500) # Important!
+```
+
+
 ```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r include=FALSE}
+set.seed(2020) # Important!
 ```
 
 ```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
@@ -1044,10 +1029,23 @@ nn_mod %>%
 --
 
 .pull-right[
-```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+
+```{r include=FALSE}
+set.seed(13) # Important!
 ```
 
 ```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r include=FALSE}
+set.seed(1000) # Important!
+```
+
+```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
+```
+
+```{r include=FALSE}
+set.seed(1980) # Important!
 ```
 
 ```{r ref.label='new-split', echo=FALSE, warnings = FALSE, message = FALSE}
