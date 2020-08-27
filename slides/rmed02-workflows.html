@@ -934,7 +934,7 @@ Put it all together! Make a new recipe for using a K-nearest neighbors model to 
 
 Save the result as `knn_rec`
 
-<div class="countdown" id="timer_5f473404" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f4739ba" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1165,7 +1165,7 @@ class: your-turn
 
 Make a workflow that combines `pca_rec` and with `rt_spec`.
 
-<div class="countdown" id="timer_5f4732cb" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f473b90" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1300,7 +1300,7 @@ Run the first chunk. Then try our KNN workflow on `alz_folds`. What is the ROC A
 
 
 
-<div class="countdown" id="timer_5f4731a0" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_5f47399c" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1341,58 +1341,6 @@ After
 ![](https://media.giphy.com/media/108GZES8iG0myc/giphy.gif)
 ]
 
----
-class: middle, frame
-
-# .center[To specify a model with parsnip]
-
-
-
-
-```r
-tree_mod &lt;- 
-  decision_tree() %&gt;% 
-  set_engine(engine = "rpart") %&gt;% 
-  set_mode("classification")
-```
-
-
-
----
-&lt;img src="figs/rmed02-workflows/unnamed-chunk-44-1.png" width="504" style="display: block; margin: auto;" /&gt;
-
----
-
-
-&lt;img src="figs/rmed02-workflows/unnamed-chunk-45-1.png" width="504" style="display: block; margin: auto;" /&gt;
-
-
----
-&lt;img src="figs/rmed02-workflows/unnamed-chunk-46-1.png" width="504" style="display: block; margin: auto;" /&gt;
-
----
-
-
-&lt;img src="figs/rmed02-workflows/big-alz-tree-1.png" width="672" style="display: block; margin: auto;" /&gt;
-
-
-
-
----
-
-
-```r
-set.seed(100)
-tree_mod %&gt;% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %&gt;% 
-  collect_metrics()
-# # A tibble: 2 x 5
-#   .metric  .estimator  mean     n std_err
-#   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
-# 1 accuracy binary     0.756    10  0.0245
-# 2 roc_auc  binary     0.770    10  0.0255
-```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

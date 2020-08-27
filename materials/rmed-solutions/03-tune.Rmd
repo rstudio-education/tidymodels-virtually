@@ -23,12 +23,6 @@ set.seed(100)
 alz_folds <- 
     vfold_cv(alz_train, v = 10, strata = Class)
 
-# feature engineering
-alz_rec <- 
-  recipe(Class ~ ., data = alz) %>%
-    step_other(Genotype, threshold = .05) %>%
-    themis::step_downsample(Class, under_ratio = 2, seed = 100) 
-
 print("Hey there, R/Medicine 2020 all-star!")
 ```
 

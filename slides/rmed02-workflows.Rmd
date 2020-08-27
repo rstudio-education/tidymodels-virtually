@@ -101,7 +101,7 @@ class: inverse, middle, center
 
 # Build a better training set
 
-# With recipes
+# with recipes
 
 ---
 class: middle, center, frame
@@ -225,6 +225,22 @@ To predict the outcome of a new data point:
 Find the K most similar old data points
 
 Take the average/mode/etc. outcome
+
+---
+class: middle, frame
+
+
+# .center[To specify a model with parsnip]
+
+.right-column[
+
+1\. Pick a .display[model]
+
+2\. Set the .display[engine]
+
+3\. Set the .display[mode] (if needed)
+
+]
 
 ---
 class: middle, frame
@@ -869,89 +885,3 @@ After
 ![](https://media.giphy.com/media/108GZES8iG0myc/giphy.gif)
 ]
 
----
-class: middle, frame
-
-# .center[To specify a model with parsnip]
-
-
-
-```{r}
-tree_mod <- 
-  decision_tree() %>% 
-  set_engine(engine = "rpart") %>% 
-  set_mode("classification")
-```
-
-
-
----
-```{r echo=FALSE}
-library(parttree)
-## Build our tree using parsnip (but with rpart as the model engine)
-alz_tree_01 <-
-  decision_tree() %>%
-  set_engine("rpart") %>%
-  set_mode("classification") %>%
-  fit(Class ~ tau + VEGF, data = alz_train)
-
-## Plot the data and model partitions
-alz_train %>%
-  ggplot(aes(x=tau, y=VEGF)) +
-  geom_jitter(aes(col=Class), alpha=0.7) +
-  geom_parttree(data = alz_tree_01, aes(fill=Class), alpha = 0.1) +
-  theme_minimal() 
-```
-
----
-
-
-```{r echo=FALSE}
-library(rattle)
-fancyRpartPlot(alz_tree_01$fit, 
-               sub = NULL,
-               palettes = "RdPu")
-```
-
-
----
-```{r echo=FALSE}
-## Build our tree using parsnip (but with rpart as the model engine)
-alz_tree_02 <-
-  decision_tree(min_n = 1, cost_complexity = 0, tree_depth = 20) %>%
-  set_engine("rpart") %>%
-  set_mode("classification") %>%
-  fit(Class ~ tau + VEGF, data = alz_train)
-
-## Plot the data and model partitions
-alz_train %>%
-  ggplot(aes(x=tau, y=VEGF)) +
-  geom_jitter(aes(col=Class), alpha=0.7) +
-  geom_parttree(data = alz_tree_02, aes(fill=Class), alpha = 0.1) +
-  theme_minimal() 
-```
-
----
-
-
-```{r echo=FALSE}
-knitr::include_graphics("figs/rmed02-workflows/big-alz-tree-1.png")
-```
-
-
-```{r big-alz-tree, include=FALSE, eval=FALSE}
-library(rattle)
-fancyRpartPlot(alz_tree_02$fit, 
-               sub = NULL,
-               palettes = "RdPu")
-```
-
----
-
-```{r}
-set.seed(100)
-tree_mod %>% 
-  fit_resamples(Class ~ ., 
-                resamples = alz_folds) %>% 
-  collect_metrics()
-```
