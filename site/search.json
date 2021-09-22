@@ -1,0 +1,25 @@
+{
+  "articles": [
+    {
+      "path": "index.html",
+      "title": "Tidymodels, Virtually",
+      "description": "An Introduction to Machine Learning with Tidymodels\n",
+      "author": [
+        {
+          "name": "Alison Hill, Ph.D.",
+          "url": "https://alison.rbind.io"
+        }
+      ],
+      "date": "`r Sys.Date()`",
+      "contents": "\n\nContents\nWelcome\nPrework\nEssential\nOptional\n\nLinks\nSlides\n\nWorkshops\nAcknowledgments\n\n\n\n\nWelcome\nThank you for enrolling in this course! These are the materials for an introductory machine learning short course with tidymodels by Dr. Alison Presmanes Hill.\nThis four-hour pre-conference short course will provide a gentle introduction to machine learning with R using the modern suite of predictive modeling packages called tidymodels. We will build, evaluate, compare, and tune predictive models. Along the way, we’ll learn about key concepts in machine learning including overfitting, the holdout method, the bias-variance trade-off, ensembling, cross-validation, and feature engineering. Learners will gain knowledge about good predictive modeling practices, as well as hands-on experience using tidymodels packages like parsnip, rsample, recipes, yardstick, tune, and workflows.\nThe entire course will be recorded and made available to registered R/Medicine 2020 conference participants for replay. To protect the privacy of participants, no breakouts, video feeds, or chats will be recorded. We also request that you refrain from recording or screen-grabbing any part of the course.\n\nPrework\nEssential\nPlease sign up for a free RStudio Cloud account here: https://rstudio.cloud.\nInstall the latest version of Zoom.\nJoin a pre-course technology check session - details are in the pre-course email.\nWe want to provide a welcoming and supportive learning environment for everyone. To help us do so, please take a look at our code of conduct.\nOptional\nPlease tune into class with a laptop that has the following installed:\n\nOn the day of the class, we’ll provide you with a link to an RStudio Cloud project that contains all of the course materials.\nA recent version of R (>=3.9.0), which is available for free at https://cran.r-project.org/\nA recent version of RStudio Desktop (>=1.3.0), available for free at https://www.rstudio.com/download (RStudio Desktop Open Source License)\nThe R packages we will use, which you can install by connecting to the internet, opening RStudio, and running at the command line:\n\n\ninstall.packages(c(\"tidyverse\", \"tidymodels\", \n                     \"modeldata\", \"kknn\", \"rpart\",\n                     \"rpart.plot\", \"rattle\", \n                     \"vip\", \"ranger\", \"partykit\"))\n  \n\n\n\nWe will use the software listed above only as an important backup should there be problems with the classroom server connection.\nI look forward to meeting you,\nAlison\n\nLinks\nRStudio Cloud workspace\nSlides\n00: Brief intro\n01: Build a model\n02: Build better workflows\n03: Tune better models\nWorkshops\nUpcoming and past offerings:\nR / Medicine 2020 Virtual Conference\nBecton, Dickinson and Company, Online\nChildren’s Hospital of Philadelphia, Online\nrstudio::conf 2020, San Francisco, CA, January 27 & 28 Training Days\nAcknowledgments\nThis is a website made with the distill package and a custom theme by Alison Hill & Desirée De Leon.\n\n\n\n",
+      "last_modified": "2021-09-22T13:28:44-07:00"
+    },
+    {
+      "path": "LICENSE.html",
+      "author": [],
+      "contents": "\n\nContents\nLicense\n\nLicense\nThis work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.\n\n\n\nThis is a human-readable summary of (and not a substitute for) the license. Please see https://creativecommons.org/licenses/by-sa/4.0/legalcode for the full legal text.\nYou are free to:\nShare—copy and redistribute the material in any medium or format\nRemix—remix, transform, and build upon the material for any purpose, even commercially.\nThe licensor cannot revoke these freedoms as long as you follow the license terms.\nUnder the following terms:\nAttribution—You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.\nShareAlike—If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.\nNo additional restrictions—You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.\nNotices:\nYou do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable exception or limitation.\nNo warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.\n\n\n",
+      "last_modified": "2021-09-22T13:28:44-07:00"
+    }
+  ],
+  "collections": []
+}

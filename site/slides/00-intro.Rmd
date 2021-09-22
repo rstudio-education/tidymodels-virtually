@@ -331,6 +331,14 @@ library(tidymodels)
 ---
 class: inverse, middle, center
 
-# To the workshop!
+# To the workshop! `r emo::ji("rocket")`
 
+<i class="fas fa-crow"></i>
+
+https://tmv.netlify.app/site/
+
+
+<i class="fas fa-cloud"></i>
+
+http://bit.ly/tmv-rmed2020
 
