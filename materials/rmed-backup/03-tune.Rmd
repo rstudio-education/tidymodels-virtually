@@ -37,7 +37,7 @@ tree_mod <-
   set_mode("classification")
 
 tree_wf <-
-  workflows() %>% 
+  workflow() %>% 
   add_formula(Class ~ .) %>% 
   add_model(tree_mod)
 
